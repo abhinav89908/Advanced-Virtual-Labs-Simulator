@@ -1,8 +1,8 @@
-# 🚀 Advanced Virtual Labs Simulator
+# Advanced Virtual Labs Simulator
 
 This is a full-stack project containing a **frontend (Vite + React)** and a **backend (Node.js + Express)**.
 
-## 📂 Project Structure  
+## Project Structure  
 ```
 /Advanced-Virtual-Labs-Simulator
 │── frontend/
@@ -13,9 +13,9 @@ This is a full-stack project containing a **frontend (Vite + React)** and a **ba
 
 ---
 
-## 🔧 **Setup & Installation**  
+## Setup & Installation  
 
-### 🖥️ **1. Clone the Repository**  
+### Clone the Repository  
 ```sh
 git clone https://github.com/abhinav89908/Advanced-Virtual-Labs-Simulator.git
 cd Advanced-Virtual-Labs-Simulator
@@ -23,29 +23,30 @@ cd Advanced-Virtual-Labs-Simulator
 
 ---
 
-## 🎨 **Frontend Setup (Vite + React)**
+## Frontend Setup (Vite + React)
 ```sh
 cd frontend
 npm install
 npm run dev
 ```
-🔹 Open **http://localhost:5173/** in your browser.  
+Open **http://localhost:5173/** in your browser.  
+
 ---
 
-## 🛠️ **Backend Setup**
+## Backend Setup
 ```sh
 cd backend
 npm install
 npm run dev
 ```
-🔹 The backend runs at **http://localhost:5000/**
+The backend runs at **http://localhost:5000/**
 
 ---
 
-## 💡 **Contributing**
-- Fork the repository 🍴  
-- Create a new branch 🔀  
-- Commit changes ✅  
-- Open a **pull request** 🛠️  
+## Contributing
+- Fork the repository  
+- Create a new branch  
+- Commit changes  
+- Open a pull request  
 
 ---

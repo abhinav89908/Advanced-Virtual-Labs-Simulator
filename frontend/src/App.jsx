@@ -4,7 +4,7 @@ import './App.css';
 
 function App() {
   const [isConnected, setIsConnected] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(true); // Add connecting state
+  const [isConnecting, setIsConnecting] = useState(true);
   const [username, setUsername] = useState('');
   const [roomId, setRoomId] = useState('');
   const [password, setPassword] = useState('');
@@ -17,11 +17,10 @@ function App() {
   
   // Connect to socket
   useEffect(() => {
-    // Check initial connection status
+
     setIsConnecting(true);
     setIsConnected(socket.connected);
 
-    // Event handlers for connection
     const onConnect = () => {
       setIsConnected(true);
       setIsConnecting(false);
@@ -39,29 +38,24 @@ function App() {
       setIsConnected(false);
     }
 
-    // Register event handlers
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on('connect_error', onConnectError);
 
-    // If socket is already connected, update state immediately
     if (socket.connected) {
       setIsConnected(true);
       setIsConnecting(false);
     }
 
-    // Handle room creation with generated password
     socket.on('room-created', ({ password }) => {
       setRoomPassword(password);
     });
 
-    // Handle authentication failure
     socket.on('authentication-failed', () => {
       setAuthError(true);
-      setTimeout(() => setAuthError(false), 3000); // Clear error after 3 seconds
+      setTimeout(() => setAuthError(false), 3000);
     });
 
-    // Handle user joining
     socket.on('user-joined', ({ user, users, content }) => {
       setUsers(users);
       if (content && !inRoom) {
@@ -72,23 +66,19 @@ function App() {
       }
     });
 
-    // Handle user leaving
     socket.on('user-left', ({ users }) => {
       setUsers(users);
     });
 
-    // Handle content updates from other users
     socket.on('content-updated', ({ content }) => {
       setContent(content);
     });
 
-    // Set a timeout to ensure we don't show "connecting" state indefinitely
     const timeoutId = setTimeout(() => {
       setIsConnecting(false);
     }, 3000);
 
     return () => {
-      // Clean up event handlers
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
       socket.off('connect_error', onConnectError);
@@ -101,7 +91,6 @@ function App() {
     };
   }, [inRoom]);
 
-  // Check if room exists when roomId changes
   const handleRoomIdChange = async (e) => {
     const newRoomId = e.target.value;
     setRoomId(newRoomId);
@@ -114,7 +103,6 @@ function App() {
     }
   };
 
-  // Handle joining a room
   const handleJoinRoom = (e) => {
     e.preventDefault();
     if (roomId && username) {
@@ -123,7 +111,6 @@ function App() {
     }
   };
 
-  // Handle leaving a room
   const handleLeaveRoom = () => {
     leaveRoom(roomId);
     setInRoom(false);
@@ -134,14 +121,12 @@ function App() {
     setNeedsPassword(false);
   };
 
-  // Handle editor content changes
   const handleContentChange = (e) => {
     const newContent = e.target.value;
     setContent(newContent);
     sendContentChange(roomId, newContent);
   };
 
-  // Get user initials for avatar
   const getUserInitials = (name) => {
     return name.split(' ').map(part => part[0]).join('').toUpperCase().substring(0, 2);
   };

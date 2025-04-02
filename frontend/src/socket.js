@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
 // Create socket with autoConnect option to allow manual connection management
-const socket = io("http://localhost:5000", {
+const socket = io("https://advanced-virtual-labs-simulato.onrender.com/", {
   reconnection: true,
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,

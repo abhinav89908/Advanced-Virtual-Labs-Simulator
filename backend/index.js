@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import path from "path";
 
 dotenv.config();
 
@@ -12,6 +13,14 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://advanced-virtual-lab-simulator.netlify.app",
 ];
+
+// Set proper MIME types for JavaScript modules
+app.use((req, res, next) => {
+  if (req.path.endsWith('.js')) {
+    res.type('application/javascript');
+  }
+  next();
+});
 
 const io = new Server(httpServer, {
   cors: {
@@ -26,8 +35,13 @@ const io = new Server(httpServer, {
   },
 });
 
+// Enable CORS and JSON parsing
 app.use(cors());
 app.use(express.json());
+
+// Serve static files if needed (add this if you're serving frontend files from backend)
+// Adjust the path as necessary for your project structure
+app.use(express.static(path.join(process.cwd(), 'public')));
 
 app.get("/", (req, res) => {
   res.send("Virtual Lab Backend Running...");

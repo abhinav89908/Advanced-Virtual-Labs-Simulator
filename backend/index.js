@@ -3,21 +3,17 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import connectDB from "./config/db.js";
 
 dotenv.config();
-connectDB();
 
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST"],
   },
 });
-
-const rooms = {}; // ✅ Store active rooms and their data
 
 app.use(cors());
 app.use(express.json());
@@ -26,38 +22,115 @@ app.get("/", (req, res) => {
   res.send("Virtual Lab Backend Running...");
 });
 
+// Store active rooms and their users
+const rooms = {};
+
+// Socket.io connection handler
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  console.log(`User connected: ${socket.id}`);
 
-  socket.on("joinRoom", (roomId) => {
+  // Check if room exists and get password if it does
+  socket.on("check-room", ({ roomId }) => {
+    const roomExists = rooms[roomId] !== undefined;
+    const needsPassword = roomExists;
+    socket.emit("room-status", { 
+      exists: roomExists, 
+      needsPassword: needsPassword 
+    });
+  });
+
+  // Handle room joining
+  socket.on("join-room", ({ roomId, username, password }) => {
+    // Leave previous rooms
+    Object.keys(socket.rooms).forEach(room => {
+      if (room !== socket.id) socket.leave(room);
+    });
+    
+    // Check if room exists
+    if (!rooms[roomId]) {
+      // Create new room with provided password
+      rooms[roomId] = { 
+        users: [],
+        content: "",
+        password: password || Math.random().toString(36).slice(2, 8) // Generate random password if none provided
+      };
+      
+      socket.emit("room-created", { password: rooms[roomId].password });
+    } else {
+      // Verify password for existing room
+      if (rooms[roomId].password !== password) {
+        socket.emit("authentication-failed");
+        return;
+      }
+    }
+
+    // Join the new room
     socket.join(roomId);
-    if (!rooms[roomId]) rooms[roomId] = { users: [], code: "" };
-
-    rooms[roomId].users.push(socket.id);
-    socket.emit("codeUpdate", rooms[roomId].code);
-    io.to(roomId).emit("roomUsers", rooms[roomId].users);
+    
+    // Add user to room
+    const user = { id: socket.id, username };
+    rooms[roomId].users.push(user);
+    
+    // Notify everyone in the room about the new user
+    io.to(roomId).emit("user-joined", { 
+      user,
+      users: rooms[roomId].users,
+      content: rooms[roomId].content
+    });
+    
+    console.log(`${username} joined room: ${roomId}`);
   });
 
-  socket.on("codeChange", ({ roomId, newCode }) => {
+  // Handle content changes
+  socket.on("content-change", ({ roomId, content }) => {
     if (rooms[roomId]) {
-      rooms[roomId].code = newCode;
-      io.to(roomId).emit("codeUpdate", newCode); // ✅ Send update to all users
+      rooms[roomId].content = content;
+      // Broadcast to everyone except sender
+      socket.to(roomId).emit("content-updated", { content });
     }
   });
 
-  socket.on("cursorMove", ({ roomId, userId, position }) => {
-    socket.to(roomId).emit("cursorUpdate", { userId, position });
+  // Handle user leaving room explicitly
+  socket.on("leave-room", ({ roomId }) => {
+    handleUserLeaving(socket, roomId);
   });
 
+  // Handle user disconnection
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-    // Remove user from all rooms
-    for (const roomId in rooms) {
-      rooms[roomId].users = rooms[roomId].users.filter((id) => id !== socket.id);
-      io.to(roomId).emit("roomUsers", rooms[roomId].users);
-      if (rooms[roomId].users.length === 0) delete rooms[roomId]; // Cleanup empty rooms
-    }
+    console.log(`User disconnected: ${socket.id}`);
+    
+    // Remove user from all rooms they were in
+    Object.keys(rooms).forEach(roomId => {
+      handleUserLeaving(socket, roomId);
+    });
   });
 });
+
+// Helper function to handle user leaving a room
+function handleUserLeaving(socket, roomId) {
+  if (rooms[roomId]) {
+    const room = rooms[roomId];
+    const userIndex = room.users.findIndex(user => user.id === socket.id);
+    
+    if (userIndex !== -1) {
+      const [removedUser] = room.users.splice(userIndex, 1);
+      socket.leave(roomId);
+      
+      io.to(roomId).emit("user-left", { 
+        userId: socket.id,
+        username: removedUser.username,
+        users: room.users 
+      });
+      
+      // Clean up empty rooms
+      if (room.users.length === 0) {
+        delete rooms[roomId];
+        console.log(`Room ${roomId} deleted (empty)`);
+      }
+      
+      console.log(`${removedUser.username} left room: ${roomId}`);
+    }
+  }
+}
 
 httpServer.listen(5000, () => console.log("Server running on port 5000"));

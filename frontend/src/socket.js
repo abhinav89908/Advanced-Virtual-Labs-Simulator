@@ -1,6 +1,5 @@
 import { io } from "socket.io-client";
 
-// Create socket with autoConnect option to allow manual connection management
 const socket = io("https://advanced-virtual-labs-simulato.onrender.com/", {
   reconnection: true,
   reconnectionAttempts: 5,
@@ -9,7 +8,6 @@ const socket = io("https://advanced-virtual-labs-simulato.onrender.com/", {
   timeout: 20000
 });
 
-// Room operations
 export const checkRoom = (roomId) => {
   return new Promise((resolve) => {
     socket.emit("check-room", { roomId });

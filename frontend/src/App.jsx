@@ -1,23 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import socket, { joinRoom, leaveRoom, sendContentChange, checkRoom } from './socket';
+import socket, { joinRoom, leaveRoom, sendContentChange, checkRoom, initializeSimulator } from './socket';
+import HomePage from './components/HomePage';
+import JoinRoomPage from './components/JoinRoomPage';
+import RoomPage from './components/RoomPage';
+import ChatBox from './components/ChatBox';
+import Header from './components/Header';
 import './App.css';
 
+// Main App component - manages global state and pages
 function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(true);
-  const [username, setUsername] = useState('');
-  const [roomId, setRoomId] = useState('');
-  const [password, setPassword] = useState('');
-  const [roomPassword, setRoomPassword] = useState('');
-  const [inRoom, setInRoom] = useState(false);
-  const [content, setContent] = useState('');
-  const [users, setUsers] = useState([]);
-  const [needsPassword, setNeedsPassword] = useState(false);
-  const [authError, setAuthError] = useState(false);
+  const [availableSimulators, setAvailableSimulators] = useState([]);
+  const [loadingSimulators, setLoadingSimulators] = useState(true);
   
-  // Connect to socket
-  useEffect(() => {
+  // State for navigation
+  const [currentPage, setCurrentPage] = useState('home');
+  const [selectedSimulatorId, setSelectedSimulatorId] = useState(null);
+  const [activeRoomId, setActiveRoomId] = useState(null);
+  const [roomData, setRoomData] = useState(null);
 
+  // Socket connection setup
+  useEffect(() => {
     setIsConnecting(true);
     setIsConnected(socket.connected);
 
@@ -36,7 +40,7 @@ function App() {
       console.log('Connection error:', err);
       setIsConnecting(false);
       setIsConnected(false);
-    }
+    };
 
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
@@ -47,246 +51,281 @@ function App() {
       setIsConnecting(false);
     }
 
-    socket.on('room-created', ({ password }) => {
-      setRoomPassword(password);
-    });
-
-    socket.on('authentication-failed', () => {
-      setAuthError(true);
-      setTimeout(() => setAuthError(false), 3000);
-    });
-
-    socket.on('user-joined', ({ user, users, content }) => {
-      setUsers(users);
-      if (content && !inRoom) {
-        setContent(content);
-      }
-      if (user.id === socket.id) {
-        setInRoom(true);
-      }
-    });
-
-    socket.on('user-left', ({ users }) => {
-      setUsers(users);
-    });
-
-    socket.on('content-updated', ({ content }) => {
-      setContent(content);
-    });
-
-    const timeoutId = setTimeout(() => {
-      setIsConnecting(false);
-    }, 3000);
+    // Fetch simulators on app load
+    fetchAvailableSimulators();
 
     return () => {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
       socket.off('connect_error', onConnectError);
-      socket.off('room-created');
-      socket.off('authentication-failed');
-      socket.off('user-joined');
-      socket.off('user-left');
-      socket.off('content-updated');
-      clearTimeout(timeoutId);
     };
-  }, [inRoom]);
+  }, []);
 
-  const handleRoomIdChange = async (e) => {
-    const newRoomId = e.target.value;
-    setRoomId(newRoomId);
-    
-    if (newRoomId.trim()) {
-      const status = await checkRoom(newRoomId);
-      setNeedsPassword(status.exists);
-    } else {
-      setNeedsPassword(false);
+  // Fetch available simulators
+  const fetchAvailableSimulators = async () => {
+    setLoadingSimulators(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/simulators');
+      if (response.ok) {
+        const data = await response.json();
+        setAvailableSimulators(data);
+      } else {
+        throw new Error('Failed to fetch simulators');
+      }
+    } catch (error) {
+      console.error('Error loading simulators:', error);
+      setAvailableSimulators([]);
+    } finally {
+      setLoadingSimulators(false);
     }
   };
 
-  const handleJoinRoom = (e) => {
-    e.preventDefault();
-    if (roomId && username) {
-      joinRoom(roomId, username, password);
-      setAuthError(false);
+  // Navigation functions
+  const navigateToJoin = (simulatorId) => {
+    setSelectedSimulatorId(simulatorId);
+    setCurrentPage('join');
+  };
+
+  const navigateToRoom = (roomId, userData) => {
+    setActiveRoomId(roomId);
+    setRoomData(userData);
+    setCurrentPage('room');
+  };
+
+  const navigateToHome = () => {
+    setCurrentPage('home');
+    setSelectedSimulatorId(null);
+    setActiveRoomId(null);
+    setRoomData(null);
+  };
+
+  // Render the appropriate component based on currentPage state
+  const renderCurrentPage = () => {
+    switch (currentPage) {
+      case 'join':
+        return (
+          <JoinRoomPage 
+            simulators={availableSimulators} 
+            simulatorId={selectedSimulatorId}
+            onJoinRoom={navigateToRoom}
+            onCancel={navigateToHome}
+          />
+        );
+      case 'room':
+        return (
+          <RoomContainer 
+            roomId={activeRoomId}
+            userData={roomData}
+            simulators={availableSimulators}
+            onLeaveRoom={navigateToHome}
+          />
+        );
+      case 'home':
+      default:
+        return (
+          <HomePage 
+            simulators={availableSimulators} 
+            loading={loadingSimulators}
+            onSelectSimulator={navigateToJoin}
+          />
+        );
     }
-  };
-
-  const handleLeaveRoom = () => {
-    leaveRoom(roomId);
-    setInRoom(false);
-    setContent('');
-    setUsers([]);
-    setPassword('');
-    setRoomPassword('');
-    setNeedsPassword(false);
-  };
-
-  const handleContentChange = (e) => {
-    const newContent = e.target.value;
-    setContent(newContent);
-    sendContentChange(roomId, newContent);
-  };
-
-  const getUserInitials = (name) => {
-    return name.split(' ').map(part => part[0]).join('').toUpperCase().substring(0, 2);
   };
 
   return (
     <div className="app-container">
-      <header>
-        <h1 className="app-title">Virtual Lab Collaborative Room</h1>
-        <div className="connection-status">
-          {isConnecting ? (
-            <>
-              <span className="status-indicator connecting"></span>
-              <span className="connecting">Connecting...</span>
-            </>
-          ) : isConnected ? (
-            <>
-              <span className="status-indicator"></span>
-              <span className="connected">Connected</span>
-            </>
-          ) : (
-            <>
-              <span className="status-indicator"></span>
-              <span className="disconnected">Disconnected</span>
-            </>
-          )}
-        </div>
-      </header>
-
-      {!inRoom ? (
-        <div className="join-room-container">
-          <div className="join-room-card">
-            <div className="join-room-header">
-              <h2>Join a Collaborative Room</h2>
-              <p>Connect with others in a shared virtual workspace</p>
-            </div>
-            <div className="join-room-body">
-              <form onSubmit={handleJoinRoom}>
-                <div className="form-group">
-                  <label htmlFor="username">Your Name</label>
-                  <input
-                    type="text"
-                    id="username"
-                    className="form-control"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Enter your name"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="roomId">Room ID</label>
-                  <input
-                    type="text"
-                    id="roomId"
-                    className="form-control"
-                    value={roomId}
-                    onChange={handleRoomIdChange}
-                    placeholder="Enter a unique room identifier"
-                    required
-                  />
-                  <small className="form-help">
-                    {needsPassword 
-                      ? "This room exists and requires a password to join" 
-                      : "Enter a unique ID to create a new room or join an existing one"}
-                  </small>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="password">
-                    {needsPassword 
-                      ? "Room Password" 
-                      : "Create Room Password (optional)"}
-                  </label>
-                  <input
-                    type="password"
-                    id="password"
-                    className="form-control"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={needsPassword 
-                      ? "Enter the room password" 
-                      : "Create a password for your room (optional)"}
-                    required={needsPassword}
-                  />
-                  {authError && (
-                    <div className="error-message">
-                      Incorrect password. Please try again.
-                    </div>
-                  )}
-                </div>
-                <button type="submit" className="btn btn-primary btn-lg btn-block">
-                  {needsPassword ? "Join Room" : "Create/Join Room"}
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="room-container">
-          <div className="room-sidebar">
-            <div className="room-header">
-              <h2>Room: <span className="room-id">{roomId}</span></h2>
-              
-              {roomPassword && (
-                <div className="room-password">
-                  <div className="password-label">
-                    <span>Room Password</span>
-                  </div>
-                  <div className="password-value">{roomPassword}</div>
-                  <p className="password-info">Share this password with others to join this room</p>
-                </div>
-              )}
-            </div>
-            
-            <div className="users-section">
-              <div className="users-title">
-                <h3>Participants</h3>
-                <span className="users-count">{users.length}</span>
-              </div>
-              <ul className="users-list">
-                {users.map((user) => (
-                  <li key={user.id} className="user-item">
-                    <div className="user-avatar">
-                      {getUserInitials(user.username)}
-                    </div>
-                    <div className="user-name">
-                      {user.username}
-                      {user.id === socket.id && <span className="user-you">you</span>}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            <div className="room-actions">
-              <button 
-                onClick={handleLeaveRoom} 
-                className="btn btn-danger leave-button">
-                Leave Room
-              </button>
-            </div>
-          </div>
-          
-          <div className="editor-container">
-            <div className="editor-header">
-              <div className="editor-title">
-                <h3>Collaborative Editor</h3>
-              </div>
-            </div>
-            <div className="editor-body">
-              <textarea
-                className="collaborative-editor"
-                value={content}
-                onChange={handleContentChange}
-                placeholder="Start typing here. Changes will be visible to everyone in the room in real-time."
-              ></textarea>
-            </div>
-          </div>
-        </div>
-      )}
+      <Header 
+        isConnected={isConnected} 
+        isConnecting={isConnecting}
+        navigateToHome={navigateToHome} 
+      />
+      
+      <main>
+        {renderCurrentPage()}
+      </main>
     </div>
+  );
+}
+
+// This container component manages room-specific state
+function RoomContainer({ roomId, userData, simulators, onLeaveRoom }) {
+  const [inRoom, setInRoom] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [roomPassword, setRoomPassword] = useState('');
+  const [selectedSimulator, setSelectedSimulator] = useState(null);
+  const [simulatorState, setSimulatorState] = useState({});
+  const [experimentData, setExperimentData] = useState({});
+  const [showExperimentReport, setShowExperimentReport] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [messageInput, setMessageInput] = useState('');
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
+  // Join room on component mount using userData
+  useEffect(() => {
+    if (userData) {
+      const { username, simulator, password } = userData;
+      
+      if (username && roomId) {
+        // Automatically join the room using the password from userData
+        joinRoom(roomId, username, password || '');
+        localStorage.setItem('username', username);
+      } else {
+        // If missing data, go back to home
+        onLeaveRoom();
+      }
+      
+      if (simulator) {
+        setSelectedSimulator(simulator);
+      }
+    } else {
+      // If no userData, go back to home
+      onLeaveRoom();
+    }
+  }, [userData, roomId, onLeaveRoom]);
+
+  // Socket event handlers
+  useEffect(() => {
+    const onRoomCreated = ({ password }) => {
+      setRoomPassword(password);
+    };
+
+    const onUserJoined = ({ user, users, simulator, simulatorState }) => {
+      setUsers(users);
+      if (user.id === socket.id) {
+        setInRoom(true);
+      }
+      if (simulator) {
+        setSelectedSimulator(simulator);
+        setSimulatorState(simulatorState || {});
+      }
+    };
+
+    const onUserLeft = ({ users }) => {
+      setUsers(users);
+    };
+
+    const onContentUpdated = ({ content, username }) => {
+      if (username && content) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: content, sender: username, time: new Date() },
+        ]);
+      }
+    };
+
+    const onSimulatorInitialized = ({ simulatorType, state }) => {
+      setSelectedSimulator(simulatorType);
+      setSimulatorState(state || {});
+    };
+
+    const onSimulatorUpdate = ({ action, data }) => {
+      if (data && typeof data === 'object') {
+        setSimulatorState((prev) => ({ ...prev, ...data }));
+
+        if (action === 'record-measurement' || action === 'simulation-results') {
+          setExperimentData((prev) => ({
+            ...prev,
+            measurements: data.measurements || data,
+          }));
+        }
+      }
+    };
+
+    socket.on('room-created', onRoomCreated);
+    socket.on('user-joined', onUserJoined);
+    socket.on('user-left', onUserLeft);
+    socket.on('content-updated', onContentUpdated);
+    socket.on('simulator-initialized', onSimulatorInitialized);
+    socket.on('simulator-update', onSimulatorUpdate);
+
+    return () => {
+      socket.off('room-created', onRoomCreated);
+      socket.off('user-joined', onUserJoined);
+      socket.off('user-left', onUserLeft);
+      socket.off('content-updated', onContentUpdated);
+      socket.off('simulator-initialized', onSimulatorInitialized);
+      socket.off('simulator-update', onSimulatorUpdate);
+    };
+  }, []);
+
+  const handleLeaveRoom = () => {
+    leaveRoom(roomId);
+    setInRoom(false);
+    setUsers([]);
+    setRoomPassword('');
+    setSelectedSimulator(null);
+    setSimulatorState({});
+    setExperimentData({});
+    setMessages([]);
+    onLeaveRoom();
+  };
+
+  const handleContentChange = (e) => {
+    setMessageInput(e.target.value);
+  };
+
+  const sendMessage = (e) => {
+    e.preventDefault();
+    if (messageInput.trim()) {
+      sendContentChange(roomId, messageInput);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { 
+          text: messageInput, 
+          sender: localStorage.getItem('username') || 'Anonymous', 
+          time: new Date(), 
+          isOwnMessage: true 
+        },
+      ]);
+      setMessageInput('');
+    }
+  };
+
+  const getUserInitials = (name) => {
+    return name
+      .split(' ')
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  // If not in room yet, show loading
+  if (!inRoom) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Joining experiment room...</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <RoomPage
+        roomId={roomId}
+        roomPassword={roomPassword}
+        users={users}
+        simulatorType={selectedSimulator}
+        simulatorState={simulatorState}
+        experimentData={experimentData}
+        showExperimentReport={showExperimentReport}
+        setShowExperimentReport={setShowExperimentReport}
+        getUserInitials={getUserInitials}
+        handleLeaveRoom={handleLeaveRoom}
+        socket={socket}
+      />
+      
+      <ChatBox
+        messages={messages}
+        messageInput={messageInput}
+        handleContentChange={handleContentChange}
+        sendMessage={sendMessage}
+        isOpen={isChatOpen}
+        toggleChat={() => setIsChatOpen(!isChatOpen)}
+        currentUser={localStorage.getItem('username') || 'Anonymous'}
+      />
+    </>
   );
 }
 

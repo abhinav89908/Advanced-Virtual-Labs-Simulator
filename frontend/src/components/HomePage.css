@@ -1,0 +1,129 @@
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.home-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.home-header h1 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.home-header p {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.simulators-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.simulator-card {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.simulator-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.simulator-card-image {
+  height: 200px;
+  overflow: hidden;
+}
+
+.simulator-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.simulator-card:hover .simulator-card-image img {
+  transform: scale(1.05);
+}
+
+.simulator-card-content {
+  padding: 1.5rem;
+}
+
+.simulator-card-content h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.8rem;
+  color: #333;
+}
+
+.simulator-card-content p {
+  color: #666;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+  min-height: 3em;
+}
+
+.start-button {
+  display: block;
+  width: 100%;
+  padding: 0.8rem 0;
+  background-color: #4a6cf7;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.start-button:hover {
+  background-color: #3a5ce5;
+}
+
+.simulators-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(74, 108, 247, 0.3);
+  border-radius: 50%;
+  border-top-color: #4a6cf7;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .home-container {
+    padding: 1rem;
+  }
+  
+  .home-header h1 {
+    font-size: 2rem;
+  }
+  
+  .simulators-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+}

@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const socket = io("https://advanced-virtual-labs-simulato.onrender.com/", {
+const socket = io("http://localhost:5000/", {
   reconnection: true,
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,
@@ -26,7 +26,58 @@ export const leaveRoom = (roomId) => {
 };
 
 export const sendContentChange = (roomId, content) => {
-  socket.emit("content-change", { roomId, content });
+  socket.emit("content-change", { roomId, content, username: localStorage.getItem('username') || 'Anonymous' });
+};
+
+// New function to share mouse position
+export const shareMousePosition = (roomId, x, y, isClicking = false) => {
+  socket.emit("mouse-move", { 
+    roomId, 
+    x, 
+    y, 
+    isClicking,
+    username: localStorage.getItem('username') || 'Anonymous'
+  });
+};
+
+// New functions for simulator actions
+// Make sure simulatorType is a string
+export const initializeSimulator = (roomId, simulatorType, initialState = {}) => {
+  // Ensure we are passing a string for the simulator type
+  const simulatorId = typeof simulatorType === 'object' ? simulatorType.id : simulatorType;
+  
+  if (!simulatorId) {
+    console.error("Invalid simulator type provided", simulatorType);
+    return;
+  }
+  
+  socket.emit("init-simulator", { 
+    roomId, 
+    simulatorType: simulatorId, 
+    initialState 
+  });
+};
+
+export const sendSimulatorAction = (roomId, action, data) => {
+  socket.emit("simulator-action", { roomId, action, data });
+};
+
+export const saveExperimentResults = (roomId, results) => {
+  return new Promise((resolve) => {
+    socket.emit("save-results", { roomId, results });
+    socket.once("results-saved", (response) => {
+      resolve(response);
+    });
+  });
+};
+
+export const getExperimentData = (experimentId) => {
+  return new Promise((resolve) => {
+    socket.emit("get-experiment-data", { experimentId });
+    socket.once("experiment-data", (data) => {
+      resolve(data);
+    });
+  });
 };
 
 export default socket;

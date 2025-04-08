@@ -162,7 +162,7 @@ function App() {
               <h2>Join a Collaborative Room</h2>
               <p>Connect with others in a shared virtual workspace</p>
             </div>
-            <div className="join-room-body">
+            <div className="join-room-body m-3">
               <form onSubmit={handleJoinRoom}>
                 <div className="form-group">
                   <label htmlFor="username">Your Name</label>

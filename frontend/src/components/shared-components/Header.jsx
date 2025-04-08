@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Users, Home, BookOpen, Beaker, Settings, ChevronDown, MessageCircle, Bot } from 'lucide-react';
-import Assistant from './virtualLabAssistant';
+import Assistant from './VirtualLabAssistant';
 
 export default function ResponsiveHeader({ isConnecting, isConnected, onAssistantToggle }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -86,6 +86,20 @@ export const updateCursorPosition = (experimentId, roomId, position) => {
   socket.emit("cursor-position-update", { experimentId, roomId, position });
 };
 
+// Chat message functions
+export const sendChatMessage = (experimentId, roomId, messageText) => {
+  if (!socket || !socket.connected) return;
+  
+  socket.emit("chat-message", { experimentId, roomId, message: messageText });
+};
+
+export const onChatMessage = (callback) => {
+  if (!socket) return;
+  
+  socket.on("chat-message-received", callback);
+  return () => socket.off("chat-message-received", callback);
+};
+
 // Event listeners for experiment room
 export const onParticipantJoined = (callback) => {
   if (!socket) return;

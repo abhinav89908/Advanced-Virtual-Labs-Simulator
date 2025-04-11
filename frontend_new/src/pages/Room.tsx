@@ -8,8 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
-import { Users, ArrowLeft, Share2, Copy, Clock } from 'lucide-react';
+import { Users, ArrowLeft, Share2, Copy, Clock, MessageSquare } from 'lucide-react';
 import MainLayout from '@/components/MainLayout';
+import ChatBox, { ChatMessage } from '@/components/ChatBox';
 
 import {
   initSocket,
@@ -20,7 +21,9 @@ import {
   onParticipantJoined,
   onParticipantLeft,
   onEditorContentUpdate,
-  onCursorPositionChanged
+  onCursorPositionChanged,
+  sendChatMessage,
+  onChatMessage
 } from '@/lib/socket';
 
 // Import experiment details
@@ -75,6 +78,12 @@ const Room = () => {
   const [error, setError] = useState(null);
   const [cursors, setCursors] = useState({});
   
+  // Chat state
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [isChatCollapsed, setIsChatCollapsed] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [currentUserId, setCurrentUserId] = useState<string>('');
+  
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
   const decorationsRef = useRef({});
@@ -99,6 +108,7 @@ const Room = () => {
         
         setParticipants(result.room.participants);
         setEditorContent(result.room.editorContent);
+        setCurrentUserId(result.userId); // Store current user's ID for chat
         setIsJoining(false);
         
         toast({
@@ -162,6 +172,24 @@ const Room = () => {
       }));
     });
     
+    // Chat message listener
+    const removeChatMessageListener = onChatMessage((data) => {
+      const { message, senderId, senderName, timestamp, id } = data;
+      
+      setChatMessages(prev => [...prev, {
+        id,
+        senderId,
+        senderName,
+        text: message,
+        timestamp: new Date(timestamp)
+      }]);
+      
+      // Increment unread count if chat is collapsed
+      if (isChatCollapsed) {
+        setUnreadCount(prev => prev + 1);
+      }
+    });
+    
     // Cleanup function
     return () => {
       leaveExperimentRoom(experimentId, roomId);
@@ -169,8 +197,9 @@ const Room = () => {
       removeParticipantLeftListener && removeParticipantLeftListener();
       removeContentUpdateListener && removeContentUpdateListener();
       removeCursorUpdateListener && removeCursorUpdateListener();
+      removeChatMessageListener && removeChatMessageListener();
     };
-  }, [experimentId, roomId, name, password, toast]);
+  }, [experimentId, roomId, name, password, toast, isChatCollapsed]);
   
   // Update cursor decorations whenever cursors state changes
   useEffect(() => {
@@ -254,6 +283,29 @@ const Room = () => {
     });
   };
   
+  // Chat handlers
+  const handleSendMessage = (messageText) => {
+    sendChatMessage(experimentId, roomId, messageText);
+    
+    // Add message to local state
+    const newMessage: ChatMessage = {
+      id: `local-${Date.now()}`,
+      senderId: currentUserId,
+      senderName: name,
+      text: messageText,
+      timestamp: new Date()
+    };
+    
+    setChatMessages(prev => [...prev, newMessage]);
+  };
+  
+  const toggleChat = () => {
+    setIsChatCollapsed(!isChatCollapsed);
+    if (!isChatCollapsed) {
+      setUnreadCount(0); // Clear unread count when opening chat
+    }
+  };
+  
   if (error) {
     return (
       <MainLayout>
@@ -313,6 +365,15 @@ const Room = () => {
             </Button>
             <Button variant="outline" size="sm" onClick={handleCopyPassword}>
               <Copy className="mr-2 h-4 w-4" /> Password
+            </Button>
+            <Button variant="outline" size="sm" onClick={toggleChat}>
+              <MessageSquare className="mr-2 h-4 w-4" />
+              <span>Chat</span>
+              {unreadCount > 0 && (
+                <Badge variant="destructive" className="ml-1">
+                  {unreadCount}
+                </Badge>
+              )}
             </Button>
           </div>
         </div>
@@ -391,6 +452,18 @@ const Room = () => {
             </div>
           </div>
         </div>
+        
+        {/* Chat Box */}
+        <ChatBox
+          messages={chatMessages}
+          onSendMessage={handleSendMessage}
+          participants={participants}
+          getColorFromString={getColorFromString}
+          currentUserId={currentUserId}
+          isCollapsed={isChatCollapsed}
+          onToggleCollapse={toggleChat}
+          unreadCount={unreadCount}
+        />
       </div>
     </MainLayout>
   );

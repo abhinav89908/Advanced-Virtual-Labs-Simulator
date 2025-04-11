@@ -75,7 +75,8 @@ export const setupSocketHandlers = (io) => {
             participants: new Map(),
             experimentId,
             roomId,
-            editorContent: '// Start your collaborative code here\n'
+            editorContent: '// Start your collaborative code here\n',
+            chatMessages: [] // Add array to store chat messages
           });
           console.log(`New room created: ${roomKey} with password: ${roomPassword}`);
         }
@@ -110,11 +111,13 @@ export const setupSocketHandlers = (io) => {
         // Send room data to the joining user
         callback({
           success: true,
+          userId: participantId, // Send back user ID for chat identification
           room: {
             experimentId,
             roomId,
             editorContent: room.editorContent,
-            participants: Array.from(room.participants.values())
+            participants: Array.from(room.participants.values()),
+            chatMessages: room.chatMessages || [] // Include chat history
           }
         });
         
@@ -200,6 +203,44 @@ export const setupSocketHandlers = (io) => {
           (experimentRooms.get(roomKey).participants.get(socket.id)?.username || 'Anonymous') : 
           socket.user.username
       });
+    });
+    
+    // Handle chat messages
+    socket.on('chat-message', (data) => {
+      const { experimentId, roomId, message } = data;
+      const roomKey = `${experimentId}:${roomId}`;
+      
+      if (experimentRooms.has(roomKey)) {
+        const room = experimentRooms.get(roomKey);
+        const participantId = socket.user.isAnonymous ? socket.id : socket.user._id;
+        const participant = room.participants.get(participantId);
+        
+        if (!participant) return;
+        
+        const chatMessage = {
+          id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          senderId: participantId,
+          senderName: participant.username,
+          message,
+          timestamp: new Date()
+        };
+        
+        // Store the message
+        if (!room.chatMessages) {
+          room.chatMessages = [];
+        }
+        room.chatMessages.push(chatMessage);
+        
+        // Limit chat history to last 100 messages
+        if (room.chatMessages.length > 100) {
+          room.chatMessages = room.chatMessages.slice(-100);
+        }
+        
+        // Broadcast to all other users in the room
+        socket.to(roomKey).emit('chat-message-received', chatMessage);
+        
+        console.log(`Chat message in room ${roomKey} from ${participant.username}`);
+      }
     });
     
     // Join project room

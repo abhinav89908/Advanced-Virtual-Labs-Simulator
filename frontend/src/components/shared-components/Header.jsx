@@ -20,6 +20,22 @@ export default function ResponsiveHeader({ isConnecting, isConnected, onAssistan
     };
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (isDropdownOpen) {
+      const handleClickOutside = (e) => {
+        if (!e.target.closest('.dropdown-container')) {
+          setIsDropdownOpen(false);
+        }
+      };
+      
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isDropdownOpen]);
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -47,32 +63,49 @@ export default function ResponsiveHeader({ isConnecting, isConnected, onAssistan
 
   return (
     <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md' : 'bg-white/80 backdrop-blur-sm'}`}>
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-2 sm:px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Title */}
-          <div className="flex items-center space-x-2">
-            <Beaker className="h-8 w-8 text-indigo-600" />
-            <h1 className="text-xl font-bold text-gray-800">Virtual Lab Collaborative Room</h1>
+          <div className="flex items-center space-x-1 sm:space-x-2">
+            <Beaker className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" />
+            <h1 className="text-base sm:text-xl font-bold text-gray-800 truncate">
+              <span className="hidden xs:inline">Virtual Lab</span> Collaborative Room
+            </h1>
           </div>
           
           {/* Connection Status (visible on all screens) */}
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
+          <div className="flex items-center space-x-1 sm:space-x-3">
+            <div className="hidden xs:flex items-center bg-gray-100 rounded-full px-2 sm:px-3 py-1 text-xs sm:text-sm">
               <span className={`h-2 w-2 rounded-full mr-2 ${getStatusClass()}`}></span>
               <span className="text-gray-700">{getStatusText()}</span>
+            </div>
+            
+            {/* Only show dot on smallest screens */}
+            <div className="flex xs:hidden items-center">
+              <span className={`h-3 w-3 rounded-full border border-gray-300 ${getStatusClass()}`}></span>
             </div>
             
             {/* Virtual Lab Assistant Button */}
             <button 
               onClick={toggleAssistant} 
-              className={`p-2 rounded-full transition-colors ${isAssistantOpen ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'}`}
+              className={`p-1 sm:p-2 rounded-full transition-colors ${isAssistantOpen ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'}`}
               aria-label="Toggle Virtual Lab Assistant"
               title="Virtual Lab Assistant"
             >
               <Bot className="h-5 w-5" />
             </button>
-            <div className={`w-full h-150 absolute top-18 left-0 rounded-lg p-4 transition-all duration-300 ${isAssistantOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-             {isAssistantOpen && <Assistant/>}
+            <div className={`fixed inset-0 sm:absolute sm:inset-auto sm:top-16 sm:right-0 sm:w-[90vw] sm:max-w-md sm:h-[80vh] bg-white sm:m-2 rounded-lg shadow-2xl transition-opacity duration-300 z-50 ${isAssistantOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+             {isAssistantOpen && (
+              <div className="h-full">
+                <button 
+                  onClick={toggleAssistant}
+                  className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 z-10 bg-white/80 rounded-full p-1"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+                <Assistant />
+              </div>
+             )}
             </div>
           </div>
 
@@ -86,7 +119,7 @@ export default function ResponsiveHeader({ isConnecting, isConnected, onAssistan
             </a>
             
             {/* Dropdown menu */}
-            <div className="relative">
+            <div className="relative dropdown-container">
               <button 
                 onClick={toggleDropdown}
                 className="text-gray-700 hover:text-indigo-600 flex items-center"

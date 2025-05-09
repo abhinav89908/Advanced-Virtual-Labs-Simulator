@@ -52,7 +52,7 @@ export default function ResponsiveHeader({ isConnecting, isConnected, onAssistan
           {/* Logo and Title */}
           <div className="flex items-center space-x-2">
             <Beaker className="h-8 w-8 text-indigo-600" />
-            <h1 className="text-xl font-bold text-gray-800">Virtual Lab Collaborative Room</h1>
+            <h1 className="text-xl font-bold text-gray-800">Virtual Labs</h1>
           </div>
           
           {/* Connection Status (visible on all screens) */}
@@ -78,10 +78,10 @@ export default function ResponsiveHeader({ isConnecting, isConnected, onAssistan
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <a href="#" className="text-gray-700 hover:text-indigo-600 flex items-center">
+            <a href="/" className="text-gray-700 hover:text-indigo-600 flex items-center">
               <Home className="h-4 w-4 mr-1" /> Home
             </a>
-            <a href="#" className="text-gray-700 hover:text-indigo-600 flex items-center">
+            <a href="/labs" className="text-gray-700 hover:text-indigo-600 flex items-center">
               <BookOpen className="h-4 w-4 mr-1" /> Labs
             </a>
             
@@ -91,20 +91,20 @@ export default function ResponsiveHeader({ isConnecting, isConnected, onAssistan
                 onClick={toggleDropdown}
                 className="text-gray-700 hover:text-indigo-600 flex items-center"
               >
-                <Users className="h-4 w-4 mr-1" /> Collaborators
+                <Users className="h-4 w-4 mr-1" /> Groups
                 <ChevronDown className="h-4 w-4 ml-1" />
               </button>
               
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">Active Users</a>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">Invite Members</a>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">Permissions</a>
+                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">Batch - 2025</a>
+                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">Batch - 2024</a>
+                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">Batch - 2023</a>
                 </div>
               )}
             </div>
             
-            <a href="#" className="text-gray-700 hover:text-indigo-600 flex items-center">
+            <a href="/chat" className="text-gray-700 hover:text-indigo-600 flex items-center">
               <MessageCircle className="h-4 w-4 mr-1" /> Chat
             </a>
             <a href="#" className="text-gray-700 hover:text-indigo-600 flex items-center">

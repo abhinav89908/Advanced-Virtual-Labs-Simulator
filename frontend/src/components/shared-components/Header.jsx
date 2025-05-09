@@ -128,16 +128,16 @@ export default function ResponsiveHeader({ isConnecting, isConnected, onAssistan
         {/* Mobile Navigation Menu */}
         <div className={`md:hidden transition-all duration-300 overflow-hidden ${isMenuOpen ? 'max-h-96 py-3' : 'max-h-0'}`}>
           <div className="flex flex-col space-y-3 pb-3">
-            <a href="#" className="text-gray-700 hover:text-indigo-600 py-2 flex items-center">
+            <a href="/" className="text-gray-700 hover:text-indigo-600 py-2 flex items-center">
               <Home className="h-5 w-5 mr-2" /> Home
             </a>
-            <a href="#" className="text-gray-700 hover:text-indigo-600 py-2 flex items-center">
+            <a href="/labs" className="text-gray-700 hover:text-indigo-600 py-2 flex items-center">
               <BookOpen className="h-5 w-5 mr-2" /> Labs
             </a>
             <a href="#" className="text-gray-700 hover:text-indigo-600 py-2 flex items-center">
               <Users className="h-5 w-5 mr-2" /> Collaborators
             </a>
-            <a href="#" className="text-gray-700 hover:text-indigo-600 py-2 flex items-center">
+            <a href="/chat" className="text-gray-700 hover:text-indigo-600 py-2 flex items-center">
               <MessageCircle className="h-5 w-5 mr-2" /> Chat
             </a>
             <a href="#" className="text-gray-700 hover:text-indigo-600 py-2 flex items-center">

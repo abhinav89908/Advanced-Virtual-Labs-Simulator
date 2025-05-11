@@ -11,14 +11,12 @@ const Console = ({ logs }) => {
         if (consoleEndRef.current) {
             consoleEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
-    }, [logs]);
-
-    return (
+    }, [logs]);    return (
         <div className="console-view">
-            <h3>Console</h3>
+            <h3>Console Output</h3>
             <div className="console-container">
                 {logs.length === 0 ? (
-                    <div className="console-empty">Console output will appear here</div>
+                    <div className="console-empty">Console output will appear here when you run code...</div>
                 ) : (
                     <div className="console-output">
                         {logs.map((log, index) => (

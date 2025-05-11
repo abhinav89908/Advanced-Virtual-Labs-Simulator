@@ -46,9 +46,7 @@ HLT              ; Stop execution`;
     const handleClear = () => {
         setCode('');
         setError('');
-    };
-
-    return (
+    };    return (
         <div className="editor-container">
             <div className="editor-header">
                 <h3>Assembly Editor</h3>
@@ -60,7 +58,7 @@ HLT              ; Stop execution`;
                         Clear
                     </button>
                     <button onClick={handleLoad} className="btn btn-primary">
-                        Load Code
+                        Assemble & Load
                     </button>
                 </div>
             </div>
@@ -74,7 +72,12 @@ HLT              ; Stop execution`;
             />
             {error && <div className="editor-error">{error}</div>}
             <div className="editor-footer">
-                <p>Hint: Use semicolon (;) for comments</p>
+                <div>
+                    <span>8085 assembly | Use semicolon (;) for comments</span>
+                </div>
+                <div>
+                    <span>{code.split('\n').length} lines</span>
+                </div>
             </div>
         </div>
     );

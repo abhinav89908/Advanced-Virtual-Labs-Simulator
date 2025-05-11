@@ -190,8 +190,7 @@ const Simulator = () => {
                 setCpuState(prev => ({ ...prev, running: false }));
             }
         }, 100);
-    };
-      // Reset the simulator
+    };    // Reset the simulator
     const resetSimulator = () => {
         cpu.reset();
         setCurrentInstruction(program.length > 0 ? 0 : null);
@@ -201,9 +200,9 @@ const Simulator = () => {
             halted: false,
             running: false
         });
-        // Trigger memory view update
+        // Trigger memory view update to show zeroed memory
         setMemoryUpdateTrigger(prev => prev + 1);
-        addLog('Simulator reset', 'info');
+        addLog('Simulator reset - memory cleared to zeros', 'info');
     };
     
     // Get memory range from CPU
@@ -220,11 +219,11 @@ const Simulator = () => {
             running: cpu.running
         });
     }, [cpu.registers, cpu.flags, cpu.halted, cpu.running]);
-    
-    return (
+      return (
         <div className="simulator">
             <div className="simulator-header">
                 <h2>8085 Microprocessor Simulator</h2>
+                <p className="simulator-subtitle">Interactive Educational Emulator</p>
             </div>
             <div className="simulator-container">
                 <div className="simulator-left-panel">

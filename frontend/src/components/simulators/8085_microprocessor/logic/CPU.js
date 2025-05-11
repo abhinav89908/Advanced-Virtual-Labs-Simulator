@@ -36,9 +36,7 @@ class CPU {
         
         // For logging
         this.executionLog = [];
-    }
-
-    // Reset the CPU to initial state
+    }    // Reset the CPU to initial state
     reset() {
         // Reset registers
         Object.keys(this.registers).forEach(reg => {
@@ -49,6 +47,9 @@ class CPU {
         Object.keys(this.flags).forEach(flag => {
             this.flags[flag] = false;
         });
+
+        // Reset memory to all zeros
+        this.memory.fill(0);
 
         // Reset execution state
         this.running = false;

@@ -49,12 +49,23 @@
 }
 
 /* General Simulator Styles */
-.simulator {
-    background: var(--background-gradient);
+.simulator-page{
+    background: var(--background-dark);
     color: var(--text-primary);
     font-family: 'Roboto', 'Segoe UI', sans-serif;
     min-height: 100vh;
     padding: 20px;
+}
+.simulator {
+    background: var(--background-gradient);
+    color: var(--text-primary);
+    font-family: 'Roboto', 'Segoe UI', sans-serif;
+    height: fit-content;
+    padding: 20px;
+    max-width: 1800px;
+    margin: 0 auto; 
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .simulator h2, .simulator h3 {
@@ -156,7 +167,7 @@
 
 .simulator-control-area {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     grid-gap: 25px;
 }
 

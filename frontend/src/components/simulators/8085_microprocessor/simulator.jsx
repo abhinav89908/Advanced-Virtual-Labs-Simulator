@@ -4,7 +4,6 @@ import RegisterView from './components/RegisterView';
 import FlagsView from './components/FlagsView';
 import MemoryView from './components/MemoryView';
 import Console from './components/Console';
-import ControlPanel from './components/ControlPanel';
 import CPU from './logic/CPU';
 import Assembler from './logic/Assembler';
 import './simulator.css';
@@ -218,23 +217,21 @@ const Simulator = () => {
             halted: cpu.halted,
             running: cpu.running
         });
-    }, [cpu.registers, cpu.flags, cpu.halted, cpu.running]);
-      return (
-        <div className="simulator">
-            <div className="simulator-header">
-                <h2>8085 Microprocessor Simulator</h2>
-                <p className="simulator-subtitle">Interactive Educational Emulator</p>
-            </div>
-            <div className="simulator-container">
-                <div className="simulator-left-panel">
-                    <Editor onLoad={handleLoadCode} />
-                    <Console logs={logs} />
+    }, [cpu.registers, cpu.flags, cpu.halted, cpu.running]);      
+    
+    
+    return (
+        <div className="simulator-page">
+            <div className="simulator">
+                <div className="simulator-header">
+                    <h2>8085 Microprocessor Simulator</h2>
+                    <p className="simulator-subtitle">Interactive Educational Emulator</p>
                 </div>
-                <div className="simulator-right-panel">
-                    <div className="simulator-control-area">
-                        <RegisterView registers={cpuState.registers} />
-                        <FlagsView flags={cpuState.flags} />
-                        <ControlPanel 
+                <div className="simulator-container">
+                    <div className="simulator-left-panel">
+                        <Editor onLoad={handleLoadCode} />
+                        <Console 
+                            logs={logs}
                             onRun={runProgram}
                             onStep={executeStep}
                             onReset={resetSimulator}
@@ -242,7 +239,13 @@ const Simulator = () => {
                             isRunning={cpuState.running}
                         />
                     </div>
-                    <MemoryView getMemory={getMemory} memoryUpdateTrigger={memoryUpdateTrigger} />
+                    <div className="simulator-right-panel">
+                        <div className="simulator-control-area">
+                            <RegisterView registers={cpuState.registers} />
+                            <FlagsView flags={cpuState.flags} />
+                        </div>
+                        <MemoryView getMemory={getMemory} memoryUpdateTrigger={memoryUpdateTrigger} />
+                    </div>
                 </div>
             </div>
         </div>

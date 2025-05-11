@@ -1,6 +1,5 @@
 import { useState, useContext } from 'react';
 import { X, User, Lock, AlertCircle } from 'lucide-react';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from './hooks/userContext';
 
@@ -83,40 +82,41 @@ export default function StudentLogin({ onClose, onSwitchToRegister }) {
 
   const handleGoogleLogin = async () => {
     setLoginError('');
-    try {
-      const provider = new GoogleAuthProvider();
-      const idToken = await result.user.getIdToken();
+    // try {
+    //   const provider = new GoogleAuthProvider();
+    //   const idToken = await result.user.getIdToken();
 
-      const response = await fetch('http://localhost:3000/api/users/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken })
-      });
+    //   const response = await fetch('http://localhost:3000/api/users/auth/google', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ idToken })
+    //   });
 
-      const text = await response.text();
-      let data;
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch (e) {
-        console.error('Failed to parse JSON:', text);
-        throw new Error('Invalid response from server');
-      }
+    //   const text = await response.text();
+    //   let data;
+    //   try {
+    //     data = text ? JSON.parse(text) : {};
+    //   } catch (e) {
+    //     console.error('Failed to parse JSON:', text);
+    //     throw new Error('Invalid response from server');
+    //   }
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Google login failed');
-      }
+    //   if (!response.ok) {
+    //     throw new Error(data.message || 'Google login failed');
+    //   }
 
-      // Create user data object from Google info
-      const userData = {
-        id: uid,
-        // Add any other user data from the response
-      };
+    //   // Create user data object from Google info
+    //   const userData = {
+    //     id: uid,
+    //     // Add any other user data from the response
+    //   };
 
-      handleLoginSuccess(userData);
-    } catch (error) {
-      console.error('Google login error:', error);
-      setLoginError(error.message || 'Google login failed');
-    }
+    //   handleLoginSuccess(userData);
+    // } catch (error) {
+    //   console.error('Google login error:', error);
+    //   setLoginError(error.message || 'Google login failed');
+    // }
+    setLoginError('Google login is not implemented yet.');
   };
 
   return (

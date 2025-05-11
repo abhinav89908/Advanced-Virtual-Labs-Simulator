@@ -6,6 +6,7 @@ import Footer from './shared-components/Footer';
 import StudentLogin from './LoginPage';
 import StudentRegistration from './RegistrationPage';
 import { UserContext } from './hooks/userContext';
+import { useContext } from 'react';
 
 export default function LandingPage() {
   const [showLogin, setShowLogin] = useState(false);
@@ -13,6 +14,7 @@ export default function LandingPage() {
   const [isConnected, setIsConnected] = useState(true);
   const [isConnecting, setIsConnecting] = useState(false);
   const navigate = useNavigate();
+  const {isLoggedIn} = useContext(UserContext);
   
   const toggleLoginModal = () => {
     setShowLogin(!showLogin);
@@ -86,6 +88,7 @@ export default function LandingPage() {
                 Access state-of-the-art laboratory experiments from your device. 
                 Learn, collaborate, and discover without limitations.
               </p>
+              { !isLoggedIn && 
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
                 <button 
                   onClick={toggleLoginModal}
@@ -100,6 +103,7 @@ export default function LandingPage() {
                   Register Now
                 </button>
               </div>
+              }
             </div>
             <div className="md:w-1/2">
               <div className="relative">

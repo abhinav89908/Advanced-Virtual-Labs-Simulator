@@ -26,6 +26,9 @@ const Simulator = () => {
         running: false
     });
     
+    // Memory update trigger for real-time memory view updates
+    const [memoryUpdateTrigger, setMemoryUpdateTrigger] = useState(0);
+    
     // Console logs
     const [logs, setLogs] = useState([]);
     
@@ -55,14 +58,16 @@ const Simulator = () => {
             
             setProgram(parsedProgram);
             setCurrentInstruction(parsedProgram.length > 0 ? 0 : null);
-            
-            // Update CPU state
+              // Update CPU state
             setCpuState({
                 registers: { ...cpu.registers },
                 flags: { ...cpu.flags },
                 halted: false,
                 running: false
             });
+            
+            // Trigger memory view update
+            setMemoryUpdateTrigger(prev => prev + 1);
             
             addLog(`Code loaded: ${parsedProgram.length} instructions ready for execution`, 'success');
         } catch (error) {
@@ -100,14 +105,16 @@ const Simulator = () => {
                 // For other instructions, move to the next one
                 setCurrentInstruction(prev => prev + 1);
             }
-            
-            // Update CPU state
+              // Update CPU state
             setCpuState({
                 registers: { ...cpu.registers },
                 flags: { ...cpu.flags },
                 halted: cpu.halted,
                 running: cpu.running
             });
+            
+            // Trigger memory view update
+            setMemoryUpdateTrigger(prev => prev + 1);
             
             // If we reached the end of the program
             if (currentInstruction + 1 >= program.length && !cpu.halted) {
@@ -170,9 +177,11 @@ const Simulator = () => {
                         isHalted = true;
                     }
                 }
-                
-                // Update the current instruction state after completing execution
+                  // Update the current instruction state after completing execution
                 setCurrentInstruction(currentInstrIndex);
+                
+                // Trigger memory view update after all instructions have been executed
+                setMemoryUpdateTrigger(prev => prev + 1);
                 
                 addLog('Program execution completed', 'success');
             } catch (error) {
@@ -182,8 +191,7 @@ const Simulator = () => {
             }
         }, 100);
     };
-    
-    // Reset the simulator
+      // Reset the simulator
     const resetSimulator = () => {
         cpu.reset();
         setCurrentInstruction(program.length > 0 ? 0 : null);
@@ -193,6 +201,8 @@ const Simulator = () => {
             halted: false,
             running: false
         });
+        // Trigger memory view update
+        setMemoryUpdateTrigger(prev => prev + 1);
         addLog('Simulator reset', 'info');
     };
     
@@ -233,7 +243,7 @@ const Simulator = () => {
                             isRunning={cpuState.running}
                         />
                     </div>
-                    <MemoryView getMemory={getMemory} />
+                    <MemoryView getMemory={getMemory} memoryUpdateTrigger={memoryUpdateTrigger} />
                 </div>
             </div>
         </div>

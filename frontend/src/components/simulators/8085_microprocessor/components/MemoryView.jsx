@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 /**
  * MemoryView component to display and interact with the memory
  */
-const MemoryView = ({ memory, getMemory }) => {
+const MemoryView = ({ memory, getMemory, memoryUpdateTrigger }) => {
     const [startAddress, setStartAddress] = useState('2100');
     const [memoryData, setMemoryData] = useState({});
     const [error, setError] = useState('');
@@ -19,12 +19,15 @@ const MemoryView = ({ memory, getMemory }) => {
         const input = e.target.value.replace(/[^0-9A-Fa-f]/g, '').toUpperCase();
         setStartAddress(input);
         setError('');
+        
+        // Auto-update when typing
+        updateMemoryView(input);
     };
-
-    // View memory at the specified address
-    const handleViewMemory = () => {
+    
+    // Update memory view with current address
+    const updateMemoryView = (addressInput = startAddress) => {
         try {
-            const address = parseInt(startAddress, 16);
+            const address = parseInt(addressInput, 16);
             if (isNaN(address) || address < 0 || address > 0xFFFF) {
                 setError('Invalid address. Must be between 0000H and FFFFH');
                 return;
@@ -37,6 +40,16 @@ const MemoryView = ({ memory, getMemory }) => {
             setError(`Error: ${e.message}`);
         }
     };
+
+    // View memory at the specified address
+    const handleViewMemory = () => {
+        updateMemoryView();
+    };
+    
+    // Update memory view whenever CPU state changes or on reset
+    useEffect(() => {
+        updateMemoryView();
+    }, [memoryUpdateTrigger]);
 
     return (
         <div className="memory-view">
@@ -72,14 +85,13 @@ const MemoryView = ({ memory, getMemory }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {Object.keys(memoryData).length > 0 && 
-                            [...Array(4).keys()].map(row => {
+                        {Object.keys(memoryData).length > 0 &&                            [...Array(4).keys()].map(row => {
                                 const baseAddress = parseInt(startAddress, 16) + (row * 16);
                                 const rowPrefix = baseAddress.toString(16).padStart(4, '0').toUpperCase();
                                 
                                 return (
                                     <tr key={rowPrefix}>
-                                        <td className="address-cell">{rowPrefix}0</td>
+                                        <td className="address-cell">{rowPrefix}</td>
                                         {[...Array(16).keys()].map(col => {
                                             const address = (baseAddress + col).toString(16).padStart(4, '0').toUpperCase();
                                             return (

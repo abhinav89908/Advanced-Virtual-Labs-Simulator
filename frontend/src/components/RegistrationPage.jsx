@@ -73,38 +73,43 @@ export default function StudentRegistration({ onClose, onSwitchToLogin }) {
   };
 
   const handleSubmit = async () => {
-    if (!validate()) {
-      return;
-    }
-    
-    setIsSubmitting(true);
-    setRegistrationStatus(null);
-    setStatusMessage('');
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Here you would normally make a fetch/axios call to your registration API
-      console.log('Registration data:', formData);
-      
-      // Simulate successful registration
+  if (!validate()) return;
+
+  setIsSubmitting(true);
+  setRegistrationStatus(null);
+  setStatusMessage('');
+
+  try {
+    const response = await fetch('http://localhost:3000/api/users/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
       setRegistrationStatus('success');
-      setStatusMessage('Registration successful! You can now log in.');
+      setStatusMessage('Registration successful! Redirecting to login...');
       
-      // Automatically switch to login after 2 seconds
       setTimeout(() => {
-        onSwitchToLogin();
+        onSwitchToLogin(); // switch to login view
       }, 2000);
-      
-    } catch (error) {
+    } else {
       setRegistrationStatus('error');
-      setStatusMessage('Registration failed. Please try again later.');
-      console.error('Registration error:', error);
-    } finally {
-      setIsSubmitting(false);
+      setStatusMessage(result.message || 'Registration failed. Please try again.');
     }
-  };
+  } catch (error) {
+    setRegistrationStatus('error');
+    setStatusMessage('An error occurred. Please try again later.');
+    console.error('Registration error:', error);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
   
   return (
     <div className="p-6">

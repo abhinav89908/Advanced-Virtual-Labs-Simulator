@@ -120,8 +120,7 @@ const Simulator = () => {
             setCpuState(prev => ({ ...prev, halted: true }));
         }
     };
-    
-    // Run the entire program
+      // Run the entire program
     const runProgram = () => {
         if (program.length === 0 || currentInstruction === null || cpu.halted) {
             return;
@@ -132,10 +131,48 @@ const Simulator = () => {
         // Use setTimeout to allow UI to update before execution
         setTimeout(() => {
             try {
+                // Create a local copy of program instructions for execution
+                const programLength = program.length;
+                let currentInstrIndex = currentInstruction;
+                let isHalted = cpu.halted;
+
                 // Execute until halted or end of program
-                while (currentInstruction !== null && currentInstruction < program.length && !cpu.halted) {
-                    executeStep();
+                while (currentInstrIndex !== null && currentInstrIndex < programLength && !isHalted) {
+                    // Get the current instruction
+                    const instruction = program[currentInstrIndex];
+                    
+                    // Execute it
+                    const result = cpu.executeInstruction(instruction);
+                    
+                    // Log the result
+                    if (result.executed) {
+                        addLog(`Executed: ${instruction.raw}`, 'info');
+                    } else {
+                        addLog(result.message, 'error');
+                    }
+                    
+                    // Handle JMP instruction or move to next instruction
+                    if (instruction.mnemonic === 'JMP') {
+                        const jumpAddress = parseInt(instruction.operands[0], 16);
+                        const nextInstructionIndex = program.findIndex(inst => inst.address === jumpAddress);
+                        currentInstrIndex = nextInstructionIndex !== -1 ? nextInstructionIndex : null;
+                    } else if (!cpu.halted) {
+                        // For other instructions, move to the next one
+                        currentInstrIndex++;
+                    }
+                    
+                    // Update halt status
+                    isHalted = cpu.halted;
+                    
+                    // If we reached the end of the program
+                    if (currentInstrIndex >= programLength && !isHalted) {
+                        cpu.halted = true;
+                        isHalted = true;
+                    }
                 }
+                
+                // Update the current instruction state after completing execution
+                setCurrentInstruction(currentInstrIndex);
                 
                 addLog('Program execution completed', 'success');
             } catch (error) {

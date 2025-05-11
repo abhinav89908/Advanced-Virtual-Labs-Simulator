@@ -4,10 +4,9 @@ import RegisterView from './components/RegisterView';
 import FlagsView from './components/FlagsView';
 import MemoryView from './components/MemoryView';
 import Console from './components/Console';
-import ControlPanel from './components/ControlPanel';
 import CPU from './logic/CPU';
 import Assembler from './logic/Assembler';
-import './simulator.css';
+import './simulator8085.css';
 
 const Simulator = () => {
     // Initialize CPU and Assembler
@@ -190,8 +189,7 @@ const Simulator = () => {
                 setCpuState(prev => ({ ...prev, running: false }));
             }
         }, 100);
-    };
-      // Reset the simulator
+    };    // Reset the simulator
     const resetSimulator = () => {
         cpu.reset();
         setCurrentInstruction(program.length > 0 ? 0 : null);
@@ -201,9 +199,9 @@ const Simulator = () => {
             halted: false,
             running: false
         });
-        // Trigger memory view update
+        // Trigger memory view update to show zeroed memory
         setMemoryUpdateTrigger(prev => prev + 1);
-        addLog('Simulator reset', 'info');
+        addLog('Simulator reset - memory cleared to zeros', 'info');
     };
     
     // Get memory range from CPU
@@ -219,23 +217,21 @@ const Simulator = () => {
             halted: cpu.halted,
             running: cpu.running
         });
-    }, [cpu.registers, cpu.flags, cpu.halted, cpu.running]);
+    }, [cpu.registers, cpu.flags, cpu.halted, cpu.running]);      
+    
     
     return (
-        <div className="simulator">
-            <div className="simulator-header">
-                <h2>8085 Microprocessor Simulator</h2>
-            </div>
-            <div className="simulator-container">
-                <div className="simulator-left-panel">
-                    <Editor onLoad={handleLoadCode} />
-                    <Console logs={logs} />
+        <div className="simulator-page">
+            <div className="simulator">
+                <div className="simulator-header">
+                    <h2>8085 Microprocessor Simulator</h2>
+                    <p className="simulator-subtitle">Interactive Educational Emulator</p>
                 </div>
-                <div className="simulator-right-panel">
-                    <div className="simulator-control-area">
-                        <RegisterView registers={cpuState.registers} />
-                        <FlagsView flags={cpuState.flags} />
-                        <ControlPanel 
+                <div className="simulator-container">
+                    <div className="simulator-left-panel">
+                        <Editor onLoad={handleLoadCode} />
+                        <Console 
+                            logs={logs}
                             onRun={runProgram}
                             onStep={executeStep}
                             onReset={resetSimulator}
@@ -243,7 +239,13 @@ const Simulator = () => {
                             isRunning={cpuState.running}
                         />
                     </div>
-                    <MemoryView getMemory={getMemory} memoryUpdateTrigger={memoryUpdateTrigger} />
+                    <div className="simulator-right-panel">
+                        <div className="simulator-control-area">
+                            <RegisterView registers={cpuState.registers} />
+                            <FlagsView flags={cpuState.flags} />
+                        </div>
+                        <MemoryView getMemory={getMemory} memoryUpdateTrigger={memoryUpdateTrigger} />
+                    </div>
                 </div>
             </div>
         </div>

@@ -49,9 +49,7 @@ const MemoryView = ({ memory, getMemory, memoryUpdateTrigger }) => {
     // Update memory view whenever CPU state changes or on reset
     useEffect(() => {
         updateMemoryView();
-    }, [memoryUpdateTrigger]);
-
-    return (
+    }, [memoryUpdateTrigger]);    return (
         <div className="memory-view">
             <h3>Memory View</h3>
             <div className="memory-controls">
@@ -68,7 +66,10 @@ const MemoryView = ({ memory, getMemory, memoryUpdateTrigger }) => {
                     <span className="address-suffix">H</span>
                 </div>
                 <button onClick={handleViewMemory} className="btn btn-secondary">
-                    View Memory
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-search" viewBox="0 0 16 16" style={{marginRight: '5px'}}>
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    </svg>
+                    View
                 </button>
             </div>
             
@@ -91,12 +92,12 @@ const MemoryView = ({ memory, getMemory, memoryUpdateTrigger }) => {
                                 
                                 return (
                                     <tr key={rowPrefix}>
-                                        <td className="address-cell">{rowPrefix}</td>
-                                        {[...Array(16).keys()].map(col => {
+                                        <td className="address-cell">{rowPrefix}</td>                                        {[...Array(16).keys()].map(col => {
                                             const address = (baseAddress + col).toString(16).padStart(4, '0').toUpperCase();
+                                            // Always show '00' for empty cells to make it clear memory is zeroed
                                             return (
-                                                <td key={col} className={`memory-cell ${memoryData[address] ? 'has-value' : ''}`}>
-                                                    {memoryData[address] ? formatByte(memoryData[address]) : '00'}
+                                                <td key={col} className={`memory-cell ${memoryData[address] && memoryData[address] !== 0 ? 'has-value' : ''}`}>
+                                                    {memoryData[address] !== undefined ? formatByte(memoryData[address]) : '00'}
                                                 </td>
                                             );
                                         })}

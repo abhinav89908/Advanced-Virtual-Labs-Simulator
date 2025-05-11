@@ -55,15 +55,15 @@ const RegisterView = ({ registers }) => {
                             <span className="register-value">{formatByte(L)}</span>
                         </div>
                     </div>
-                </div>
-                <div className="register-group special-registers">
-                    <div className="register">
-                        <span className="register-label">PC</span>
-                        <span className="register-value">{formatWord(PC)}</span>
-                    </div>
-                    <div className="register">
-                        <span className="register-label">SP</span>
-                        <span className="register-value">{formatWord(SP)}</span>
+                    <div className="register-group special-registers">
+                        <div className="register">
+                            <span className="register-label">PC</span>
+                            <span className="register-value">{formatWord(PC)}</span>
+                        </div>
+                        <div className="register">
+                            <span className="register-label">SP</span>
+                            <span className="register-value">{formatWord(SP)}</span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -24,6 +24,14 @@ export default function ExperimentPage() {
   const [results, setResults] = useState({});
   const [showCompletionModal, setShowCompletionModal] = useState(false);
 
+  // Handle custom render types like the 8085 simulator
+  useEffect(() => {
+    if (currentExperiment && currentExperiment.render_type === "custom" && currentExperiment.module_url) {
+      // Navigate to the custom module URL
+      navigate(currentExperiment.module_url);
+    }
+  }, [currentExperiment, navigate]);
+
   // Simulated user authentication - in a real app, this would use Firebase Auth or similar
   useEffect(() => {
     // For demo purposes, we'll use the first user in our JSON data

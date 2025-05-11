@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, Beaker, BookOpen, Clock, ChevronRight, Tag } from 'lucide-react';
+import { Search, Filter, Beaker, BookOpen, Clock, ChevronRight, Tag, Cpu } from 'lucide-react';
 import labsData from '../../virtual_db/labs.json';
 import ResponsiveHeader from '../shared-components/Header';
 import Footer from '../shared-components/Footer';
@@ -67,6 +67,10 @@ export default function LabDashboard() {
     setSelectedCategory(category);
   };
 
+  const navigateToSimulator = () => {
+    navigate('/simulator/8085');
+  };
+
   const handleAssistantToggle = (isOpen) => {
     console.log("Assistant is now:", isOpen ? "open" : "closed");
   };
@@ -80,11 +84,22 @@ export default function LabDashboard() {
       />
       
       <main className="flex-grow container mx-auto px-4 pt-24 pb-12">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Virtual Laboratory</h1>
-          <p className="text-gray-600">
-            Explore interactive experiments across various scientific disciplines
-          </p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Virtual Laboratory</h1>
+            <p className="text-gray-600">
+              Explore interactive experiments across various scientific disciplines
+            </p>
+          </div>
+          <div>
+            <button
+              onClick={navigateToSimulator}
+              className="flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md transition-colors"
+            >
+              <Cpu className="h-5 w-5 mr-2" />
+              8085 Simulator
+            </button>
+          </div>
         </div>
         
         {/* Search and Filter Bar */}

@@ -21,14 +21,13 @@
     },
     "render_type": "iframe",
     "module_url": "/labs"
-  },
-  {
+  },  {
     "_id": "exp_8085_microprocessor",
     "lab_id": "logic_design_microprocessor",
     "name": "8085 Microprocessor Simulator",
     "description": "Simulate the 8085 microprocessor and learn about its architecture, instruction set, and programming. Write and execute assembly language programs in a virtual environment.",
     
-    "instructions": "1. Select the instruction set to use\n2. Write your assembly code in the editor\n3. Press 'Run' to execute the program\n4. View the output and debug as necessary",
+    "instructions": "1. Write your assembly code in the editor\n2. Press 'Load Code' to parse the program\n3. Press 'Run' to execute the entire program\n4. Use 'Step' to execute one instruction at a time\n5. Monitor registers, flags, and memory values\n6. Press 'Reset' to start over",
     "thumbnail": "/images/lab-thumbnail.png",
     "difficulty": "Advanced",
     "estimated_time": "90 mins",
@@ -42,8 +41,8 @@
     "output_config": {
       "output": { "formula": "", "unit": "" }
     },
-    "render_type": "iframe",
-    "module_url": "/labs/microprocessor",
+    "render_type": "custom",
+    "module_url": "/simulator/8085",
     "created_at": "2023-06-15"
   }
 ]

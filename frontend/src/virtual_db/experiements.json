@@ -20,10 +20,10 @@
       "angle_of_refraction": { "formula": "Snell's Law", "unit": "degrees" }
     },
     "render_type": "iframe",
-    "module_url": "/labs"
+    "module_url": "/simulator/8085"
   },  {
-    "_id": "exp_8085_microprocessor",
-    "lab_id": "logic_design_microprocessor",
+    "_id": "exp_8085_microprocessor2",
+    "lab_id": "logic_design_microprocessor2",
     "name": "8085 Microprocessor Simulator",
     "description": "Simulate the 8085 microprocessor and learn about its architecture, instruction set, and programming. Write and execute assembly language programs in a virtual environment.",
     
@@ -41,7 +41,7 @@
     "output_config": {
       "output": { "formula": "", "unit": "" }
     },
-    "render_type": "custom",
+    "render_type": "iframe",
     "module_url": "/simulator/8085",
     "created_at": "2023-06-15"
   }

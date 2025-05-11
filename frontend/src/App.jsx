@@ -3,7 +3,7 @@ import LandingPage from './components/LandingPage';
 import LabDashboard from './components/labs/LabDashboard';
 import ExperimentPage from './components/labs/ExperimentPage';
 import Room from './components/Room';
-import Simulator8085 from './components/simulators/8085_microprocessor/Simulator';
+import Simulator8085 from './components/simulators/8085_microprocessor/Simulator8085';
 
 function App() {
   return (

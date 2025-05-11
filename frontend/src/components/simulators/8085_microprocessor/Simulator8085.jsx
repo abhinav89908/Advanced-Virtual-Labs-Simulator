@@ -6,7 +6,7 @@ import MemoryView from './components/MemoryView';
 import Console from './components/Console';
 import CPU from './logic/CPU';
 import Assembler from './logic/Assembler';
-import './simulator.css';
+import './simulator8085.css';
 
 const Simulator = () => {
     // Initialize CPU and Assembler

@@ -98,16 +98,6 @@ export default function LandingPage() {
                   Register Now
                 </button>
               </div>
-              <div className="flex items-center">
-                <button 
-                  onClick={navigateToSimulator}
-                  className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
-                >
-                  <Cpu className="mr-2 h-5 w-5" />
-                  Try the 8085 Simulator
-                </button>
-                <span className="ml-3 text-sm text-gray-500">No login required</span>
-              </div>
             </div>
             <div className="md:w-1/2">
               <div className="relative">

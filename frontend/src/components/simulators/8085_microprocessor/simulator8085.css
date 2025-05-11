@@ -167,7 +167,7 @@
 
 .simulator-control-area {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 2fr 1fr;
     grid-gap: 25px;
 }
 
@@ -914,7 +914,7 @@
 }
 
 /* Responsive layout */
-@media (max-width: 768px) {
+@media (max-width: 918px) {
     .simulator-container {
         flex-direction: column;
     }

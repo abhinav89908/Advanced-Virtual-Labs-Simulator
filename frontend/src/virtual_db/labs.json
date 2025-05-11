@@ -10,13 +10,14 @@
     "enabled": true,
     "experiments": [],
     "render_type": "iframe",
+    "module_url": "https://abhinavprajapati.netlify.app/",
     "author": "Abhinav Prajapati",
     "version": "1.2",
     "difficulty": "Beginner",
     "estimated_time": "45 mins"
   },
   {
-    "_id": "logic_design_microprocessor",
+    "_id": "logic_design_microprocessor2",
     "name": "Microprocessor Lab",
     "description": "Dive into the fundamentals of logic design with hands-on experiments. Learn about digital circuits, Boolean algebra, and the principles of designing combinational and sequential logic systems.",
     "category": "Logic Design",

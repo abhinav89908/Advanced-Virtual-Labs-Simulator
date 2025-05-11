@@ -1,5 +1,30 @@
 [
   {
+    "_id": "exp_ray_optics",
+    "lab_id": "physics_optics",
+    "name": "Ray Optics Simulator",
+    "description": "Interactive simulator for ray optics demonstrating image formation using concave/convex lenses and mirrors. Visualize ray diagrams and understand the principles of geometric optics.",
+    "instructions": "1. Select the type of optical element (concave/convex lens or mirror).\n2. Adjust the focal length using the slider.\n3. Move the object to different positions.\n4. Observe how the image forms and its properties.\n5. Toggle ray visualization and numerical values.",
+    "thumbnail": "/images/experiment.png",
+    "difficulty": "Intermediate",
+    "estimated_time": "45 mins",
+    "assets": {
+      "scripts": ["rayOptics.js"],
+      "styles": ["simulatorOptics.css"]
+    },
+    "input_config": {
+      "element_type": { "type": "dropdown", "options": ["Convex Lens", "Concave Lens", "Concave Mirror", "Convex Mirror"], "default": "Convex Lens" },
+      "focal_length": { "type": "number", "unit": "cm", "default": 10, "min": 1, "max": 30 },
+      "object_distance": { "type": "number", "unit": "cm", "default": 20, "min": 5, "max": 50 }
+    },
+    "output_config": {
+      "image_distance": { "formula": "1/f = 1/v ± 1/u", "unit": "cm" },
+      "magnification": { "formula": "M = -v/u", "unit": "" }
+    },
+    "render_type": "iframe",
+    "module_url": "/simulator/optics"
+  },
+  {
     "_id": "exp_light_refraction",
     "lab_id": "physics_optics",
     "name": "Light Refraction Experiment",
@@ -21,7 +46,7 @@
     },
     "render_type": "iframe",
     "module_url": "/simulator/8085"
-  },  {
+  },{
     "_id": "exp_8085_microprocessor2",
     "lab_id": "logic_design_microprocessor2",
     "name": "8085 Microprocessor Simulator",

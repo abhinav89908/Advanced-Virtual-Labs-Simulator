@@ -16,17 +16,16 @@ const Console = ({ logs, onRun, onStep, onReset, isHalted, isRunning }) => {
     return (
         <div className="console-view">            <div className="console-header">
                 <h3>Console Output</h3>
-                <div className="console-controls">
+                <div className="control-buttons">
                     <button 
                         onClick={onRun} 
                         className="btn btn-primary"
                         disabled={isHalted || isRunning}
                         title="Run the entire program"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style={{marginRight: '4px'}}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style={{marginRight: '4px'}}>
                             <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
-                        </svg>
-                        Run
+                        </svg> Run
                     </button>
                     <button 
                         onClick={onStep} 
@@ -50,11 +49,11 @@ const Console = ({ logs, onRun, onStep, onReset, isHalted, isRunning }) => {
                         </svg>
                         Reset
                     </button>
-                </div>
-                <div className="execution-status">
-                    {isHalted && <span className="status halted">CPU Halted</span>}
-                    {isRunning && <span className="status running">Running...</span>}
-                    {!isHalted && !isRunning && <span className="status ready">Ready</span>}
+                    <div className="execution-status">
+                        {isHalted && <span className="status halted">CPU Halted</span>}
+                        {isRunning && <span className="status running">Running...</span>}
+                        {!isHalted && !isRunning && <span className="status ready">Ready</span>}
+                    </div>
                 </div>
             </div>
             <div className="console-container">

@@ -838,13 +838,16 @@
 .control-buttons {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 12px;
     justify-content: center;
 }
 
-.control-buttons .btn {
-    min-width: 100px;
-    padding: 12px 20px;
+.control-buttons .btn  {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 120px;
+    padding: 12px 40px;
     font-weight: 600;
 }
 

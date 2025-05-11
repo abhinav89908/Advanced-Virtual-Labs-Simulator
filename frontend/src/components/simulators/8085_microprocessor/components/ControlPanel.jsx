@@ -37,12 +37,12 @@ const ControlPanel = ({ onRun, onStep, onReset, isHalted, isRunning }) => {    r
                     </svg>
                     Reset
                 </button>
-            </div>
-            <div className="execution-status">
-                <span className="execution-status-label">Status:</span>
-                {isHalted && <span className="status halted">CPU Halted</span>}
-                {isRunning && <span className="status running">Running...</span>}
-                {!isHalted && !isRunning && <span className="status ready">Ready</span>}
+                <div className="execution-status">
+                    <span className="execution-status-label">Status:</span>
+                    {isHalted && <span className="status halted">CPU Halted</span>}
+                    {isRunning && <span className="status running">Running...</span>}
+                    {!isHalted && !isRunning && <span className="status ready">Ready</span>}
+                </div>
             </div>
         </div>
     );

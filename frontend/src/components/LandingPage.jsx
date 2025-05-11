@@ -1,16 +1,19 @@
-
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { ArrowRight, Beaker, BookOpen, CheckCircle, Users, MessageCircle, Bot } from 'lucide-react';
 import ResponsiveHeader from './shared-components/Header';
+import Footer from './shared-components/Footer';
 import StudentLogin from './LoginPage';
 import StudentRegistration from './RegistrationPage';
+import { UserContext } from './hooks/userContext';
 
 export default function LandingPage() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegistration, setShowRegistration] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
   const [isConnecting, setIsConnecting] = useState(false);
-  
+  const { isLoggedIn } = useContext(UserContext);
+
+
   const toggleLoginModal = () => {
     setShowLogin(!showLogin);
     if (showRegistration) setShowRegistration(false);
@@ -79,20 +82,38 @@ export default function LandingPage() {
                 Access state-of-the-art laboratory experiments from your device. 
                 Learn, collaborate, and discover without limitations.
               </p>
-              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <button 
-                  onClick={toggleLoginModal}
-                  className="px-6 py-3 bg-[#75aede] text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center"
-                >
-                  Student Login <ArrowRight className="ml-2 h-5 w-5" />
-                </button>
-                <button 
-                  onClick={toggleRegistrationModal}
-                  className="px-6 py-3 border-2 border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors flex items-center justify-center"
-                >
-                  Register Now
-                </button>
-              </div>
+              
+              {!isLoggedIn && (
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                  <button 
+                    onClick={toggleLoginModal}
+                    className="px-6 py-3 bg-[#75aede] text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center"
+                  >
+                    Student Login <ArrowRight className="ml-2 h-5 w-5" />
+                  </button>
+                  <button 
+                    onClick={toggleRegistrationModal}
+                    className="px-6 py-3 border-2 border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors flex items-center justify-center"
+                  >
+                    Register Now
+                  </button>
+                </div>
+              )}
+              
+              {isLoggedIn && (
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                  <button 
+                    className="px-6 py-3 bg-[#75aede] text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center"
+                  >
+                    Explore Labs <ArrowRight className="ml-2 h-5 w-5" />
+                  </button>
+                  <button 
+                    className="px-6 py-3 border-2 border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors flex items-center justify-center"
+                  >
+                    My Dashboard
+                  </button>
+                </div>
+              )}
             </div>
             <div className="md:w-1/2">
               <div className="relative">
@@ -172,74 +193,40 @@ export default function LandingPage() {
           <p className="text-xl mb-8 max-w-3xl mx-auto">
             Join thousands of students already using Virtual Labs to enhance their scientific education.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <button 
-              onClick={toggleRegistrationModal}
-              className="px-8 py-3 bg-white text-indigo-600 font-medium rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              Register Now
-            </button>
-            <button 
-              onClick={toggleLoginModal}
-              className="px-8 py-3 border-2 border-white text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              Student Login
-            </button>
-          </div>
+          
+          {/* Only show CTA buttons if not logged in */}
+          {!isLoggedIn && (
+            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+              <button 
+                onClick={toggleRegistrationModal}
+                className="px-8 py-3 bg-white text-indigo-600 font-medium rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                Register Now
+              </button>
+              <button 
+                onClick={toggleLoginModal}
+                className="px-8 py-3 border-2 border-white text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                Student Login
+              </button>
+            </div>
+          )}
+          
+          {/* Show get started button when logged in */}
+          {isLoggedIn && (
+            <div className="flex justify-center">
+              <button className="px-8 py-3 bg-white text-indigo-600 font-medium rounded-lg hover:bg-gray-100 transition-colors">
+                Get Started Now
+              </button>
+            </div>
+          )}
         </div>
       </section>
       
       {/* Footer */}
-      <footer className="bg-gray-800 text-gray-300 py-12">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between">
-            <div className="mb-8 md:mb-0">
-              <div className="flex items-center space-x-2 mb-4">
-                <Beaker className="h-8 w-8 text-indigo-400" />
-                <h3 className="text-xl font-bold text-white">Virtual Labs</h3>
-              </div>
-              <p className="max-w-xs">
-                Transforming science education through accessible, interactive virtual experiments.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
-              <div>
-                <h4 className="text-white font-semibold mb-4">Navigation</h4>
-                <ul className="space-y-2">
-                  <li><a href="#" className="hover:text-white transition-colors">Home</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Labs</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-white font-semibold mb-4">Resources</h4>
-                <ul className="space-y-2">
-                  <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Tutorials</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Community</a></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-white font-semibold mb-4">Contact</h4>
-                <ul className="space-y-2">
-                  <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Feedback</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Partnership</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-gray-700 mt-12 pt-8 text-center">
-            <p>&copy; {new Date().getFullYear()} Virtual Labs. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-      
-      {/* Login Modal */}
-      {showLogin && (
+      <Footer/>
+      {/* Login Modal - Only show if not logged in */}
+      {!isLoggedIn && showLogin && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
             <StudentLogin onClose={toggleLoginModal} onSwitchToRegister={toggleRegistrationModal} />
@@ -247,8 +234,8 @@ export default function LandingPage() {
         </div>
       )}
       
-      {/* Registration Modal */}
-      {showRegistration && (
+      {/* Registration Modal - Only show if not logged in */}
+      {!isLoggedIn && showRegistration && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
             <StudentRegistration onClose={toggleRegistrationModal} onSwitchToLogin={toggleLoginModal} />
@@ -256,5 +243,4 @@ export default function LandingPage() {
         </div>
       )}
     </div>
-  );
-}
+  )};

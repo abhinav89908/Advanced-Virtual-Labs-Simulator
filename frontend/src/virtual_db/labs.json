@@ -1,0 +1,35 @@
+[
+  {
+    "_id": "physics_optics",
+    "name": "Optics Lab",
+    "description": "Explore classical mechanics through interactive simulations of forces, motion, and energy. Perfect for understanding Newton's laws and fundamental physics concepts.",
+    "category": "Physics",
+    "thumbnail": "/images/experiment.png",  
+    "tags": [],
+    "created_at": "2023-05-10",
+    "enabled": true,
+    "experiments": [],
+    "render_type": "iframe",
+    "author": "Abhinav Prajapati",
+    "version": "1.2",
+    "difficulty": "Beginner",
+    "estimated_time": "45 mins"
+  },
+  {
+    "_id": "logic_design_microprocessor",
+    "name": "Microprocessor Lab",
+    "description": "Dive into the fundamentals of logic design with hands-on experiments. Learn about digital circuits, Boolean algebra, and the principles of designing combinational and sequential logic systems.",
+    "category": "Logic Design",
+    "thumbnail": "/images/experiment.png",  
+    "tags": [],
+    "created_at": "2023-06-15",
+    "enabled": true,
+    "experiments": [],
+    "render_type": "iframe",
+    "module_url": "https://abhinavprajapati.netlify.app/",
+    "author": "Mansi Samant",
+    "version": "1.0",
+    "difficulty": "Intermediate",
+    "estimated_time": "60 mins"
+  }
+]

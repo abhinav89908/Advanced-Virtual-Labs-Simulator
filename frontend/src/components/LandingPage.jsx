@@ -1,6 +1,6 @@
-
 import { useState } from 'react';
-import { ArrowRight, Beaker, BookOpen, CheckCircle, Users, MessageCircle, Bot } from 'lucide-react';
+import { ArrowRight, Beaker, BookOpen, CheckCircle, Users, MessageCircle, Bot, Cpu } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import ResponsiveHeader from './shared-components/Header';
 import StudentLogin from './LoginPage';
 import StudentRegistration from './RegistrationPage';
@@ -10,6 +10,7 @@ export default function LandingPage() {
   const [showRegistration, setShowRegistration] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
   const [isConnecting, setIsConnecting] = useState(false);
+  const navigate = useNavigate();
   
   const toggleLoginModal = () => {
     setShowLogin(!showLogin);
@@ -19,6 +20,10 @@ export default function LandingPage() {
   const toggleRegistrationModal = () => {
     setShowRegistration(!showRegistration);
     if (showLogin) setShowLogin(false);
+  };
+
+  const navigateToSimulator = () => {
+    navigate('/simulator/8085');
   };
 
   const handleAssistantToggle = (isOpen) => {
@@ -79,7 +84,7 @@ export default function LandingPage() {
                 Access state-of-the-art laboratory experiments from your device. 
                 Learn, collaborate, and discover without limitations.
               </p>
-              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
                 <button 
                   onClick={toggleLoginModal}
                   className="px-6 py-3 bg-[#75aede] text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center"
@@ -92,6 +97,16 @@ export default function LandingPage() {
                 >
                   Register Now
                 </button>
+              </div>
+              <div className="flex items-center">
+                <button 
+                  onClick={navigateToSimulator}
+                  className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
+                >
+                  <Cpu className="mr-2 h-5 w-5" />
+                  Try the 8085 Simulator
+                </button>
+                <span className="ml-3 text-sm text-gray-500">No login required</span>
               </div>
             </div>
             <div className="md:w-1/2">

@@ -1,228 +1,424 @@
 import { useState, useEffect } from 'react';
-import { Mic, BookOpen, Lightbulb, MonitorPlay, MessageSquare, Save, Send } from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Play, Clipboard, FileText, BookOpen, Award, Save, ExternalLink, Info, AlertTriangle } from 'lucide-react';
+import labsData from '../../virtual_db/labs.json';
+import experimentsData from '../../virtual_db/experiements.json';
+import usersData from '../../virtual_db/users.json';
+import ResponsiveHeader from '../shared-components/Header';
+import Footer from '../shared-components/Footer';
 
-// This would come from your backend or context in a real application
-const sampleLabData = {
-  id: "exp-123",
-  title: "Pendulum Motion Experiment",
-  labManual: "# Pendulum Motion Experiment\n\n## Objective\nTo study the simple pendulum motion and verify the relationship between period and length.\n\n## Theory\nA simple pendulum consists of a small bob suspended by a light string. When displaced and released, it oscillates about its equilibrium position.\n\n## Procedure\n1. Measure the length of the pendulum\n2. Displace the pendulum by a small angle\n3. Release and measure the time for 20 oscillations\n4. Calculate the period of oscillation\n5. Repeat with different lengths\n\n## Observations\nRecord your measurements in the table provided in the Results section.",
-  tips: "- Ensure small oscillations (less than 15°) for the small-angle approximation to be valid\n- Use a stopwatch with good precision\n- Start timing when the pendulum passes through the equilibrium position\n- Avoid parallax error when measuring lengths",
-  simulationUrl: "https://example.com/pendulum-simulation"
-};
+export default function ExperimentPage() {
+  const [searchParams] = useSearchParams();
+  const labId = searchParams.get('lab');
+  const experimentId = searchParams.get('experiment');
+  const navigate = useNavigate();
+  
+  const [currentUser, setCurrentUser] = useState(null);
+  const [lab, setLab] = useState(null);
+  const [experiments, setExperiments] = useState([]);
+  const [currentExperiment, setCurrentExperiment] = useState(null);
+  const [iframeKey, setIframeKey] = useState(0); // For forcing iframe reload
+  const [isLoading, setIsLoading] = useState(true);
+  const [isConnected, setIsConnected] = useState(true);
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [results, setResults] = useState({});
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
 
-const ExperimentPage = () => {
-  const [activeTab, setActiveTab] = useState('manual');
-  const [messages, setMessages] = useState([
-    { user: 'System', text: 'Welcome to the lab chat! Connect with others working on this experiment.', timestamp: new Date() }
-  ]);
-  const [userMessage, setUserMessage] = useState('');
-  const [connectedUsers, setConnectedUsers] = useState(['John', 'Maria']);
-  const [results, setResults] = useState('');
-  const [isListening, setIsListening] = useState(false);
-  const [assistantMessage, setAssistantMessage] = useState('Hello! I am your lab assistant. Ask me anything about this experiment.');
-
-  // This would be replaced with actual socket.io implementation
-  const simulateNewMessage = () => {
-    const randomUser = connectedUsers[Math.floor(Math.random() * connectedUsers.length)];
-    if (Math.random() > 0.7) {
-      const newMessage = {
-        user: randomUser,
-        text: `I'm working on step ${Math.floor(Math.random() * 5) + 1} now.`,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, newMessage]);
-    }
-  };
-
+  // Handle custom render types like the 8085 simulator
   useEffect(() => {
-    const interval = setInterval(simulateNewMessage, 15000);
-    return () => clearInterval(interval);
-  }, [connectedUsers]);
+    if (currentExperiment && currentExperiment.render_type === "custom" && currentExperiment.module_url) {
+      // Navigate to the custom module URL
+      navigate(currentExperiment.module_url);
+    }
+  }, [currentExperiment, navigate]);
 
-  const handleSendMessage = () => {
-    if (userMessage.trim() === '') return;
-    
-    const newMessage = {
-      user: 'You',
-      text: userMessage,
-      timestamp: new Date()
+  // Simulated user authentication - in a real app, this would use Firebase Auth or similar
+  useEffect(() => {
+    // For demo purposes, we'll use the first user in our JSON data
+    setCurrentUser(usersData[0]);
+  }, []);
+
+  // Fetch lab and experiments data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Find the selected lab
+        const selectedLab = labsData.find(l => l._id === labId);
+        
+        if (!selectedLab) {
+          throw new Error('Lab not found');
+        }
+        
+        setLab(selectedLab);
+        
+        // Find all experiments for this lab
+        const labExperiments = experimentsData.filter(exp => exp.lab_id === labId);
+        setExperiments(labExperiments);
+        
+        // Set current experiment (either from URL param or first experiment)
+        if (experimentId) {
+          const selectedExperiment = experimentsData.find(exp => exp._id === experimentId);
+          if (selectedExperiment) {
+            setCurrentExperiment(selectedExperiment);
+          } else {
+            setCurrentExperiment(labExperiments[0]);
+          }
+          console.log('Selected experiment:', selectedExperiment);
+        } else if (labExperiments.length > 0) {
+          setCurrentExperiment(labExperiments[0]);
+        }
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error loading experiment:', error);
+        setIsLoading(false);
+      }
+    };
+
+    if (labId) {
+      fetchData();
+    } else {
+      navigate('/labs');
+    }
+  }, [labId, experimentId, navigate]);
+
+  // Simulate experiment completion
+  const handleCompleteExperiment = () => {
+    // In a real app, this would send data to Firebase/database
+    const newResults = {
+      completed: true,
+      score: Math.floor(Math.random() * 21) + 80, // Random score 80-100
+      timestamp: new Date().toISOString()
     };
     
-    setMessages(prev => [...prev, newMessage]);
-    setUserMessage('');
-  };
-
-  const toggleListening = () => {
-    setIsListening(!isListening);
-    if (!isListening) {
-      // Simulate a response from the assistant after "listening"
-      setTimeout(() => {
-        setAssistantMessage("The pendulum's period T is related to its length L by the formula T = 2π√(L/g), where g is the acceleration due to gravity. Make sure to measure the length from the pivot point to the center of the bob.");
-        setIsListening(false);
-      }, 3000);
+    setResults(newResults);
+    setShowCompletionModal(true);
+    
+    // Update progress in user object (simulation only)
+    if (currentUser && currentExperiment) {
+      const updatedUser = {...currentUser};
+      if (!updatedUser.progress) {
+        updatedUser.progress = {};
+      }
+      
+      updatedUser.progress[currentExperiment._id] = {
+        completed: true,
+        score: newResults.score,
+        last_attempt: newResults.timestamp,
+        attempts: updatedUser.progress[currentExperiment._id]?.attempts 
+          ? updatedUser.progress[currentExperiment._id].attempts + 1 
+          : 1
+      };
+      
+      setCurrentUser(updatedUser);
+      console.log('Updated user progress:', updatedUser.progress);
     }
   };
 
-  const saveResults = () => {
-    alert("Results saved! (In a real app, this would save to database)");
+  const selectExperiment = (experiment) => {
+    setCurrentExperiment(experiment);
+    setIframeKey(prev => prev + 1); // Force iframe reload
+    navigate(`/experiment?lab=${labId}&experiment=${experiment._id}`);
   };
 
+  const handleRestartExperiment = () => {
+    setIframeKey(prev => prev + 1); // Force iframe reload
+  };
+
+  const handleBackToLabs = () => {
+    navigate('/labs');
+  };
+
+  const handleAssistantToggle = (isOpen) => {
+    console.log("Assistant is now:", isOpen ? "open" : "closed");
+  };
+
+  // Check if user has completed this experiment before
+  const getExperimentProgress = () => {
+    if (!currentUser || !currentExperiment) return null;
+    return currentUser.progress?.[currentExperiment._id];
+  };
+
+  const experimentProgress = getExperimentProgress();
+
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-blue-700 text-white p-4">
-        <h1 className="text-xl font-bold">{sampleLabData.title}</h1>
-      </header>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <ResponsiveHeader 
+        isConnected={isConnected} 
+        isConnecting={false}
+        onAssistantToggle={handleAssistantToggle}
+      />
       
-      {/* Main content area */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left side - Lab content */}
-        <div className="flex flex-col w-3/4 p-4 overflow-hidden">
-          {/* Tabs */}
-          <div className="flex border-b">
-            <button 
-              className={`flex items-center px-4 py-2 ${activeTab === 'manual' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600'}`} 
-              onClick={() => setActiveTab('manual')}
-            >
-              <BookOpen className="mr-2 h-4 w-4" />
-              Lab Manual
-            </button>
-            <button 
-              className={`flex items-center px-4 py-2 ${activeTab === 'tips' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600'}`} 
-              onClick={() => setActiveTab('tips')}
-            >
-              <Lightbulb className="mr-2 h-4 w-4" />
-              Tips
-            </button>
-            <button 
-              className={`flex items-center px-4 py-2 ${activeTab === 'simulation' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600'}`} 
-              onClick={() => setActiveTab('simulation')}
-            >
-              <MonitorPlay className="mr-2 h-4 w-4" />
-              Simulation
-            </button>
-            <button 
-              className={`flex items-center px-4 py-2 ${activeTab === 'assistant' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600'}`} 
-              onClick={() => setActiveTab('assistant')}
-            >
-              <Mic className="mr-2 h-4 w-4" />
-              Lab Assistant
-            </button>
+      <main className="flex-grow container mx-auto pt-20 pb-12">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
           </div>
-          
-          {/* Tab content */}
-          <div className="flex-1 overflow-auto p-4">
-            {activeTab === 'manual' && (
-              <div className="prose max-w-none">
-                <div dangerouslySetInnerHTML={{ __html: sampleLabData.labManual.replace(/\n/g, '<br/>') }} />
-              </div>
-            )}
-            
-            {activeTab === 'tips' && (
-              <div className="prose max-w-none">
-                <h2 className="text-xl font-semibold mb-4">Tips & Tricks</h2>
-                <ul className="list-disc pl-5">
-                  {sampleLabData.tips.split('\n').map((tip, index) => (
-                    <li key={index} className="mb-2">{tip.replace('- ', '')}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            
-            {activeTab === 'simulation' && (
-              <div className="h-full flex flex-col items-center justify-center">
-                <div className="bg-gray-200 w-full h-64 md:h-96 flex items-center justify-center border border-gray-300 rounded">
-                  <p className="text-gray-600">Simulation would load here from: {sampleLabData.simulationUrl}</p>
-                </div>
-                <p className="mt-4 text-gray-700">Use the simulation controls to adjust parameters and observe the results</p>
-              </div>
-            )}
-            
-            {activeTab === 'assistant' && (
-              <div className="flex flex-col h-full">
-                <div className="bg-blue-50 p-4 rounded-lg mb-4">
-                  <p className="text-gray-800">{assistantMessage}</p>
-                </div>
-                <div className="flex-1"></div>
-                <div className="flex items-center">
-                  <button 
-                    className={`flex items-center justify-center p-3 rounded-full ${isListening ? 'bg-red-500' : 'bg-blue-500'} text-white mr-4`}
-                    onClick={toggleListening}
-                  >
-                    <Mic className="h-5 w-5" />
-                  </button>
-                  <p className="text-gray-600">{isListening ? 'Listening... Speak your question' : 'Click the microphone to ask a question'}</p>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          {/* Results section */}
-          <div className="bg-white p-4 border rounded-md mt-4">
-            <h3 className="text-lg font-medium mb-2">Results</h3>
-            <textarea 
-              className="w-full h-32 p-2 border rounded" 
-              placeholder="Record your experiment results here..." 
-              value={results} 
-              onChange={(e) => setResults(e.target.value)}
-            ></textarea>
-            <button 
-              className="mt-2 bg-green-600 text-white px-4 py-2 rounded flex items-center"
-              onClick={saveResults}
-            >
-              <Save className="mr-2 h-4 w-4" />
-              Save Results
-            </button>
-          </div>
-        </div>
-        
-        {/* Right side - Chat */}
-        <div className="w-1/4 bg-white border-l border-gray-200 flex flex-col">
-          <div className="p-3 bg-gray-100 border-b">
-            <h3 className="font-medium flex items-center">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Live Chat ({connectedUsers.length + 1} users)
-            </h3>
-          </div>
-          
-          {/* Chat messages */}
-          <div className="flex-1 overflow-y-auto p-3">
-            {messages.map((msg, index) => (
-              <div key={index} className="mb-3">
-                <div className="flex items-center">
-                  <span className="font-medium text-sm">{msg.user}</span>
-                  <span className="text-xs text-gray-500 ml-2">
-                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-                <p className="text-gray-800 text-sm">{msg.text}</p>
-              </div>
-            ))}
-          </div>
-          
-          {/* Chat input */}
-          <div className="p-3 border-t">
-            <div className="flex">
-              <input
-                type="text"
-                className="flex-1 border rounded-l-md px-3 py-2"
-                placeholder="Type your message..."
-                value={userMessage}
-                onChange={(e) => setUserMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              />
-              <button 
-                className="bg-blue-600 text-white rounded-r-md px-3 py-2"
-                onClick={handleSendMessage}
+        ) : (
+          <div className="px-4">
+            {/* Back and breadcrumb navigation */}
+            <div className="mb-6">
+              <button
+                onClick={handleBackToLabs}
+                className="flex items-center text-indigo-600 hover:text-indigo-800 transition-colors"
               >
-                <Send className="h-5 w-5" />
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Labs
+              </button>
+              <div className="text-sm text-gray-500 mt-2">
+                Labs / {lab?.category} / {lab?.name}
+              </div>
+            </div>
+            
+            {/* Lab Header */}
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">{lab?.name}</h1>
+              <p className="text-gray-600 mb-4">{lab?.description}</p>
+              <div className="flex flex-wrap gap-2">
+                {lab?.tags.map((tag, index) => (
+                  <span 
+                    key={index} 
+                    className="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-md text-sm"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+            
+            {/* Main Content with Sidebar */}
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Sidebar with Experiment List */}
+              <div className="lg:w-64 bg-white rounded-xl shadow-sm overflow-hidden">
+                <div className="bg-indigo-600 px-4 py-3">
+                  <h3 className="text-white font-medium">Available Experiments</h3>
+                </div>
+                <div className="divide-y divide-gray-200">
+                  {experiments.map((experiment) => {
+                    const isCompleted = currentUser?.progress?.[experiment._id]?.completed;
+                    return (
+                      <button
+                        key={experiment._id}
+                        className={`block w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
+                          currentExperiment?._id === experiment._id ? 'bg-indigo-50' : ''
+                        }`}
+                        onClick={() => selectExperiment(experiment)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-gray-800">{experiment.name}</span>
+                          {isCompleted && (
+                            <Award className="h-4 w-4 text-green-500" />
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-500 flex items-center gap-2 mt-1">
+                          <span>{experiment.difficulty}</span>
+                          <span>•</span>
+                          <span>{experiment.estimated_time}</span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              {/* Main Experiment Area */}
+              <div className="flex-1 flex flex-col">
+                {currentExperiment ? (
+                  <>
+                    {/* Experiment Header */}
+                    <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
+                      <div className="flex justify-between items-center">
+                        <h2 className="text-xl font-bold text-gray-800">
+                          {currentExperiment.name}
+                        </h2>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setShowInstructions(!showInstructions)}
+                            className="px-3 py-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm"
+                          >
+                            {showInstructions ? 'Hide' : 'Show'} Instructions
+                          </button>
+                          <button
+                            onClick={handleRestartExperiment}
+                            className="px-3 py-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm flex items-center"
+                          >
+                            <Play className="h-3.5 w-3.5 mr-1" /> Reset
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Instructions Panel */}
+                    {showInstructions && (
+                      <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
+                        <h3 className="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                          <FileText className="h-5 w-5 mr-2 text-indigo-500" />
+                          Instructions
+                        </h3>
+                        <p className="text-gray-600 mb-4">{currentExperiment.description}</p>
+                        <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
+                          <h4 className="font-medium text-gray-700 mb-2">Procedure</h4>
+                          <div className="text-gray-600 whitespace-pre-line">
+                            {currentExperiment.instructions}
+                          </div>
+                        </div>
+                        
+                        {/* Previous Results (if any) */}
+                        {experimentProgress && (
+                          <div className="mt-4 bg-blue-50 p-4 rounded-md border border-blue-200">
+                            <h4 className="flex items-center font-medium text-blue-700 mb-2">
+                              <Info className="h-4 w-4 mr-2" />
+                              Previous Attempt
+                            </h4>
+                            <div className="grid grid-cols-3 gap-4 text-sm">
+                              <div>
+                                <div className="text-blue-600 font-medium">Score</div>
+                                <div>{experimentProgress.score}%</div>
+                              </div>
+                              <div>
+                                <div className="text-blue-600 font-medium">Attempts</div>
+                                <div>{experimentProgress.attempts}</div>
+                              </div>
+                              <div>
+                                <div className="text-blue-600 font-medium">Last Attempt</div>
+                                <div>{new Date(experimentProgress.last_attempt).toLocaleDateString()}</div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Experiment Interactive Area */}
+                    <div className="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col flex-grow">
+                      <div className="bg-gray-100 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
+                        <h3 className="font-medium text-gray-700">Interactive Simulation</h3>
+                        <a 
+                          href={currentExperiment.module_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-indigo-600 text-sm flex items-center"
+                        >
+                          Open in New Tab <ExternalLink className="h-3.5 w-3.5 ml-1" />
+                        </a>
+                      </div>
+                      
+                      <div className="flex-grow flex flex-col">
+                        {/* Render iframe or component based on render_type */}
+                        {currentExperiment.render_type === "iframe" ? (
+                          <iframe
+                            key={iframeKey}
+                            src={currentExperiment.module_url}
+                            title={currentExperiment.name}
+                            className="w-full flex-grow border-0"
+                            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                            loading="lazy"
+                          ></iframe>
+                        ) : (
+                          <div className="flex-grow flex items-center justify-center p-8 bg-gray-50">
+                            <div className="text-center">
+                              <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+                              <h3 className="text-lg font-medium text-gray-800 mb-2">Component Not Available</h3>
+                              <p className="text-gray-600 max-w-md">
+                                This experiment uses a custom renderer that isn't available in the demo version.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Action Bar */}
+                      <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                        <div className="flex justify-between items-center">
+                          <div className="text-sm text-gray-500">
+                            Complete the steps above to finish this experiment
+                          </div>
+                          <div className="flex gap-3">
+                            <button
+                              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              Save Progress
+                            </button>
+                            <button
+                              onClick={handleCompleteExperiment}
+                              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                            >
+                              Complete Experiment
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="bg-white rounded-xl shadow-md p-8 text-center">
+                    <div className="text-gray-500 mb-4">
+                      <Clipboard className="h-12 w-12 mx-auto" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-800 mb-2">No Experiment Selected</h3>
+                    <p className="text-gray-600">
+                      Please select an experiment from the list to begin.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+      
+      {/* Completion Modal */}
+      {showCompletionModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 animate-fade-in">
+            <div className="text-center mb-6">
+              <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Award className="h-8 w-8 text-green-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800">Experiment Complete!</h2>
+              <p className="text-gray-600 mt-2">
+                You've successfully completed {currentExperiment?.name}
+              </p>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+              <div className="flex justify-between items-center mb-4">
+                <span className="font-medium text-gray-700">Your Score</span>
+                <span className="text-xl font-bold text-indigo-600">{results.score}%</span>
+              </div>
+              
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className="bg-indigo-600 h-2.5 rounded-full"
+                  style={{ width: `${results.score}%` }}  
+                ></div>
+              </div>
+            </div>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowCompletionModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Close
+              </button>
+              <button
+                onClick={handleBackToLabs}
+                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+              >
+                Back to Labs
               </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
+      
+      <Footer />
     </div>
   );
-};
-
-export default ExperimentPage;
+}

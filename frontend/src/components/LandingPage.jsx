@@ -1,5 +1,6 @@
-import { useState, useContext } from 'react';
-import { ArrowRight, Beaker, BookOpen, CheckCircle, Users, MessageCircle, Bot } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, Beaker, BookOpen, CheckCircle, Users, MessageCircle, Bot, Cpu } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import ResponsiveHeader from './shared-components/Header';
 import Footer from './shared-components/Footer';
 import StudentLogin from './LoginPage';
@@ -11,9 +12,8 @@ export default function LandingPage() {
   const [showRegistration, setShowRegistration] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
   const [isConnecting, setIsConnecting] = useState(false);
-  const { isLoggedIn } = useContext(UserContext);
-
-
+  const navigate = useNavigate();
+  
   const toggleLoginModal = () => {
     setShowLogin(!showLogin);
     if (showRegistration) setShowRegistration(false);
@@ -22,6 +22,10 @@ export default function LandingPage() {
   const toggleRegistrationModal = () => {
     setShowRegistration(!showRegistration);
     if (showLogin) setShowLogin(false);
+  };
+
+  const navigateToSimulator = () => {
+    navigate('/simulator/8085');
   };
 
   const handleAssistantToggle = (isOpen) => {
@@ -82,38 +86,20 @@ export default function LandingPage() {
                 Access state-of-the-art laboratory experiments from your device. 
                 Learn, collaborate, and discover without limitations.
               </p>
-              
-              {!isLoggedIn && (
-                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <button 
-                    onClick={toggleLoginModal}
-                    className="px-6 py-3 bg-[#75aede] text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center"
-                  >
-                    Student Login <ArrowRight className="ml-2 h-5 w-5" />
-                  </button>
-                  <button 
-                    onClick={toggleRegistrationModal}
-                    className="px-6 py-3 border-2 border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors flex items-center justify-center"
-                  >
-                    Register Now
-                  </button>
-                </div>
-              )}
-              
-              {isLoggedIn && (
-                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <button 
-                    className="px-6 py-3 bg-[#75aede] text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center"
-                  >
-                    Explore Labs <ArrowRight className="ml-2 h-5 w-5" />
-                  </button>
-                  <button 
-                    className="px-6 py-3 border-2 border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors flex items-center justify-center"
-                  >
-                    My Dashboard
-                  </button>
-                </div>
-              )}
+              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
+                <button 
+                  onClick={toggleLoginModal}
+                  className="px-6 py-3 bg-[#75aede] text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center"
+                >
+                  Student Login <ArrowRight className="ml-2 h-5 w-5" />
+                </button>
+                <button 
+                  onClick={toggleRegistrationModal}
+                  className="px-6 py-3 border-2 border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors flex items-center justify-center"
+                >
+                  Register Now
+                </button>
+              </div>
             </div>
             <div className="md:w-1/2">
               <div className="relative">

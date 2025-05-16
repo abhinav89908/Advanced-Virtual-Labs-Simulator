@@ -34,8 +34,8 @@
 body {
   font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  color: var(--grey-800);
-  background-color: var(--grey-100);
+  color: var(--body_color);
+  background-color: var(--body_background);
   min-height: 100vh;
 }
 

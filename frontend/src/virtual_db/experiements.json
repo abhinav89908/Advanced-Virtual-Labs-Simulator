@@ -69,5 +69,26 @@
     "render_type": "iframe",
     "module_url": "/simulator/8085",
     "created_at": "2023-06-15"
+  },{
+    "_id": "exp_3d_titration",
+    "lab_id": "chemistry_lab",
+    "name": "3D Titration Experiment",
+    "description": "Perform a 3D titration to neutralize an acid with a base. Observe the color change of the indicator as the reaction completes.",
+    "instructions": "1. Add titrant to the acid solution using the control panel.\n2. Observe the color change in the beaker as the reaction progresses.\n3. Stop adding titrant when the solution is neutralized (pink color).\n4. Record the volume of titrant used.",
+    "thumbnail": "/images/lab-thumbnail.png",
+    "difficulty": "Beginner",
+    "estimated_time": "30 mins",
+    "assets": {
+      "scripts": ["reactionLogic3D.js"],
+      "styles": ["simulatorTitration.css"]
+    },
+    "input_config": {
+      "titrant_volume": { "type": "number", "unit": "mL", "default": 0, "min": 0, "max": 50 }
+    },
+    "output_config": {
+      "reaction_status": { "formula": "Neutralized when volume >= 25 mL", "unit": "" }
+    },
+    "render_type": "iframe",
+    "module_url": "/simulator/titration"
   }
 ]

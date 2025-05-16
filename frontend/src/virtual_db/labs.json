@@ -4,7 +4,7 @@
     "name": "Optics Lab",
     "description": "Explore classical mechanics through interactive simulations of forces, motion, and energy. Perfect for understanding Newton's laws and fundamental physics concepts.",
     "category": "Physics",
-    "thumbnail": "/images/experiment.png",  
+    "thumbnail": "/images/experiment.png",
     "tags": [],
     "created_at": "2023-05-10",
     "enabled": true,
@@ -21,7 +21,7 @@
     "name": "Microprocessor Lab",
     "description": "Dive into the fundamentals of logic design with hands-on experiments. Learn about digital circuits, Boolean algebra, and the principles of designing combinational and sequential logic systems.",
     "category": "Logic Design",
-    "thumbnail": "/images/experiment.png",  
+    "thumbnail": "/images/experiment.png",
     "tags": [],
     "created_at": "2023-06-15",
     "enabled": true,
@@ -32,5 +32,22 @@
     "version": "1.0",
     "difficulty": "Intermediate",
     "estimated_time": "60 mins"
+  },
+  {
+    "_id": "chemistry_lab",
+    "name": "Chemistry Lab",
+    "description": "Perform interactive chemistry experiments, including titration and reaction simulations. Learn about chemical reactions and their properties.",
+    "category": "Chemistry",
+    "thumbnail": "/images/experiment.png",
+    "tags": ["Chemistry", "Titration", "Reactions"],
+    "created_at": "2025-05-13",
+    "enabled": true,
+    "experiments": ["exp_3d_titration"],
+    "render_type": "custom",
+    "module_url": "https://abhinavprajapati.netlify.app/",
+    "author": "Sachin Upadhyay",
+    "version": "1.0",
+    "difficulty": "Beginner",
+    "estimated_time": "30 mins"
   }
 ]

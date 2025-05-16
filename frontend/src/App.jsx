@@ -6,6 +6,7 @@ import { UserProvider } from './components/hooks/userContext';
 import Room from './components/Room';
 import Simulator8085 from './components/simulators/8085_microprocessor/Simulator8085';
 import SimulatorOptics from './components/simulators/ray_optics/SimulatorOptics';
+import SimulatorTitration from './components/simulators/titration/SimulatorTitration';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/chat" element={<Room />} />
         <Route path="/simulator/8085" element={<Simulator8085 />} />
         <Route path="/simulator/optics" element={<SimulatorOptics />} />
+        <Route path="/simulator/titration" element={<SimulatorTitration />} />
       </Routes>
     </Router>
     </UserProvider>

@@ -147,7 +147,7 @@ export default function ExperimentPage() {
   const experimentProgress = getExperimentProgress();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-900 flex flex-col">
       <ResponsiveHeader 
         isConnected={isConnected} 
         isConnecting={false}
@@ -157,65 +157,50 @@ export default function ExperimentPage() {
       <main className="flex-grow container mx-auto pt-20 pb-12">
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-400"></div>
           </div>
         ) : (
           <div className="px-4">
-            {/* Back and breadcrumb navigation */}
-            <div className="mb-6">
-              <button
-                onClick={handleBackToLabs}
-                className="flex items-center text-indigo-600 hover:text-indigo-800 transition-colors"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Labs
-              </button>
-              <div className="text-sm text-gray-500 mt-2">
-                Labs / {lab?.category} / {lab?.name}
-              </div>
-            </div>
-            
             {/* Lab Header */}
-            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">{lab?.name}</h1>
-              <p className="text-gray-600 mb-4">{lab?.description}</p>
+            <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 p-6 mb-6">
+              <h1 className="text-2xl md:text-3xl font-bold text-teal-300 mb-2">{lab?.name}</h1>
+              <p className="text-gray-300 mb-4">{lab?.description}</p>
               <div className="flex flex-wrap gap-2">
                 {lab?.tags.map((tag, index) => (
-                  <span 
-                    key={index} 
-                    className="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-md text-sm"
-                  >
+                  <span key={index} className="bg-gray-800/50 text-teal-300 px-2.5 py-1 rounded-md text-sm border border-teal-500/20">
                     {tag}
                   </span>
                 ))}
               </div>
             </div>
             
-            {/* Main Content with Sidebar */}
+            {/* Main Content Layout */}
             <div className="flex flex-col lg:flex-row gap-6">
-              {/* Sidebar with Experiment List */}
-              <div className="lg:w-64 bg-white rounded-xl shadow-sm overflow-hidden">
-                <div className="bg-indigo-600 px-4 py-3">
-                  <h3 className="text-white font-medium">Available Experiments</h3>
+              {/* Sidebar */}
+              <div className="lg:w-64 bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden">
+                <div className="bg-teal-500/10 border-b border-teal-500/20 px-4 py-3">
+                  <h3 className="text-teal-300 font-medium">Available Experiments</h3>
                 </div>
-                <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-gray-800/50">
                   {experiments.map((experiment) => {
                     const isCompleted = currentUser?.progress?.[experiment._id]?.completed;
                     return (
                       <button
                         key={experiment._id}
-                        className={`block w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                          currentExperiment?._id === experiment._id ? 'bg-indigo-50' : ''
+                        className={`block w-full px-4 py-3 text-left transition-colors ${
+                          currentExperiment?._id === experiment._id 
+                            ? 'bg-teal-500/10 text-teal-300' 
+                            : 'text-gray-300 hover:bg-teal-500/5 hover:text-teal-300'
                         }`}
                         onClick={() => selectExperiment(experiment)}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-medium text-gray-800">{experiment.name}</span>
+                          <span className="font-medium">{experiment.name}</span>
                           {isCompleted && (
-                            <Award className="h-4 w-4 text-green-500" />
+                            <Award className="h-4 w-4 text-teal-400" />
                           )}
                         </div>
-                        <span className="text-xs text-gray-500 flex items-center gap-2 mt-1">
+                        <span className="text-xs text-gray-400 flex items-center gap-2 mt-1">
                           <span>{experiment.difficulty}</span>
                           <span>•</span>
                           <span>{experiment.estimated_time}</span>
@@ -226,84 +211,49 @@ export default function ExperimentPage() {
                 </div>
               </div>
               
-              {/* Main Experiment Area */}
+              {/* Main Area */}
               <div className="flex-1 flex flex-col">
                 {currentExperiment ? (
                   <>
                     {/* Experiment Header */}
-                    <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
+                    <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 p-6 mb-4">
                       <div className="flex justify-between items-center">
-                        <h2 className="text-xl font-bold text-gray-800">
+                        <h2 className="text-xl font-bold text-white">
                           {currentExperiment.name}
                         </h2>
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => setShowInstructions(!showInstructions)}
-                            className="px-3 py-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm"
-                          >
+                          <button className="px-3 py-1.5 rounded-md border border-teal-500/20 text-teal-300 hover:bg-teal-500/10 text-sm">
                             {showInstructions ? 'Hide' : 'Show'} Instructions
                           </button>
-                          <button
-                            onClick={handleRestartExperiment}
-                            className="px-3 py-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm flex items-center"
-                          >
+                          <button className="px-3 py-1.5 rounded-md border border-teal-500/20 text-teal-300 hover:bg-teal-500/10 text-sm flex items-center">
                             <Play className="h-3.5 w-3.5 mr-1" /> Reset
                           </button>
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Instructions Panel */}
                     {showInstructions && (
-                      <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
-                        <h3 className="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                          <FileText className="h-5 w-5 mr-2 text-indigo-500" />
+                      <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 p-6 mb-4">
+                        <h3 className="flex items-center text-lg font-semibold text-white mb-3">
+                          <FileText className="h-5 w-5 mr-2 text-teal-400" />
                           Instructions
                         </h3>
-                        <p className="text-gray-600 mb-4">{currentExperiment.description}</p>
-                        <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
-                          <h4 className="font-medium text-gray-700 mb-2">Procedure</h4>
-                          <div className="text-gray-600 whitespace-pre-line">
+                        <p className="text-gray-300 mb-4">{currentExperiment.description}</p>
+                        <div className="bg-gray-700/50 p-4 rounded-md border border-teal-500/20">
+                          <h4 className="font-medium text-teal-300 mb-2">Procedure</h4>
+                          <div className="text-gray-300 whitespace-pre-line">
                             {currentExperiment.instructions}
                           </div>
                         </div>
-                        
-                        {/* Previous Results (if any) */}
-                        {experimentProgress && (
-                          <div className="mt-4 bg-blue-50 p-4 rounded-md border border-blue-200">
-                            <h4 className="flex items-center font-medium text-blue-700 mb-2">
-                              <Info className="h-4 w-4 mr-2" />
-                              Previous Attempt
-                            </h4>
-                            <div className="grid grid-cols-3 gap-4 text-sm">
-                              <div>
-                                <div className="text-blue-600 font-medium">Score</div>
-                                <div>{experimentProgress.score}%</div>
-                              </div>
-                              <div>
-                                <div className="text-blue-600 font-medium">Attempts</div>
-                                <div>{experimentProgress.attempts}</div>
-                              </div>
-                              <div>
-                                <div className="text-blue-600 font-medium">Last Attempt</div>
-                                <div>{new Date(experimentProgress.last_attempt).toLocaleDateString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     )}
                     
-                    {/* Experiment Interactive Area */}
-                    <div className="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col flex-grow">
-                      <div className="bg-gray-100 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
-                        <h3 className="font-medium text-gray-700">Interactive Simulation</h3>
-                        <a 
-                          href={currentExperiment.module_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-indigo-600 text-sm flex items-center"
-                        >
+                    {/* Interactive Area */}
+                    <div className="bg-gray-900/50 backdrop-blur-xl rounded-xl border border-gray-800/50 overflow-hidden flex-grow">
+                      <div className="bg-gray-800/50 px-4 py-2 border-b border-gray-700/50 flex justify-between items-center">
+                        <h3 className="font-medium text-teal-300">Interactive Simulation</h3>
+                        <a href="#" className="text-teal-400 text-sm flex items-center hover:text-teal-300">
                           Open in New Tab <ExternalLink className="h-3.5 w-3.5 ml-1" />
                         </a>
                       </div>
@@ -333,21 +283,16 @@ export default function ExperimentPage() {
                       </div>
                       
                       {/* Action Bar */}
-                      <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                      <div className="bg-gray-800/50 px-6 py-4 border-t border-gray-700/50">
                         <div className="flex justify-between items-center">
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-400">
                             Complete the steps above to finish this experiment
                           </div>
                           <div className="flex gap-3">
-                            <button
-                              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
-                            >
+                            <button className="px-4 py-2 border border-teal-500/20 rounded-md text-teal-300 hover:bg-teal-500/10">
                               Save Progress
                             </button>
-                            <button
-                              onClick={handleCompleteExperiment}
-                              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-                            >
+                            <button className="px-4 py-2 bg-teal-500/20 border border-teal-500/30 text-teal-300 rounded-md hover:bg-teal-500/30">
                               Complete Experiment
                             </button>
                           </div>

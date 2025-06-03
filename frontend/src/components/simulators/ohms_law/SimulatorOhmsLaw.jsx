@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import CircuitBoard from "./components/CircuitBoard";
 import ControlPanel from "./components/ControlPanel";
 import DataTable from "./components/DataTable";
+import ExperimentData from "./components/ExperimentData";
 import { calculateCircuit } from "./logic/circuitLogic";
 import "./simulatorCircuit.css";
+import "./components/ExperimentData.css";
 
 const SimulatorOhmsLaw = () => {
   // Circuit state
@@ -305,6 +307,44 @@ const SimulatorOhmsLaw = () => {
     });
   };
 
+  // Handle loading a saved experiment
+  const handleLoadSavedExperiment = (experimentData) => {
+    try {
+      if (experimentData.input) {
+        // Load voltage
+        if (experimentData.input.voltage !== undefined) {
+          setVoltage(experimentData.input.voltage);
+        }
+        
+        // Load resistance
+        if (experimentData.input.resistance !== undefined) {
+          setResistance(experimentData.input.resistance);
+        }
+        
+        // Load component positions
+        if (experimentData.input.components) {
+          setComponents(experimentData.input.components);
+        }
+        
+        // Load connections
+        if (experimentData.input.connections) {
+          setConnections(experimentData.input.connections);
+          
+          // Check if circuit is complete
+          checkCircuitCompletion(experimentData.input.connections);
+        }
+      }
+      
+      // Load measurements if available
+      if (experimentData.output && experimentData.output.measurements) {
+        setMeasurements(experimentData.output.measurements);
+      }
+    } catch (error) {
+      console.error('Error loading experiment:', error);
+      alert('Failed to load the experiment data');
+    }
+  };
+
   return (
     <div className="simulator-container">
       <h1>Ohm's Law Circuit Simulator</h1>
@@ -381,6 +421,19 @@ const SimulatorOhmsLaw = () => {
           </div>
         )}
       </div>
+      
+      {/* Add ExperimentData component */}
+      <ExperimentData
+        voltage={voltage}
+        resistance={resistance}
+        current={current}
+        power={power}
+        components={components}
+        connections={connections}
+        circuitComplete={circuitComplete}
+        measurements={measurements}
+        onLoadSavedExperiment={handleLoadSavedExperiment}
+      />
     </div>
   );
 };

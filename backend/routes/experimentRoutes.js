@@ -25,9 +25,10 @@ router.post('/results', async (req, res) => {
     try {
         const { studentId, experimentId, input, output } = req.body;
         
-        console.log('Storing experiment results:', req.body);
+        console.log('Storing experiment results:', JSON.stringify(req.body, null, 2));
 
         if (!studentId || !experimentId) {
+            console.log('Missing required fields:', { studentId, experimentId });
             return res.status(400).json({ 
                 success: false, 
                 message: 'Student ID and Experiment ID are required' 
@@ -44,20 +45,31 @@ router.post('/results', async (req, res) => {
             updatedAt: serverTimestamp()
         };
 
+        console.log('Results data to be added:', JSON.stringify(resultsData, null, 2));
+
         // Add document to Firestore
         const docRef = await addDoc(collection(db, 'experimentResults'), resultsData);
+        console.log('Experiment results saved successfully with ID:', docRef.id);
 
-        res.status(201).json({ 
+        return res.status(201).json({ 
             success: true, 
             message: 'Experiment results saved successfully',
             resultId: docRef.id 
         });
     } catch (error) {
         console.error('Error storing experiment results:', error);
-        res.status(500).json({ 
+        console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            code: error.code
+        });
+        
+        return res.status(500).json({ 
             success: false, 
-            message: 'Failed to save experiment results',
-            error: error.message 
+            message: 'Failed to save experiment results: ' + (error.message || 'Unknown error'),
+            errorCode: error.code || 'UNKNOWN_ERROR',
+            error: error.toString()
         });
     }
 });
@@ -73,6 +85,13 @@ router.get('/results/:studentId/:experimentId', async (req, res) => {
         
         console.log('Fetching experiment results for student:', studentId, 'experiment:', experimentId);
 
+        if (!studentId || !experimentId) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Student ID and Experiment ID are required' 
+            });
+        }
+
         // Query for results matching both studentId and experimentId
         const q = query(
             collection(db, 'experimentResults'),
@@ -83,8 +102,9 @@ router.get('/results/:studentId/:experimentId', async (req, res) => {
         const querySnapshot = await getDocs(q);
         
         if (querySnapshot.empty) {
-            return res.status(404).json({ 
-                success: false, 
+            return res.status(200).json({ 
+                success: true, 
+                results: [],
                 message: 'No results found for this student and experiment' 
             });
         }
@@ -101,16 +121,25 @@ router.get('/results/:studentId/:experimentId', async (req, res) => {
             });
         });
 
-        res.status(200).json({ 
+        console.log(`Found ${results.length} results for student ${studentId} and experiment ${experimentId}`);
+        return res.status(200).json({ 
             success: true, 
             results 
         });
     } catch (error) {
         console.error('Error fetching experiment results:', error);
-        res.status(500).json({ 
+        console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            code: error.code
+        });
+        
+        return res.status(500).json({ 
             success: false, 
-            message: 'Failed to fetch experiment results',
-            error: error.message 
+            message: 'Failed to fetch experiment results: ' + (error.message || 'Unknown error'),
+            errorCode: error.code || 'UNKNOWN_ERROR',
+            error: error.toString()
         });
     }
 });
@@ -124,7 +153,7 @@ router.post('/notes', async (req, res) => {
     try {
         const { studentId, experimentId, notes, noteId } = req.body;
         
-        console.log('Storing/updating experiment notes:', req.body);
+        console.log('Storing/updating experiment notes:', JSON.stringify(req.body, null, 2));
 
         if (!studentId || !experimentId) {
             return res.status(400).json({ 
@@ -158,7 +187,8 @@ router.post('/notes', async (req, res) => {
                 updatedAt: serverTimestamp()
             });
 
-            res.status(200).json({ 
+            console.log(`Note ${noteId} updated successfully`);
+            return res.status(200).json({ 
                 success: true, 
                 message: 'Notes updated successfully',
                 noteId 
@@ -173,10 +203,13 @@ router.post('/notes', async (req, res) => {
                 updatedAt: serverTimestamp()
             };
 
+            console.log('Note data to be added:', JSON.stringify(noteData, null, 2));
+
             // Add document to Firestore
             const docRef = await addDoc(collection(db, 'experimentNotes'), noteData);
+            console.log('Note saved successfully with ID:', docRef.id);
 
-            res.status(201).json({ 
+            return res.status(201).json({ 
                 success: true, 
                 message: 'Notes saved successfully',
                 noteId: docRef.id 
@@ -184,10 +217,18 @@ router.post('/notes', async (req, res) => {
         }
     } catch (error) {
         console.error('Error storing experiment notes:', error);
-        res.status(500).json({ 
+        console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            code: error.code
+        });
+        
+        return res.status(500).json({ 
             success: false, 
-            message: 'Failed to save notes',
-            error: error.message 
+            message: 'Failed to save notes: ' + (error.message || 'Unknown error'),
+            errorCode: error.code || 'UNKNOWN_ERROR',
+            error: error.toString()
         });
     }
 });

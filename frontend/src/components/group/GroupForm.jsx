@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
 import { UserContext } from '../hooks/userContext';
 import ResponsiveHeader from '../shared-components/Header';
 import Footer from '../shared-components/Footer';
 import { Shield, Users, ArrowLeft, X, Plus, User, Save } from 'lucide-react';
+import { getGroupDetails, createGroup, updateGroup } from '../../services/groupService';
+import { getAllUsers } from '../../services/userService';
 
 const GroupForm = () => {
   const { groupId } = useParams();
@@ -19,7 +20,7 @@ const GroupForm = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const { isAdmin, isLoggedIn } = useContext(UserContext);
+  const { isAdmin, isLoggedIn, user } = useContext(UserContext);
   const navigate = useNavigate();
   const isEditMode = !!groupId;
   
@@ -36,15 +37,12 @@ const GroupForm = () => {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      
-      // Fetch all users
-      const usersResponse = await axios.get('/api/admin/users');
-      setAvailableUsers(usersResponse.data);
+      const usersResponse = await getAllUsers();
+      setAvailableUsers(usersResponse.users || []);
       
       if (isEditMode) {
-        // Fetch group data if in edit mode
-        const groupResponse = await axios.get(`/api/admin/groups/${groupId}`);
-        const group = groupResponse.data;
+        const groupResponse = await getGroupDetails(groupId);
+        const group = groupResponse.group;
         
         setFormData({
           name: group.name,
@@ -92,13 +90,14 @@ const GroupForm = () => {
       
       const payload = {
         ...formData,
-        memberIds: selectedUsers.map(user => user.id)
+        memberIds: selectedUsers.map(user => user.id),
+        creatorId: user.id
       };
       
       if (isEditMode) {
-        await axios.put(`/api/admin/groups/${groupId}`, payload);
+        await updateGroup(groupId, { ...payload, userId: user.id });
       } else {
-        await axios.post('/api/admin/groups', payload);
+        await createGroup(payload);
       }
       
       navigate('/admin/groups');
@@ -238,9 +237,9 @@ const GroupForm = () => {
                               className="flex items-center px-4 py-2 hover:bg-gray-800 cursor-pointer"
                             >
                               <div className="h-8 w-8 rounded-full bg-teal-500/20 text-teal-300 flex items-center justify-center mr-2">
-                                {user.username.charAt(0).toUpperCase()}
+                                {user.firstName.charAt(0).toUpperCase()}
                               </div>
-                              <span className="text-gray-300">{user.username}</span>
+                              <span className="text-gray-300">{user.firstName + user.lastName}</span>
                             </div>
                           ))}
                         </div>
@@ -268,7 +267,7 @@ const GroupForm = () => {
                                 <div className="h-7 w-7 rounded-full bg-teal-500/20 text-teal-300 flex items-center justify-center mr-2">
                                   {user.username.charAt(0).toUpperCase()}
                                 </div>
-                                <span className="text-gray-300 text-sm">{user.username}</span>
+                                <span className="text-gray-300 text-sm">{user.firstName + user.lastName}</span>
                               </div>
                               <button
                                 type="button"

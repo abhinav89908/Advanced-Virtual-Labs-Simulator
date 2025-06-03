@@ -1,32 +1,34 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { UserCircle, Plus, Search, Users, MessageCircle } from 'lucide-react';
 import ResponsiveHeader from '../shared-components/Header';
 import Footer from '../shared-components/Footer';
 import { UserContext } from '../hooks/userContext';
+import { getJoinedGroups } from '../../services/groupService';
 
 const GroupsPage = () => {
-  const [groups, setGroups] = useState(['Loading...']);
+  const [groups, setGroups] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isConnected, setIsConnected] = useState(true);
+  const [error, setError] = useState(null);
   const { isLoggedIn, user, isAdmin } = useContext(UserContext);
   
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && user) {
       fetchGroups();
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, user]);
   
   const fetchGroups = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get('/api/groups');
-      setGroups(response.data);
+      const response = await getJoinedGroups(user.id);
+      setGroups(response.groups || []);
       setIsLoading(false);
     } catch (error) {
       console.error('Failed to fetch groups:', error);
+      setError('Failed to load your groups. Please try again later.');
       setIsLoading(false);
     }
   };
@@ -100,6 +102,9 @@ const GroupsPage = () => {
 };
 
 const GroupCard = ({ group }) => {
+  // Add count for display if available
+  const memberCount = group.members?.length || 0;
+  
   return (
     <Link
       to={`/groups/${group.id}`}
@@ -124,7 +129,7 @@ const GroupCard = ({ group }) => {
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-700/50">
           <div className="flex items-center text-sm text-gray-400">
             <Users className="h-4 w-4 mr-1" />
-            <span>{group.memberCount} members</span>
+            <span>{memberCount} members</span>
           </div>
           
           {group.hasUnreadMessages && (

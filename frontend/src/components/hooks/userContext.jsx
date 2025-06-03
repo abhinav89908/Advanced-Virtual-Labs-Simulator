@@ -5,47 +5,80 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Add explicit isLoggedIn state
 
   useEffect(() => {
     // Check localStorage for existing user data
     const storedUser = localStorage.getItem('user');
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const storedLoginStatus = localStorage.getItem('isLoggedIn');
     
-    if (storedUser && isLoggedIn) {
+    if (storedUser && storedLoginStatus) {
       try {
         setUser(JSON.parse(storedUser));
+        setIsLoggedIn(true); // Explicitly set logged in state
       } catch (error) {
         console.error('Error parsing user data from localStorage', error);
         // Clear invalid data
         localStorage.removeItem('user');
         localStorage.removeItem('isLoggedIn');
+        setIsLoggedIn(false);
       }
     }
     
     setIsLoading(false);
   }, []);
 
-  const logout = () => {
-    // Clear user data from state
-    setUser(null);
-
-    console.log('Logging out user:', user);
-    
-    // Clear user data from localStorage
-    localStorage.removeItem('user');
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('token'); // In case you're using a token
-    
-    // Log the logout action for debugging
-    console.log('User logged out successfully');
+  // Login function to update both user data and isLoggedIn status
+  const login = (userData) => {
+    setUser(userData);
+    setIsLoggedIn(true);
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('isLoggedIn', true);
   };
 
-  // Helper functions to check user status
+  // Improved logout function 
+  const logout = () => {
+    // Clear user data
+    setUser(null);
+    setIsLoggedIn(false);
+    
+    // Remove from local storage
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('isLoggedIn');
+    
+    console.log("User logged out successfully");
+  };
+
+  // Add function to update user context
+  const updateUserContext = (updatedUserData) => {
+    setUser(prevUser => {
+      const newUserData = {
+        ...prevUser,
+        ...updatedUserData
+      };
+      
+      // Update local storage
+      localStorage.setItem('user', JSON.stringify(newUserData));
+      return newUserData;
+    });
+  };
+  
+  // Helper function to check admin status
   const isAdmin = user && user.role === 'admin';
-  const isLoggedIn = !!user; // Convert user to boolean - true if user exists, false otherwise
 
   return (
-    <UserContext.Provider value={{ user, setUser, logout, isAdmin, isLoading, isLoggedIn }}>
+    <UserContext.Provider value={{ 
+      user, 
+      setUser, 
+      isLoggedIn, 
+      setIsLoggedIn, 
+      login, 
+      logout, 
+      isAdmin, 
+      isLoading, 
+      updateUserContext 
+    }}>
       {children}
     </UserContext.Provider>
   );

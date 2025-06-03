@@ -13,6 +13,7 @@ import GroupPage from './components/group/GroupPage';
 import GroupManagement from './components/group/GroupManagement';
 import GroupForm from './components/group/GroupForm';
 import GroupDetail from './components/group/GroupDetail';
+import UserProfile from './components/user/UserProfile'; // Import the new UserProfile component
 
 // Simulators
 import SimulatorTitration from './components/simulators/titration/SimulatorTitration';
@@ -38,17 +39,19 @@ function App() {
           <Route path="/experiment" element={<ExperimentPage />} />
           <Route path="/chat" element={<Room />} />
           <Route path="/groups" element={<GroupPage />} />
+          <Route path="/groups/:groupId" element={<GroupDetail />} />
           <Route path="/createGroup" element={<GroupForm />} />
-           <Route path="/my-experiments" element={<UserExperimentsDashboard />} />
+          <Route path="/my-experiments" element={<UserExperimentsDashboard />} />
+          <Route path="/profile" element={<UserProfile />} /> {/* Add new route for user profile */}
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminPortal />} />
           <Route path="/admin/students" element={<StudentsManagement/>} />
           <Route path="/admin/groups" element={<GroupManagementAdmin />} />
+          <Route path="/admin/groups/create" element={<GroupForm />} /> {/* Add route for admin to create group */}
+          <Route path="/admin/groups/edit/:groupId" element={<GroupForm />} /> {/* Add route for admin to edit group */}
           <Route path="/admin/experiments" element={<ExperimentsAdmin/>} />
           
-      
-
           {/* Simulator Routes */}
           <Route path="/simulator/titration" element={<SimulatorTitration />} />
           <Route path="/simulator/optics" element={<SimulatorOptics />} />

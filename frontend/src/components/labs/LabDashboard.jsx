@@ -108,15 +108,6 @@ export default function LabDashboard() {
             </p>
           </div>
           <div>
-            <button
-              onClick={navigateToSimulator}
-              className="flex items-center bg-gradient-to-r from-teal-500 to-teal-400 hover:from-teal-600 hover:to-teal-500 
-                text-white px-6 py-3 rounded-xl transition-all duration-300 shadow-lg shadow-teal-500/20 
-                hover:shadow-xl hover:shadow-teal-500/30 hover:-translate-y-0.5"
-            >
-              <Cpu className="h-5 w-5 mr-2" />
-              8085 Simulator
-            </button>
           </div>
         </div>
 
@@ -197,11 +188,7 @@ export default function LabDashboard() {
                 <div
                   className="h-48 bg-cover bg-center relative"
                   style={{
-                    backgroundImage: `url('/images/${
-                      lab.name.toLowerCase().includes("microprocessor")
-                        ? "microprocessor_lab.jpg"
-                        : "optics_lab.jpg"
-                    }')`,
+                    backgroundImage: `url(${lab.thumbnail})`,
                   }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent">

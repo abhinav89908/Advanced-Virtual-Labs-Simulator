@@ -43,9 +43,12 @@ export default function StudentLogin({ onClose, onSwitchToRegister }) {
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('isLoggedIn', 'true');
     
-    // Close the modal and redirect
-    onClose();
-    navigate('/');
+    // Navigate based on role
+    if (userData.role === 'admin') {
+      navigate('/admin');
+    } else {
+      navigate('/');
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -67,9 +70,12 @@ export default function StudentLogin({ onClose, onSwitchToRegister }) {
 
       // Extract user data from response
       const userData = {
-        email: formData.email,
-        name: data.name || formData.email.split('@')[0],
-        id: data.id || 'user-id',
+        email: data.user.email,
+        firstName: data.user.firstName,
+        lastName: data.user.lastName,
+        id: data.user.id,
+        role: data.user.role || 'user', // Use the role from backend or default to 'user'
+        studentId: data.user.studentId
       };
 
       handleLoginSuccess(userData);
@@ -105,10 +111,14 @@ export default function StudentLogin({ onClose, onSwitchToRegister }) {
     //     throw new Error(data.message || 'Google login failed');
     //   }
 
-    //   // Create user data object from Google info
+    //   // Create user data object from Google info with role
     //   const userData = {
-    //     id: uid,
-    //     // Add any other user data from the response
+    //     id: data.user.id,
+    //     email: data.user.email,
+    //     firstName: data.user.name.split(' ')[0],
+    //     lastName: data.user.name.split(' ').slice(1).join(' '),
+    //     role: data.user.role || 'user',
+    //     profileImage: data.user.picture
     //   };
 
     //   handleLoginSuccess(userData);

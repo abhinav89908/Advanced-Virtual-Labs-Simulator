@@ -52,12 +52,12 @@ export default function LandingPage() {
 
   const toggleLoginModal = () => {
     setShowLogin(!showLogin);
-    if (showRegistration) setShowRegistration(false);
+    navigate('/login');
   };
 
   const toggleRegistrationModal = () => {
     setShowRegistration(!showRegistration);
-    if (showLogin) setShowLogin(false);
+    navigate('/register');
   };
 
   const handleAssistantToggle = (isOpen) => {
@@ -131,28 +131,30 @@ export default function LandingPage() {
                   </span>
                 </h1>
                 
-                {!isLoggedIn && (
-                  <div className="flex flex-col sm:flex-row gap-6 pt-4">
-                    <button
-                      onClick={toggleLoginModal}
-                      className="group relative px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-400 rounded-xl text-white font-medium text-lg shadow-lg shadow-teal-500/20 hover:shadow-xl hover:shadow-teal-500/30 hover:-translate-y-0.5 transition-all duration-300"
-                    >
-                      <span className="relative z-10 flex items-center justify-center">
-                        Student Login
-                        <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                      </span>
-                    </button>
-                    <button
-                      onClick={toggleRegistrationModal}
-                      className="group px-8 py-4 rounded-xl text-gray-300 font-medium text-lg border border-gray-700 hover:border-teal-500/50 hover:bg-teal-500/10 transition-all duration-300 hover:-translate-y-0.5"
-                    >
-                      <span className="flex items-center justify-center">
-                        Register Now
-                        <ArrowRight className="ml-2 h-5 w-5 opacity-0 -translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0" />
-                      </span>
-                    </button>
-                  </div>
-                )}
+                <div className="flex flex-col sm:flex-row gap-6 pt-4">
+                  {isLoggedIn ? '' : (
+                    <>
+                      <button
+                        onClick={toggleLoginModal}
+                        className="group relative px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-400 rounded-xl text-white font-medium text-lg shadow-lg shadow-teal-500/20 hover:shadow-xl hover:shadow-teal-500/30 hover:-translate-y-0.5 transition-all duration-300"
+                      >
+                        <span className="relative z-10 flex items-center justify-center">
+                          Student Login
+                          <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                        </span>
+                      </button>
+                      <button
+                        onClick={toggleRegistrationModal}
+                        className="group px-8 py-4 rounded-xl text-gray-300 font-medium text-lg border border-gray-700 hover:border-teal-500/50 hover:bg-teal-500/10 transition-all duration-300 hover:-translate-y-0.5"
+                      >
+                        <span className="flex items-center justify-center">
+                          Register Now
+                          <ArrowRight className="ml-2 h-5 w-5 opacity-0 -translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0" />
+                        </span>
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
             {/* ...existing right column content... */}
@@ -261,7 +263,7 @@ export default function LandingPage() {
           <p className="text-xl mb-8 max-w-3xl mx-auto text-white/90">
             Join thousands of students already using Virtual Labs to enhance their scientific education.
           </p>
-          {!isLoggedIn && (
+          { !isLoggedIn ? (
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
               <button onClick={toggleRegistrationModal}
                 className="px-8 py-3 bg-white text-teal-600 font-medium rounded-lg hover:bg-gray-50 
@@ -274,14 +276,10 @@ export default function LandingPage() {
                 Student Login
               </button>
             </div>
-          )}
+          ) : ''}
         </div>
       </section>
-
       <Footer />
-
-      {showLogin && <StudentLogin onClose={toggleLoginModal} />}
-      {showRegistration && <StudentRegistration onClose={toggleRegistrationModal} />}
     </div>
   );
 }

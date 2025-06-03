@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 /**
  * Editor component for writing and editing 8085 assembly code
  */
-const Editor = ({ onLoad, initialCode }) => {
-    const [code, setCode] = useState(initialCode || '');
+const Editor = ({ onLoad, initialCode = '' }) => {
+    const [code, setCode] = useState(initialCode);
     const [error, setError] = useState('');
+
+    // Update code when initialCode prop changes
+    useEffect(() => {
+        if (initialCode && initialCode.trim() !== '') {
+            setCode(initialCode);
+        }
+    }, [initialCode]);
 
     // Handle code changes
     const handleCodeChange = (e) => {

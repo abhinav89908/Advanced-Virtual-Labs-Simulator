@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './simulatorOptics.css';
+import './components/ExperimentData.css';
 
 // Import components
 import Header from './components/Header';
@@ -8,6 +9,7 @@ import RayCanvas from './components/RayCanvas';
 import PropertiesPanel from './components/PropertiesPanel';
 import Tutorial from './components/Tutorial';
 import ConfigurationManager from './components/ConfigurationManager';
+import ExperimentData from './components/ExperimentData';
 
 // Import physics logic
 import { calculateImageProperties, getExplanationTip } from './logic/RayOpticsCalculator';
@@ -103,6 +105,26 @@ const SimulatorOptics = () => {  // State for optical element and parameters
     }));
   };
 
+  // Handler for loading saved experiment
+  const handleLoadSavedExperiment = (experimentData) => {
+    if (experimentData.input) {
+      // Load element type
+      if (experimentData.input.elementType) {
+        setElementType(experimentData.input.elementType);
+      }
+      
+      // Load focal length
+      if (experimentData.input.focalLength !== undefined) {
+        setFocalLength(experimentData.input.focalLength);
+      }
+      
+      // Load object distance
+      if (experimentData.input.objectDistance !== undefined) {
+        setObjectDistance(experimentData.input.objectDistance);
+      }
+    }
+  };
+
   return (
     <div className="simulator-optics">
       <Header 
@@ -162,6 +184,15 @@ const SimulatorOptics = () => {  // State for optical element and parameters
       </div>
       
       <Tutorial />
+      
+      {/* Add ExperimentData component */}
+      <ExperimentData
+        elementType={elementType}
+        focalLength={focalLength}
+        objectDistance={objectDistance}
+        imageProps={imageProps}
+        onLoadSavedExperiment={handleLoadSavedExperiment}
+      />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Plus, Play, Pause, SkipForward, RefreshCw, Table } from 'lucide-react';
+import ExperimentData from './components/ExperimentData';
 
 const ProcessSchedulerSimulator = () => {
   const [processes, setProcesses] = useState([]);
@@ -177,6 +178,53 @@ const ProcessSchedulerSimulator = () => {
     if (completedProcesses.length === 0) return 0;
     const sum = completedProcesses.reduce((acc, p) => acc + p.turnaroundTime, 0);
     return (sum / completedProcesses.length).toFixed(2);
+  };
+  
+  // Handle loading a saved experiment
+  const handleLoadSavedExperiment = (experimentData) => {
+    try {
+      // Reset simulation first
+      resetSimulation();
+      
+      // Load processes
+      if (experimentData.input && experimentData.input.processes) {
+        // Map saved processes to include remainingTime and other runtime properties
+        const loadedProcesses = experimentData.input.processes.map(p => ({
+          ...p,
+          remainingTime: p.burstTime,
+          completed: false,
+          startTime: null,
+          endTime: null
+        }));
+        
+        setProcesses(loadedProcesses);
+      }
+      
+      // Load algorithm
+      if (experimentData.input && experimentData.input.algorithm) {
+        setAlgorithm(experimentData.input.algorithm);
+      }
+      
+      // Load time quantum for Round Robin
+      if (experimentData.input && experimentData.input.timeQuantum) {
+        setTimeQuantum(experimentData.input.timeQuantum);
+      }
+      
+      // Load execution history if running the same simulation again
+      if (experimentData.output && experimentData.output.executionHistory) {
+        setExecutionHistory(experimentData.output.executionHistory);
+      }
+      
+      // Load current time if continuing the simulation
+      if (experimentData.output && experimentData.output.currentTime !== undefined) {
+        setCurrentTime(experimentData.output.currentTime);
+      }
+      
+      alert('Experiment loaded successfully');
+    } catch (error) {
+      console.error('Error loading experiment:', error);
+      alert('Failed to load experiment data');
+    }
   };
   
   return (
@@ -435,6 +483,17 @@ const ProcessSchedulerSimulator = () => {
           </div>
         </div>
       </div>
+      
+      {/* Add ExperimentData component */}
+      <ExperimentData
+        processes={processes}
+        algorithm={algorithm}
+        timeQuantum={timeQuantum}
+        executionHistory={executionHistory}
+        completedProcesses={completedProcesses}
+        currentTime={currentTime}
+        onLoadSavedExperiment={handleLoadSavedExperiment}
+      />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Wifi, Server, Monitor, Router, Cable, Plus, Trash2, Terminal, Play, AlertCircle, Settings, Save } from 'lucide-react';
+import ExperimentData from './components/ExperimentData';
 
 const NetworkSimulator = () => {
   // Canvas for network topology
@@ -25,6 +26,11 @@ const NetworkSimulator = () => {
     latency: 100,
     bandwidth: 100
   });
+  
+  // Function to add a log message to the terminal
+  const addLog = (content, type = 'response') => {
+    setTerminalOutput(prev => [...prev, { type, content }]);
+  };
   
   // Terminal commands handling
   const handleTerminalCommand = () => {
@@ -576,6 +582,41 @@ Approximate round trip times in milli-seconds:
     setPackets([]);
   };
   
+  // Handle loading a saved experiment
+  const handleLoadSavedExperiment = (experimentData) => {
+    try {
+      if (experimentData.input) {
+        // Load devices
+        if (experimentData.input.devices && Array.isArray(experimentData.input.devices)) {
+          setDevices(experimentData.input.devices);
+          addLog(`Loaded ${experimentData.input.devices.length} network devices`, 'system');
+        }
+        
+        // Load connections
+        if (experimentData.input.connections && Array.isArray(experimentData.input.connections)) {
+          setConnections(experimentData.input.connections);
+          addLog(`Loaded ${experimentData.input.connections.length} network connections`, 'system');
+        }
+      }
+      
+      // Load simulation settings if available
+      if (experimentData.output && experimentData.output.simulationSettings) {
+        setSimulationSettings(experimentData.output.simulationSettings);
+        addLog('Restored simulation settings', 'system');
+      }
+      
+      // Clear selection states
+      setSelectedDevice(null);
+      setSelectedConnection(null);
+      setIsDrawingConnection(false);
+      
+      addLog('Successfully loaded saved experiment', 'system');
+    } catch (error) {
+      addLog(`Error loading saved experiment: ${error.message}`, 'error');
+      console.error('Error loading saved experiment:', error);
+    }
+  };
+  
   return (
     <div className="network-simulator">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -871,6 +912,18 @@ Approximate round trip times in milli-seconds:
               </div>
             </div>
           </div>
+        </div>
+        
+        {/* Add ExperimentData component below the main grid */}
+        <div className="lg:col-span-4">
+          <ExperimentData
+            devices={devices}
+            connections={connections}
+            terminalOutput={terminalOutput}
+            simulationSettings={simulationSettings}
+            onLoadSavedExperiment={handleLoadSavedExperiment}
+            addLog={addLog}
+          />
         </div>
       </div>
     </div>

@@ -5,7 +5,9 @@ import Beaker3D from "./components/Beaker3D";
 import Liquid3D from "./components/Liquid3D";
 import ControlPanel3D from "./components/ControlPanel3D";
 import Stand3D from "./components/Stand3D";
+import ExperimentData from "./components/ExperimentData";
 import "./simulatorTitration.css";
+import "./components/ExperimentData.css";
 
 const SimulatorTitration = () => {
   // Experiment state
@@ -127,6 +129,49 @@ const SimulatorTitration = () => {
   const handleDragEnd = () => {
     setIsDragging(false);
     setActiveElement(null);
+  };
+
+  // Handle loading a saved experiment
+  const handleLoadSavedExperiment = (experimentData) => {
+    try {
+      if (experimentData.input) {
+        // Load acid type
+        if (experimentData.input.selectedAcid) {
+          setSelectedAcid(experimentData.input.selectedAcid);
+        }
+        
+        // Load base type
+        if (experimentData.input.selectedBase) {
+          setSelectedBase(experimentData.input.selectedBase);
+        }
+        
+        // Load concentration
+        if (experimentData.input.concentration !== undefined) {
+          setConcentration(experimentData.input.concentration);
+        }
+      }
+      
+      // Load experiment output data
+      if (experimentData.output) {
+        // Load titrant volume
+        if (experimentData.output.volume !== undefined) {
+          setVolume(experimentData.output.volume);
+        }
+        
+        // Load reaction status
+        if (experimentData.output.reactionComplete !== undefined) {
+          setReactionComplete(experimentData.output.reactionComplete);
+        }
+        
+        // Load measurements
+        if (experimentData.output.measurements && Array.isArray(experimentData.output.measurements)) {
+          setMeasurements(experimentData.output.measurements);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading experiment:', error);
+      alert('Failed to load the experiment data');
+    }
   };
 
   useEffect(() => {
@@ -309,6 +354,17 @@ const SimulatorTitration = () => {
           <p className="no-data">No measurements recorded yet. Click "Record Data" after performing titration.</p>
         )}
       </div>
+
+      {/* Add ExperimentData component */}
+      <ExperimentData
+        selectedAcid={selectedAcid}
+        selectedBase={selectedBase}
+        concentration={concentration}
+        volume={volume}
+        reactionComplete={reactionComplete}
+        measurements={measurements}
+        onLoadSavedExperiment={handleLoadSavedExperiment}
+      />
     </div>
   );
 };

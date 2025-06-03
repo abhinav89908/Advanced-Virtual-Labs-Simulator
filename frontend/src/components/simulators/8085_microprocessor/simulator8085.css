@@ -135,10 +135,11 @@
 }
 
 .simulator-container {
-    display: flex;
-    gap: 25px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
     margin-top: 15px;
+    min-height: 600px;
 }
 
 .simulator-left-panel,
@@ -156,7 +157,7 @@
 .simulator-left-panel {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 1rem;
 }
 
 .simulator-right-panel {
@@ -736,7 +737,7 @@
     background-color: rgba(15, 23, 42, 0.8);
     border-radius: 8px;
     padding: 15px;
-    height: 220px;
+    height: 200px;
     overflow-y: auto;
     font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
     font-size: 0.9rem;

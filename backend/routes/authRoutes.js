@@ -169,4 +169,28 @@ router.get('/getUsers', async (req, res) => {
 }
 );
 
+router.get('/:userId/details', async (req, res) => {
+  try {
+    // get user details
+    const { userId } = req.params;
+    const userRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const userData = userSnap.data();
+    // Remove sensitive data before sending to client
+    const { password, ...safeUserData } = userData;
+    res.status(200).json({
+      user: {
+        id: userSnap.id,
+        ...safeUserData
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    res.status(500).json({ error: 'Failed to fetch user details' });
+  }
+});
+
 export default router;

@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { UserContext } from '../hooks/userContext';
 import ResponsiveHeader from '../shared-components/Header';
 import Footer from '../shared-components/Footer';
 import { Shield, Users, Plus, Search, Edit, Trash2, ArrowLeft, User, AlertCircle, Eye } from 'lucide-react';
+import { getAllGroups, deleteGroup } from '../../services/groupService';
 
 const GroupManagement = () => {
   const [groups, setGroups] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState(null);
-  const { isAdmin, isLoggedIn } = useContext(UserContext);
+  const { isAdmin, isLoggedIn, user } = useContext(UserContext);
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -27,8 +27,8 @@ const GroupManagement = () => {
   const fetchGroups = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get('/api/admin/groups');
-      setGroups(response.data);
+      const response = await getAllGroups();
+      setGroups(response.groups || []);
       setIsLoading(false);
     } catch (error) {
       console.error('Failed to fetch groups:', error);
@@ -40,7 +40,7 @@ const GroupManagement = () => {
   const handleDeleteGroup = async (groupId) => {
     if (window.confirm('Are you sure you want to delete this group? This action cannot be undone.')) {
       try {
-        await axios.delete(`/api/admin/groups/${groupId}`);
+        await deleteGroup(groupId, user.id);
         setGroups(groups.filter(group => group.id !== groupId));
       } catch (error) {
         console.error('Failed to delete group:', error);

@@ -13,7 +13,9 @@ import {
     arrayUnion,
     arrayRemove,
     serverTimestamp,
-    Timestamp 
+    Timestamp,
+    orderBy,
+    limit 
 } from 'firebase/firestore';
 
 const router = express.Router();
@@ -25,11 +27,12 @@ const router = express.Router();
  */
 router.post('/create', async (req, res) => {
     try {
-        const { name, description, creatorId, course, batchYear } = req.body;
+        const { name, description, creatorId, course, year } = req.body;
         
-        console.log('Creating new group:', req.body);
+        console.log('Creating new group with data:', JSON.stringify(req.body, null, 2));
 
         if (!name || !creatorId) {
+            console.log('Missing required fields:', { name, creatorId });
             return res.status(400).json({ 
                 success: false, 
                 message: 'Group name and creator ID are required' 
@@ -41,13 +44,14 @@ router.post('/create', async (req, res) => {
             name,
             description: description || '',
             course: course || '',
-            batchYear: batchYear || new Date().getFullYear().toString(),
+            batchYear: year || new Date().getFullYear().toString(),
             creatorId,
             members: [creatorId], // Creator is automatically a member
             admins: [creatorId],  // Creator is automatically an admin
-            createdAt: serverTimestamp(),
             updatedAt: serverTimestamp()
         };
+
+        console.log('Group data to be added:', groupData);
 
         // Add document to Firestore
         const docRef = await addDoc(collection(db, 'groups'), groupData);
@@ -66,6 +70,10 @@ router.post('/create', async (req, res) => {
         });
     }
 });
+
+// get all groups of joined by user
+
+
 
 /**
  * @route   GET /api/groups/:groupId
@@ -552,6 +560,373 @@ router.post('/:groupId/remove-member', async (req, res) => {
             success: false, 
             message: 'Failed to remove member',
             error: error.message 
+        });
+    }
+});
+
+/**
+ * @route   GET /api/groups/joined/:userId
+ * @desc    Get all groups joined by a user
+ * @access  Public
+ */
+router.get('/joined/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        
+        console.log('Fetching groups joined by user:', userId);
+
+        if (!userId) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'User ID is required' 
+            });
+        }
+
+        const q = query(
+            collection(db, 'groups'),
+            where('members', 'array-contains', userId)
+        );
+        
+        const querySnapshot = await getDocs(q);
+        console.log(`Found ${querySnapshot.size} groups joined by user ${userId}`);
+        
+        if (querySnapshot.empty) {
+            return res.status(200).json({ 
+                success: true, 
+                groups: [],
+                message: 'User has not joined any groups' 
+            });
+        }
+        
+        const groups = [];
+        querySnapshot.forEach(doc => {
+            groups.push({
+                id: doc.id,
+                ...doc.data(),
+                createdAt: doc.data().createdAt?.toDate().toISOString() || null,
+                updatedAt: doc.data().updatedAt?.toDate().toISOString() || null
+            });
+        });
+        
+        return res.status(200).json({ 
+            success: true, 
+            groups,
+            message: `Found ${groups.length} groups joined by the user`
+        });
+    } catch (error) {
+        console.error('Error fetching joined groups:', error);
+        console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            code: error.code
+        });
+        
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Failed to fetch joined groups: ' + (error.message || 'Unknown error'),
+            errorCode: error.code || 'UNKNOWN_ERROR',
+            error: error.toString()
+        });
+    }
+});
+
+/**
+ * @route   POST /api/groups/:groupId/messages
+ * @desc    Send a message to a group
+ * @access  Public
+ */
+router.post('/:groupId/messages', async (req, res) => {
+    try {
+        const { groupId } = req.params;
+        const { userId, username, content } = req.body;
+        
+        console.log('Sending message to group:', groupId);
+
+        if (!groupId || !userId || !content) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Group ID, User ID and message content are required' 
+            });
+        }
+
+        // Check if group exists
+        const groupRef = doc(db, 'groups', groupId);
+        const groupDoc = await getDoc(groupRef);
+        
+        if (!groupDoc.exists()) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Group not found' 
+            });
+        }
+
+        // Check if user is a member of the group
+        const groupData = groupDoc.data();
+        if (!groupData.members.includes(userId)) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Only group members can send messages' 
+            });
+        }
+
+        // Create message document
+        const messageData = {
+            groupId,
+            userId,
+            username,
+            content,
+            timestamp: serverTimestamp(),
+            read: false
+        };
+
+        console.log('Message data to be added:', messageData);
+
+        // Add document to Firestore
+        const docRef = await addDoc(collection(db, 'groupMessages'), messageData);
+        console.log('Message sent successfully with ID:', docRef.id);
+
+        return res.status(201).json({ 
+            success: true, 
+            message: 'Message sent successfully',
+            messageId: docRef.id 
+        });
+    } catch (error) {
+        console.error('Error sending message:', error);
+        console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            code: error.code
+        });
+        
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Failed to send message: ' + (error.message || 'Unknown error'),
+            errorCode: error.code || 'UNKNOWN_ERROR',
+            error: error.toString()
+        });
+    }
+});
+
+/**
+ * @route   GET /api/groups/:groupId/messages
+ * @desc    Get messages for a group
+ * @access  Public
+ */
+router.get('/:groupId/messages', async (req, res) => {
+    try {
+        const { groupId } = req.params;
+        const { limit: msgLimit = 100 } = req.query;
+        
+        console.log('Fetching messages for group:', groupId);
+
+        if (!groupId) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Group ID is required' 
+            });
+        }
+
+        // Check if group exists
+        const groupRef = doc(db, 'groups', groupId);
+        const groupDoc = await getDoc(groupRef);
+        
+        if (!groupDoc.exists()) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Group not found' 
+            });
+        }
+
+        // Query for messages
+        try {
+            const q = query(
+                collection(db, 'groupMessages'),
+                where('groupId', '==', groupId),
+                orderBy('timestamp', 'asc'),
+                limit(parseInt(msgLimit))
+            );
+
+            const querySnapshot = await getDocs(q);
+            
+            // Check if there are no messages in the group
+            if (querySnapshot.empty) {
+                console.log(`No messages found for group ${groupId}`);
+                return res.status(200).json({ 
+                    success: true, 
+                    messages: [],
+                    message: 'No messages in this group yet'
+                });
+            }
+            
+            const messages = [];
+            querySnapshot.forEach(doc => {
+                messages.push({
+                    id: doc.id,
+                    ...doc.data(),
+                    // Convert timestamp to ISO string
+                    timestamp: doc.data().timestamp?.toDate().toISOString() || null
+                });
+            });
+
+            console.log(`Found ${messages.length} messages for group ${groupId}`);
+            return res.status(200).json({ 
+                success: true, 
+                messages 
+            });
+        } catch (error) {
+            // Handle Firestore index error specifically
+            if (error.code === 'failed-precondition' && error.message.includes('index')) {
+                console.error('Missing Firestore index for query. Please create a composite index for groupId and timestamp.');
+                
+                // Fallback query without ordering when index doesn't exist
+                try {
+                    console.log('Attempting fallback query without ordering');
+                    const fallbackQuery = query(
+                        collection(db, 'groupMessages'),
+                        where('groupId', '==', groupId)
+                    );
+                    
+                    const fallbackSnapshot = await getDocs(fallbackQuery);
+                    
+                    if (fallbackSnapshot.empty) {
+                        return res.status(200).json({ 
+                            success: true, 
+                            messages: [],
+                            message: 'No messages in this group yet'
+                        });
+                    }
+                    
+                    // Convert documents to messages and sort manually
+                    let messages = [];
+                    fallbackSnapshot.forEach(doc => {
+                        messages.push({
+                            id: doc.id,
+                            ...doc.data(),
+                            timestamp: doc.data().timestamp?.toDate().toISOString() || null
+                        });
+                    });
+                    
+                    // Sort manually by timestamp
+                    messages.sort((a, b) => {
+                        if (!a.timestamp) return -1;
+                        if (!b.timestamp) return 1;
+                        return new Date(a.timestamp) - new Date(b.timestamp);
+                    });
+                    
+                    // Apply limit after sorting
+                    if (msgLimit) {
+                        messages = messages.slice(0, parseInt(msgLimit));
+                    }
+                    
+                    console.log(`Found ${messages.length} messages for group ${groupId} (fallback method)`);
+                    return res.status(200).json({ 
+                        success: true, 
+                        messages,
+                        indexMissing: true
+                    });
+                    
+                } catch (fallbackError) {
+                    throw fallbackError; // If fallback also fails, throw to outer catch
+                }
+            }
+            throw error; // Re-throw if it's not an index error
+        }
+    } catch (error) {
+        console.error('Error fetching messages:', error);
+        console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            code: error.code
+        });
+        
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Failed to fetch messages: ' + (error.message || 'Unknown error'),
+            errorCode: error.code || 'UNKNOWN_ERROR',
+            error: error.toString()
+        });
+    }
+});
+
+/**
+ * @route   POST /api/groups/:groupId/documents
+ * @desc    Save document information for a group
+ * @access  Public
+ */
+router.post('/:groupId/documents', async (req, res) => {
+    try {
+        const { groupId } = req.params;
+        const { userId, username, fileName, fileUrl, fileType, fileSize } = req.body;
+        
+        console.log('Saving document info to group:', groupId);
+
+        if (!groupId || !userId || !fileName || !fileUrl) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Group ID, User ID, file name and file URL are required' 
+            });
+        }
+
+        // Check if group exists
+        const groupRef = doc(db, 'groups', groupId);
+        const groupDoc = await getDoc(groupRef);
+        
+        if (!groupDoc.exists()) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Group not found' 
+            });
+        }
+
+        // Check if user is a member of the group
+        const groupData = groupDoc.data();
+        if (!groupData.members.includes(userId)) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Only group members can share documents' 
+            });
+        }
+
+        // Create message document with document type
+        const messageData = {
+            groupId,
+            userId,
+            username,
+            type: 'document',
+            fileName,
+            fileUrl,
+            fileType,
+            fileSize,
+            timestamp: serverTimestamp(),
+            read: false
+        };
+
+        // Add document to Firestore
+        const docRef = await addDoc(collection(db, 'groupMessages'), messageData);
+        console.log('Document message saved successfully with ID:', docRef.id);
+
+        return res.status(201).json({ 
+            success: true, 
+            message: 'Document shared successfully',
+            documentId: docRef.id 
+        });
+    } catch (error) {
+        console.error('Error sharing document:', error);
+        console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            code: error.code
+        });
+        
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Failed to share document: ' + (error.message || 'Unknown error'),
+            errorCode: error.code || 'UNKNOWN_ERROR',
+            error: error.toString()
         });
     }
 });

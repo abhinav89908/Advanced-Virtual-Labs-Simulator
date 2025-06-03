@@ -6,7 +6,8 @@ import {
   CheckCircle,
   Users,
   MessageCircle,
-  Bot
+  Bot,
+  X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ResponsiveHeader from './shared-components/Header';
@@ -38,10 +39,11 @@ const floatAnimation = `
 export default function LandingPage() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegistration, setShowRegistration] = useState(false);
-  const [isConnected, setIsConnected] = useState(true);
-  const [isConnecting, setIsConnecting] = useState(false);
   const navigate = useNavigate();
-  const { isLoggedIn } = useContext(UserContext);
+  const { user, isLoggedIn } = useContext(UserContext);
+  
+  // Force component re-render when login state changes
+  const [rerender, setRerender] = useState(0);
 
   useEffect(() => {
     const style = document.createElement('style');
@@ -50,14 +52,40 @@ export default function LandingPage() {
     return () => style.remove();
   }, []);
 
+  // This effect will trigger a re-render when isLoggedIn changes
+  useEffect(() => {
+    setRerender(prev => prev + 1);
+    
+    // If user just logged in, close any open modals
+    if (isLoggedIn) {
+      setShowLogin(false);
+      setShowRegistration(false);
+    }
+  }, [isLoggedIn]);
+
   const toggleLoginModal = () => {
     setShowLogin(!showLogin);
-    navigate('/login');
+    setShowRegistration(false);
   };
 
   const toggleRegistrationModal = () => {
     setShowRegistration(!showRegistration);
-    navigate('/register');
+    setShowLogin(false); // Close login if open
+  };
+
+  const switchToLogin = () => {
+    setShowRegistration(false);
+    setShowLogin(true);
+  };
+
+  const switchToRegistration = () => {
+    setShowLogin(false);
+    setShowRegistration(true);
+  };
+
+  const closeModals = () => {
+    setShowLogin(false);
+    setShowRegistration(false);
   };
 
   const handleAssistantToggle = (isOpen) => {
@@ -106,8 +134,6 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-800 to-gray-900">
       <ResponsiveHeader
-        isConnected={isConnected}
-        isConnecting={isConnecting}
         onAssistantToggle={handleAssistantToggle}
       />
 
@@ -132,7 +158,8 @@ export default function LandingPage() {
                 </h1>
                 
                 <div className="flex flex-col sm:flex-row gap-6 pt-4">
-                  {isLoggedIn ? '' : (
+                  {/* Check if user is NOT logged in before showing buttons */}
+                  {!isLoggedIn && (
                     <>
                       <button
                         onClick={toggleLoginModal}
@@ -154,9 +181,22 @@ export default function LandingPage() {
                       </button>
                     </>
                   )}
+                  {/* If user is logged in, show a different call-to-action */}
+                  {isLoggedIn && (
+                    <button
+                      onClick={() => navigate('/labs')}
+                      className="group relative px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-400 rounded-xl text-white font-medium text-lg shadow-lg shadow-teal-500/20 hover:shadow-xl hover:shadow-teal-500/30 hover:-translate-y-0.5 transition-all duration-300"
+                    >
+                      <span className="relative z-10 flex items-center justify-center">
+                        Explore Labs
+                        <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                      </span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
+            
             {/* ...existing right column content... */}
             <div className="md:w-1/2">
               <div className="relative w-full max-w-xl mx-auto">
@@ -263,7 +303,7 @@ export default function LandingPage() {
           <p className="text-xl mb-8 max-w-3xl mx-auto text-white/90">
             Join thousands of students already using Virtual Labs to enhance their scientific education.
           </p>
-          { !isLoggedIn ? (
+          {!isLoggedIn ? (
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
               <button onClick={toggleRegistrationModal}
                 className="px-8 py-3 bg-white text-teal-600 font-medium rounded-lg hover:bg-gray-50 
@@ -276,9 +316,76 @@ export default function LandingPage() {
                 Student Login
               </button>
             </div>
-          ) : ''}
+          ) : (
+            <button onClick={() => navigate('/labs')}
+              className="px-8 py-3 bg-white text-teal-600 font-medium rounded-lg hover:bg-gray-50 
+                transition-all duration-300 hover:-translate-y-0.5 shadow-lg shadow-teal-700/20">
+              Explore Labs
+            </button>
+          )}
         </div>
       </section>
+      
+      {/* Modal Overlays */}
+      {showLogin && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+          <div 
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm"
+            onClick={closeModals}
+          ></div>
+          
+          <div className="relative w-full max-w-md mx-auto p-6 z-10">
+            <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 rounded-xl shadow-xl shadow-black/30 overflow-hidden">
+              <div className="flex justify-between items-center px-6 py-4 border-b border-gray-700/50">
+                <h2 className="text-xl font-bold text-white">Sign In</h2>
+                <button 
+                  onClick={closeModals}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              
+              <div className="p-6">
+                <StudentLogin 
+                  onClose={closeModals} 
+                  onSwitchToRegister={switchToRegistration}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {showRegistration && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+          <div 
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm"
+            onClick={closeModals}
+          ></div>
+          
+          <div className="relative w-full max-w-2xl mx-auto p-6 z-10">
+            <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 rounded-xl shadow-xl shadow-black/30 overflow-hidden">
+              <div className="flex justify-between items-center px-6 py-4 border-b border-gray-700/50">
+                <h2 className="text-xl font-bold text-white">Create Account</h2>
+                <button 
+                  onClick={closeModals}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              
+              <div className="p-6">
+                <StudentRegistration 
+                  onClose={closeModals} 
+                  onSwitchToLogin={switchToLogin}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <Footer />
     </div>
   );

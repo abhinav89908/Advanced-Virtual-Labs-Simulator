@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, Plus, Edit, Trash2, Users, Calendar, School, RefreshCw } from 'lucide-react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link} from 'react-router-dom';
+import { useContext } from 'react';
+import { UserContext } from '../hooks/userContext'; 
 
 const GroupManagement = () => {
   const [groups, setGroups] = useState([]);
@@ -12,6 +14,7 @@ const GroupManagement = () => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [students, setStudents] = useState([]);
   const [studentSearchTerm, setStudentSearchTerm] = useState('');
+  const {user} = useContext(UserContext); 
   
   const [formData, setFormData] = useState({
     name: '',
@@ -21,7 +24,7 @@ const GroupManagement = () => {
     course: '',
     department: '',
     members: [],
-    creatorId: localStorage.getItem('user').id // Assuming userId is stored in localStorage
+    creatorId: user.id // Assuming userId is stored in localStorage
   });
   
   // Fetch groups and students data
@@ -96,7 +99,7 @@ const GroupManagement = () => {
       course: group.course || '',
       department: group.department || '',
       members: group.members || [],
-      creatorId: localStorage.getItem('user').id // Assuming userId is stored in localStorage
+      creatorId: user.id // Assuming userId is stored in localStorage
     });
     setShowAddModal(true);
   };
@@ -112,7 +115,7 @@ const GroupManagement = () => {
       course: '',
       department: '',
       members: [],
-      creatorId: localStorage.getItem('user').id
+      creatorId: user.id
     });
     setShowAddModal(true);
   };

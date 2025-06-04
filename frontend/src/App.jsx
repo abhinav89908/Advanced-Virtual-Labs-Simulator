@@ -104,6 +104,7 @@ function App() {
           <Route path="/createGroup" element={<GroupForm />} />
           <Route path="/my-experiments" element={<UserExperimentsDashboard />} />
           <Route path="/profile" element={<UserProfile />} />
+          <Route path="/experiment" element={<ExperimentPage />} />
           
           {/* Test Routes */}
           <Route path="/tests" element={<TestList />} />

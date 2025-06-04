@@ -1,6 +1,6 @@
 .control-panel {
 
-  background: rgba(30, 41, 59, 0.8);
+  background: rgba(30, 41, 59, 0.8) !important;
   backdrop-filter: blur(8px);
   border: 1px solid rgba(94, 234, 212, 0.1);
   border-radius: 12px;

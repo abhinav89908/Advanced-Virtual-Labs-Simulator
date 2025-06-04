@@ -18,6 +18,168 @@ import {
 
 const router = express.Router();
 
+// ADD THIS: Specific routes must come before generic ones
+
+/**
+ * @route   GET /api/tests/results/all
+ * @desc    Get all test results for admin
+ * @access  Admin
+ */
+router.get('/results/all', async (req, res) => {
+    try {
+        console.log('Fetching all test results from database');
+        
+        // Get all test results directly from collection
+        const resultsRef = collection(db, 'testResults');
+        const querySnapshot = await getDocs(resultsRef);
+        
+        if (querySnapshot.empty) {
+            console.log('No test results found');
+            return res.status(200).json({ 
+                success: true, 
+                results: [] 
+            });
+        }
+        
+        const results = [];
+        for (const docSnapshot of querySnapshot.docs) {
+            try {
+                const resultData = docSnapshot.data();
+                
+                // Safely handle timestamp conversion
+                const submittedAt = resultData.submittedAt?.toDate?.() 
+                    ? resultData.submittedAt.toDate().toISOString() 
+                    : null;
+                    
+                const updatedAt = resultData.updatedAt?.toDate?.() 
+                    ? resultData.updatedAt.toDate().toISOString() 
+                    : null;
+                
+                const result = {
+                    id: docSnapshot.id,
+                    ...resultData,
+                    submittedAt,
+                    updatedAt
+                };
+                
+                // Get test details
+                if (resultData.testId) {
+                    try {
+                        const testDocRef = doc(db, 'tests', resultData.testId);
+                        const testDocSnapshot = await getDoc(testDocRef);
+                        if (testDocSnapshot.exists()) {
+                            result.test = {
+                                id: testDocSnapshot.id,
+                                title: testDocSnapshot.data().title || 'Untitled Test',
+                                description: testDocSnapshot.data().description || ''
+                            };
+                        }
+                    } catch (testError) {
+                        console.error('Error fetching test details:', testError);
+                    }
+                }
+                
+                results.push(result);
+            } catch (resultError) {
+                console.error('Error processing user test result:', resultError);
+                // Skip this result and continue with others
+            }
+        }
+        
+        console.log(`Found ${results.length} test results`);
+        res.status(200).json({ 
+            success: true, 
+            results 
+        });
+    } catch (error) {
+        console.error('Error fetching all test results:', error);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Failed to fetch test results'
+        });
+    }
+});
+
+/**
+ * @route   GET /api/tests/result/:resultId
+ * @desc    Get detailed test result by result ID
+ * @access  Public
+ */
+router.get('/result/:resultId', async (req, res) => {
+    try {
+        const { resultId } = req.params;
+        console.log('Fetching detailed test result for result ID:', resultId);
+        
+        if (!resultId) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Result ID is required' 
+            });
+        }
+        
+        // Get the result document
+        const resultRef = doc(db, 'testResults', resultId);
+        const resultDoc = await getDoc(resultRef);
+        
+        if (!resultDoc.exists()) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Test result not found' 
+            });
+        }
+        
+        const resultData = resultDoc.data();
+        
+        // Safely handle timestamp conversion
+        const submittedAt = resultData.submittedAt?.toDate?.() 
+            ? resultData.submittedAt.toDate().toISOString() 
+            : null;
+            
+        const updatedAt = resultData.updatedAt?.toDate?.() 
+            ? resultData.updatedAt.toDate().toISOString() 
+            : null;
+        
+        const result = {
+            id: resultDoc.id,
+            ...resultData,
+            submittedAt,
+            updatedAt
+        };
+        
+        // Get test details
+        if (resultData.testId) {
+            try {
+                const testDocRef = doc(db, 'tests', resultData.testId);
+                const testDocSnapshot = await getDoc(testDocRef);
+                if (testDocSnapshot.exists()) {
+                    const testData = testDocSnapshot.data();
+                    result.test = {
+                        id: testDocSnapshot.id,
+                        title: testData.title || 'Untitled Test',
+                        description: testData.description || '',
+                        questions: testData.questions || []
+                    };
+                }
+            } catch (testError) {
+                console.error('Error fetching test details:', testError);
+            }
+        }
+        
+        console.log(`Successfully fetched result details for ${resultId}`);
+        res.status(200).json({ 
+            success: true, 
+            result 
+        });
+    } catch (error) {
+        console.error('Error fetching detailed test result:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to fetch detailed test result: ' + (error.message || 'Unknown error'),
+            error: error.toString()
+        });
+    }
+});
+
 /**
  * @route   POST /api/tests/create
  * @desc    Create a new test
@@ -658,232 +820,6 @@ router.get('/results/:userId', async (req, res) => {
         res.status(500).json({ 
             success: false, 
             message: 'Failed to fetch test results: ' + (error.message || 'Unknown error'),
-            error: error.toString()
-        });
-    }
-});
-
-/**
- * @route   GET /api/tests/results/all
- * @desc    Get all test results from all users
- * @access  Admin
- */
-router.get('/results/all', async (req, res) => {
-    try {
-        console.log('Fetching all test results from database');
-        
-        // Get all test results directly from collection
-        const resultsRef = collection(db, 'testResults');
-        const querySnapshot = await getDocs(resultsRef);
-        
-        if (querySnapshot.empty) {
-            console.log('No test results found in database');
-            return res.status(200).json({ 
-                success: true, 
-                results: [],
-                message: 'No test results found' 
-            });
-        }
-        
-        const results = [];
-        for (const docSnapshot of querySnapshot.docs) {
-            try {
-                const resultData = docSnapshot.data();
-                
-                // Safely handle timestamp conversion
-                const submittedAt = resultData.submittedAt?.toDate?.() 
-                    ? resultData.submittedAt.toDate().toISOString() 
-                    : null;
-                    
-                const updatedAt = resultData.updatedAt?.toDate?.() 
-                    ? resultData.updatedAt.toDate().toISOString() 
-                    : null;
-                
-                const result = {
-                    id: docSnapshot.id,
-                    ...resultData,
-                    submittedAt,
-                    updatedAt
-                };
-                
-                // Get test details (if available)
-                if (resultData.testId) {
-                    try {
-                        const testDocRef = doc(db, 'tests', resultData.testId);
-                        const testDocSnapshot = await getDoc(testDocRef);
-                        if (testDocSnapshot.exists()) {
-                            result.test = {
-                                id: testDocSnapshot.id,
-                                title: testDocSnapshot.data().title || 'Untitled Test',
-                                description: testDocSnapshot.data().description || '',
-                                timeLimit: testDocSnapshot.data().timeLimit || 60
-                            };
-                        }
-                    } catch (testError) {
-                        console.error('Error fetching test details:', testError);
-                        result.test = { 
-                            id: resultData.testId,
-                            title: 'Error Loading Test',
-                            description: ''
-                        };
-                    }
-                }
-                
-                // Get student details (if available)
-                if (resultData.userId) {
-                    try {
-                        const userDocRef = doc(db, 'users', resultData.userId);
-                        const userDocSnapshot = await getDoc(userDocRef);
-                        if (userDocSnapshot.exists()) {
-                            result.student = {
-                                id: userDocSnapshot.id,
-                                firstName: userDocSnapshot.data().firstName || '',
-                                lastName: userDocSnapshot.data().lastName || '',
-                                email: userDocSnapshot.data().email || '',
-                                studentId: userDocSnapshot.data().studentId || ''
-                            };
-                        }
-                    } catch (userError) {
-                        console.error('Error fetching user details:', userError);
-                        result.student = { 
-                            id: resultData.userId,
-                            firstName: 'Unknown',
-                            lastName: 'Student',
-                            email: ''
-                        };
-                    }
-                }
-                
-                results.push(result);
-            } catch (resultError) {
-                console.error('Error processing test result:', resultError);
-                // Skip this result and continue with others
-            }
-        }
-        
-        console.log(`Successfully fetched ${results.length} test results from database`);
-        return res.status(200).json({ 
-            success: true, 
-            results 
-        });
-    } catch (error) {
-        console.error('Error fetching all test results:', error);
-        return res.status(500).json({ 
-            success: false, 
-            message: 'Failed to fetch test results: ' + (error.message || 'Unknown error'),
-            error: error.toString()
-        });
-    }
-});
-
-/**
- * @route   GET /api/tests/getResult
- * @desc    Legacy endpoint for getting all test results
- * @access  Admin
- */
-router.get('/getResult', async (req, res) => {
-    try {
-        console.log('Redirecting getResult request to /results/all endpoint');
-        
-        // Get all test results directly from collection
-        const resultsRef = collection(db, 'testResults');
-        const querySnapshot = await getDocs(resultsRef);
-        
-        if (querySnapshot.empty) {
-            return res.status(200).json({ 
-                success: true, 
-                results: [],
-                message: 'No test results found' 
-            });
-        }
-        
-        // Process results same as /results/all endpoint
-        const results = [];
-        for (const docSnapshot of querySnapshot.docs) {
-            try {
-                const resultData = docSnapshot.data();
-                
-                // Safely handle timestamp conversion
-                const submittedAt = resultData.submittedAt?.toDate?.() 
-                    ? resultData.submittedAt.toDate().toISOString() 
-                    : null;
-                    
-                const updatedAt = resultData.updatedAt?.toDate?.() 
-                    ? resultData.updatedAt.toDate().toISOString() 
-                    : null;
-                
-                const result = {
-                    id: docSnapshot.id,
-                    ...resultData,
-                    submittedAt,
-                    updatedAt
-                };
-                
-                // Get test details (if available)
-                if (resultData.testId) {
-                    try {
-                        const testDocRef = doc(db, 'tests', resultData.testId);
-                        const testDocSnapshot = await getDoc(testDocRef);
-                        if (testDocSnapshot.exists()) {
-                            result.test = {
-                                id: testDocSnapshot.id,
-                                title: testDocSnapshot.data().title || 'Untitled Test',
-                                description: testDocSnapshot.data().description || '',
-                                timeLimit: testDocSnapshot.data().timeLimit || 60
-                            };
-                        }
-                    } catch (testError) {
-                        console.error('Error fetching test details:', testError);
-                        result.test = { 
-                            id: resultData.testId,
-                            title: 'Error Loading Test',
-                            description: ''
-                        };
-                    }
-                }
-                
-                // Get student details (if available)
-                if (resultData.userId) {
-                    try {
-                        const userDocRef = doc(db, 'users', resultData.userId);
-                        const userDocSnapshot = await getDoc(userDocRef);
-                        if (userDocSnapshot.exists()) {
-                            result.student = {
-                                id: userDocSnapshot.id,
-                                firstName: userDocSnapshot.data().firstName || '',
-                                lastName: userDocSnapshot.data().lastName || '',
-                                email: userDocSnapshot.data().email || '',
-                                studentId: userDocSnapshot.data().studentId || ''
-                            };
-                        }
-                    } catch (userError) {
-                        console.error('Error fetching user details:', userError);
-                        result.student = { 
-                            id: resultData.userId,
-                            firstName: 'Unknown',
-                            lastName: 'Student',
-                            email: ''
-                        };
-                    }
-                }
-                
-                results.push(result);
-            } catch (resultError) {
-                console.error('Error processing test result:', resultError);
-                // Skip this result and continue with others
-            }
-        }
-        
-        console.log(`Found ${results.length} test results via getResult endpoint`);
-        return res.status(200).json({ 
-            success: true, 
-            results 
-        });
-    } catch (error) {
-        console.error('Error fetching all test results:', error);
-        return res.status(500).json({ 
-            success: false, 
-            message: 'Failed to fetch test results',
             error: error.toString()
         });
     }

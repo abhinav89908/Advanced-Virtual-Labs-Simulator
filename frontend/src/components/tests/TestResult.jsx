@@ -42,11 +42,14 @@ const TestResult = () => {
         setLoading(true);
         setError(null);
         
+        // Call getTestResult with only the resultId parameter
         const response = await getTestResult(resultId);
         
         if (response.success) {
+          console.log('Successfully fetched test result:', response.result);
           setResult(response.result);
         } else {
+          console.error('Failed to fetch test result:', response.message);
           setError(response.message || 'Failed to load test result');
         }
       } catch (error) {

@@ -2,43 +2,72 @@ import axios from 'axios';
 
 const API_BASE_URL =  'http://localhost:3000/api';
 
-// Get all users (admin only)
+// Get all users
 export const getAllUsers = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/users/getUsers`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching all users:', error);
+    console.error('Error fetching users:', error);
     throw error;
   }
 };
 
-// Get user profile
-export const getUserProfile = async (userId) => {
+// Get user by ID
+export const getUserById = async (userId) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/users/${userId}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching user profile:', error);
+    console.error('Error fetching user:', error);
     throw error;
   }
 };
 
-// Update user profile
-export const updateUserProfile = async (userId, userData) => {
+// Get user details - added to fix the missing export error
+export const getUserDetails = async (userId) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/users/${userId}/details`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    // If the dedicated endpoint fails, try to fall back to the regular user endpoint
+    try {
+      const fallbackResponse = await getUserById(userId);
+      return fallbackResponse;
+    } catch (fallbackError) {
+      console.error('Fallback also failed:', fallbackError);
+      throw error; // Throw the original error
+    }
+  }
+};
+
+// Update user
+export const updateUser = async (userId, userData) => {
   try {
     const response = await axios.put(`${API_BASE_URL}/users/${userId}`, userData);
     return response.data;
   } catch (error) {
-    console.error('Error updating user profile:', error);
+    console.error('Error updating user:', error);
     throw error;
   }
 };
 
-// Register a new user
+// Delete user
+export const deleteUser = async (userId) => {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    throw error;
+  }
+};
+
+// Register new user
 export const registerUser = async (userData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/register`, userData);
+    const response = await axios.post(`${API_BASE_URL}/users/register`, userData);
     return response.data;
   } catch (error) {
     console.error('Error registering user:', error);
@@ -49,7 +78,7 @@ export const registerUser = async (userData) => {
 // Login user
 export const loginUser = async (credentials) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/login`, credentials);
+    const response = await axios.post(`${API_BASE_URL}/users/login`, credentials);
     return response.data;
   } catch (error) {
     console.error('Error logging in:', error);
@@ -57,57 +86,12 @@ export const loginUser = async (credentials) => {
   }
 };
 
-// Admin functions
-export const getStudentsList = async () => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/admin/students`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching students list:', error);
-    throw error;
-  }
-};
-
-export const updateUserRole = async (userId, role) => {
-  try {
-    const response = await axios.put(`${API_BASE_URL}/admin/users/${userId}/role`, { role });
-    return response.data;
-  } catch (error) {
-    console.error('Error updating user role:', error);
-    throw error;
-  }
-};
-
-export const deleteUser = async (userId) => {
-  try {
-    const response = await axios.delete(`${API_BASE_URL}/admin/users/${userId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error deleting user:', error);
-    throw error;
-  }
-};
-
-// Get user details by ID
-export const getUserDetails = async (userId) => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/users/${userId}/details`);
-    return response.data.user;
-  } catch (error) {
-    console.error('Error fetching user details:', error);
-    // Return a default user object to prevent UI errors
-    return { firstName: 'User', username: 'User' };
-  }
-};
-
 export default {
   getAllUsers,
-  getUserProfile,
-  updateUserProfile,
-  registerUser,
-  loginUser,
-  getStudentsList,
-  updateUserRole,
+  getUserById,
+  getUserDetails, // Add to default export
+  updateUser,
   deleteUser,
-  getUserDetails
+  registerUser,
+  loginUser
 };

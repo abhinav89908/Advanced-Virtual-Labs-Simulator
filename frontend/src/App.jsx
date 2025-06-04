@@ -8,12 +8,11 @@ import RegistrationPage from './components/RegistrationPage';
 import LabDashboard from './components/labs/LabDashboard';
 import ExperimentPage from './components/labs/ExperimentPage';
 import Room from './components/Room';
-import AdminPortal from './components/admin/AdminPortal';
 import GroupPage from './components/group/GroupPage';
 import GroupManagement from './components/group/GroupManagement';
 import GroupForm from './components/group/GroupForm';
 import GroupDetail from './components/group/GroupDetail';
-import UserProfile from './components/user/UserProfile'; // Import the new UserProfile component
+import UserProfile from './components/user/UserProfile';
 
 // Simulators
 import SimulatorTitration from './components/simulators/titration/SimulatorTitration';
@@ -23,9 +22,19 @@ import SimulatorOhmsLaw from './components/simulators/ohms_law/SimulatorOhmsLaw'
 import SimulatorOS from './components/simulators/operating_system/SimulatorOS';
 import SimulatorCN from './components/simulators/computer_networks/SimulatorCN';
 import UserExperimentsDashboard from './components/experiments/MyExperiment';
-import StudentsManagement from './components/admin/StudentManagement';
+
+// Admin Components
+import AdminPortal from './components/admin/AdminPortal';
+import AdminDashboard from './components/admin/AdminDashboard';
+import StudentManagement from './components/admin/StudentManagement';
 import GroupManagementAdmin from './components/admin/GroupManagement';
-import ExperimentsAdmin from './components/admin/ExperimentManagement';
+import ResultsManagement from './components/admin/ResultsManagement';
+import TestManagement from './components/admin/TestManagement';
+
+// Test Components
+import TestList from './components/tests/TestList';
+import TakeTest from './components/tests/TakeTest';
+import TestResult from './components/tests/TestResult';
 
 function App() {
   return (
@@ -36,21 +45,30 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegistrationPage />} />
           <Route path="/labs" element={<LabDashboard />} />
-          <Route path="/experiment" element={<ExperimentPage />} />
+  
           <Route path="/chat" element={<Room />} />
           <Route path="/groups" element={<GroupPage />} />
           <Route path="/groups/:groupId" element={<GroupDetail />} />
           <Route path="/createGroup" element={<GroupForm />} />
           <Route path="/my-experiments" element={<UserExperimentsDashboard />} />
-          <Route path="/profile" element={<UserProfile />} /> {/* Add new route for user profile */}
+          <Route path="/profile" element={<UserProfile />} />
+          
+          {/* Test Routes */}
+          <Route path="/tests" element={<TestList />} />
+          <Route path="/tests/take/:testId" element={<TakeTest />} />
+          <Route path="/tests/result/:resultId" element={<TestResult />} />
           
           {/* Admin Routes */}
-          <Route path="/admin" element={<AdminPortal />} />
-          <Route path="/admin/students" element={<StudentsManagement/>} />
-          <Route path="/admin/groups" element={<GroupManagementAdmin />} />
-          <Route path="/admin/groups/create" element={<GroupForm />} /> {/* Add route for admin to create group */}
-          <Route path="/admin/groups/edit/:groupId" element={<GroupForm />} /> {/* Add route for admin to edit group */}
-          <Route path="/admin/experiments" element={<ExperimentsAdmin/>} />
+          <Route path="/admin" element={<AdminPortal />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="students" element={<StudentManagement />} />
+            <Route path="groups" element={<GroupManagementAdmin />} />
+            <Route path="tests" element={<TestManagement />} />
+            <Route path="results" element={<ResultsManagement />} />
+          </Route>
+          
+          <Route path="/admin/groups/create" element={<GroupForm />} />
+          <Route path="/admin/groups/edit/:groupId" element={<GroupForm />} />
           
           {/* Simulator Routes */}
           <Route path="/simulator/titration" element={<SimulatorTitration />} />

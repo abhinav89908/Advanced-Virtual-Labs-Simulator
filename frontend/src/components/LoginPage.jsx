@@ -93,10 +93,6 @@ export default function StudentLogin({ onClose, onSwitchToRegister }) {
     }
   };
 
-  const handleGoogleLogin = () => {
-    setLoginError('Google login is not implemented yet.');
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-800 to-gray-900">
       
@@ -150,27 +146,6 @@ export default function StudentLogin({ onClose, onSwitchToRegister }) {
                 {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="rememberMe"
-                    name="rememberMe"
-                    type="checkbox"
-                    checked={formData.rememberMe}
-                    onChange={handleChange}
-                    className="h-4 w-4 text-teal-500 focus:ring-teal-500 border-gray-700 rounded bg-gray-800"
-                  />
-                  <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-400">
-                    Remember me
-                  </label>
-                </div>
-                <div className="text-sm">
-                  <a href="#" className="text-teal-400 hover:text-teal-300 transition-colors">
-                    Forgot password?
-                  </a>
-                </div>
-              </div>
-
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -184,21 +159,6 @@ export default function StudentLogin({ onClose, onSwitchToRegister }) {
                 ) : 'Sign in'}
               </button>
             </form>
-
-            <div className="mt-8 flex items-center">
-              <div className="flex-grow h-px bg-gray-700/50"></div>
-              <span className="px-3 text-sm text-gray-400">or</span>
-              <div className="flex-grow h-px bg-gray-700/50"></div>
-            </div>
-
-            <button
-              onClick={handleGoogleLogin}
-              className="mt-5 w-full flex items-center justify-center py-2.5 px-4 border border-gray-700 rounded-lg bg-gray-800/50 text-gray-300 hover:bg-gray-700 transition-colors"
-            >
-              <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" className="h-5 w-5 mr-2" />
-              Sign in with Google
-            </button>
-
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-400">
                 Don't have an account?{' '}

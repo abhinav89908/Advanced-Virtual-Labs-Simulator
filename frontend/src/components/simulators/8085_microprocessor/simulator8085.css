@@ -1259,3 +1259,38 @@
     padding: 6px 12px;
     height: 32px;
 }
+
+.experiment-data-section {
+    background: var(--panel-bg);
+    border: 1px solid rgba(94, 234, 212, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    position: relative;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+}
+
+.experiment-data-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--accent-gradient);
+}
+
+.experiment-data-section:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 8px 32px rgba(94, 234, 212, 0.15);
+}
+
+.experiment-data-section h3 {
+    color: var(--accent-primary);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(94, 234, 212, 0.3);
+}

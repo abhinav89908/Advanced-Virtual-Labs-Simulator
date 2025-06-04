@@ -42,7 +42,27 @@
 }
 
 .control-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 2rem 1.5rem;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  border-radius: 10px;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.control-group.slider {
+  margin-bottom: 1rem;
+  padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  border-radius: 10px;
+  min-height: 180px;  /* Increased to accommodate both sliders */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;  /* Add gap between sliders */
 }
 
 .control-group label {
@@ -73,7 +93,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  padding: 0.8rem;
+  background: rgba(30, 41, 59, 0.4);
+  border-radius: 8px;
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  margin-bottom: 0.8rem;
 }
 
 .value-display {
@@ -81,15 +105,18 @@
   color: rgb(94, 234, 212);
   font-size: 0.9rem;
   background: rgba(15, 23, 42, 0.4);
-  padding: 0.3rem 0.5rem;
+  padding: 0.8rem 1.2rem;
   border-radius: 4px;
-  min-width: 50px;
+  min-width: 70px;
   text-align: center;
+  margin-left: 1rem;
 }
 
 .slider-container {
   position: relative;
-  padding: 0.5rem 0;
+  padding: 0.5rem;
+  height: 40px;
+  margin: 0;
 }
 
 .slider-container::before {
@@ -254,6 +281,66 @@
 
 .ray-toggle input:checked + .toggle-label:after {
   left: 38px;
+}
+
+.experiment-data-panel {
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  color: #f1f5f9;
+  transition: all 0.3s ease;
+}
+
+.experiment-data-panel:hover {
+  border-color: rgb(94, 234, 212);
+  box-shadow: 0 8px 32px rgba(94, 234, 212, 0.15);
+}
+
+.experiment-data-panel h3 {
+  color: rgb(94, 234, 212);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(94, 234, 212, 0.3);
+}
+
+.experiment-data-panel .data-section {
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.experiment-data-panel input,
+.experiment-data-panel textarea {
+  width: 100%;
+  padding: 0.8rem;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  border-radius: 8px;
+  color: #f1f5f9;
+  margin: 0.5rem 0;
+}
+
+.experiment-data-panel button {
+  background: rgba(94, 234, 212, 0.1);
+  color: rgb(94, 234, 212);
+  border: 1px solid rgba(94, 234, 212, 0.3);
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.experiment-data-panel button:hover {
+  background: rgba(94, 234, 212, 0.2);
+  border-color: rgb(94, 234, 212);
+  box-shadow: 0 0 15px rgba(94, 234, 212, 0.3);
 }
 
 @media (max-width: 768px) {

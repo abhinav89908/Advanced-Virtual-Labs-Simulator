@@ -245,14 +245,14 @@ export default function ExperimentPage() {
                     {/* Instructions Panel */}
                     {showInstructions && (
                       <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 p-6 mb-4">
-                        <h3 className="flex items-center text-lg font-semibold text-white mb-3">
+                        <h3 className="flex items-center text-lg font-semibold text-teal-300 mb-3">
                           <FileText className="h-5 w-5 mr-2 text-teal-400" />
                           Instructions
                         </h3>
-                        <p className="text-gray-300 mb-4">{currentExperiment.description}</p>
-                        <div className="bg-gray-700/50 p-4 rounded-md border border-teal-500/20">
+                        <p className="text-gray-200 mb-4">{currentExperiment.description}</p>
+                        <div className="bg-gray-700/50 p-4 rounded-md border border-gray-500">
                           <h4 className="font-medium text-teal-300 mb-2">Procedure</h4>
-                          <div className="text-gray-300 whitespace-pre-line">
+                          <div className="text-gray-100 whitespace-pre-line">
                             {currentExperiment.instructions}
                           </div>
                         </div>

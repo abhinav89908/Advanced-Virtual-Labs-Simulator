@@ -1,23 +1,28 @@
 .control-panel {
-  background-color: #ffffff;
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(94, 234, 212, 0.1);
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   min-width: 280px;
   max-width: 320px;
   transition: all 0.3s ease;
+  color: #f1f5f9;
 }
 
 .control-panel:hover {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  border-color: rgb(94, 234, 212);
+  box-shadow: 0 8px 32px rgba(94, 234, 212, 0.15);
 }
 
 .control-panel h2 {
   margin: 0 0 1.5rem 0;
   font-size: 1.5rem;
   font-weight: 600;
-  color: #2d3748;
+  color: rgb(94, 234, 212);
   position: relative;
+  text-shadow: 0 0 10px rgba(94, 234, 212, 0.3);
 }
 
 .control-panel h2::after {
@@ -25,7 +30,7 @@
   position: absolute;
   width: 40px;
   height: 3px;
-  background-color: #4299e1;
+  background: linear-gradient(90deg, rgb(94, 234, 212), transparent);
   left: 0;
   bottom: -8px;
   border-radius: 2px;
@@ -40,9 +45,7 @@
 }
 
 .control-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #4a5568;
+  color: #f1f5f9;
   font-weight: 500;
   font-size: 0.95rem;
 }
@@ -51,24 +54,18 @@
   width: 100%;
   padding: 0.8rem;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  background-color: #f8fafc;
-  color: #2d3748;
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  background: rgba(30, 41, 59, 0.6);
+  color: #f1f5f9;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234a5568' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.8rem center;
-  background-size: 16px;
-  padding-right: 2.5rem;
+  transition: all 0.3s ease;
 }
 
-.element-selector:focus {
+.element-selector:hover, .element-selector:focus {
+  border-color: rgb(94, 234, 212);
+  box-shadow: 0 0 15px rgba(94, 234, 212, 0.2);
   outline: none;
-  border-color: #90cdf4;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
 }
 
 .slider-header {
@@ -80,9 +77,9 @@
 
 .value-display {
   font-weight: 600;
-  color: #2d3748;
+  color: rgb(94, 234, 212);
   font-size: 0.9rem;
-  background-color: #ebf5ff;
+  background: rgba(15, 23, 42, 0.4);
   padding: 0.3rem 0.5rem;
   border-radius: 4px;
   min-width: 50px;
@@ -108,6 +105,7 @@
 
 .slider-container input[type=range] {
   -webkit-appearance: none;
+  appearance: none;
   width: 100%;
   background: transparent;
   position: relative;
@@ -119,16 +117,16 @@
   height: 20px;
   width: 20px;
   border-radius: 50%;
-  background: #4299e1;
+  background: rgb(94, 234, 212);
   cursor: pointer;
   margin-top: -8px;
-  box-shadow: 0 2px 5px rgba(66, 153, 225, 0.3);
+  box-shadow: 0 0 15px rgba(94, 234, 212, 0.3);
   transition: background 0.15s ease, transform 0.15s ease;
 }
 
 .slider-container input[type=range]::-webkit-slider-thumb:hover {
-  background: #3182ce;
   transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(94, 234, 212, 0.5);
 }
 
 .slider-container input[type=range]::-webkit-slider-runnable-track {
@@ -165,7 +163,7 @@
   position: relative;
   padding-left: 50px;
   font-size: 0.95rem;
-  color: #4a5568;
+  color: #f1f5f9;
   font-weight: 500;
 }
 
@@ -177,7 +175,8 @@
   transform: translateY(-50%);
   width: 40px;
   height: 20px;
-  background-color: #cbd5e0;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(94, 234, 212, 0.2);
   border-radius: 20px;
   transition: background-color 0.3s;
 }
@@ -196,7 +195,7 @@
 }
 
 .toggle-group input:checked + .toggle-label:before {
-  background-color: #4299e1;
+  background: rgb(94, 234, 212);
 }
 
 .toggle-group input:checked + .toggle-label:after {
@@ -214,11 +213,10 @@
 }
 
 .ray-toggles {
-  background-color: #f7fafc;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid rgba(94, 234, 212, 0.1);
   border-radius: 8px;
   padding: 1rem;
-  margin-bottom: 1rem;
-  border: 1px solid #edf2f7;
 }
 
 .ray-toggle {

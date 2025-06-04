@@ -4,11 +4,9 @@ import RegisterView from './components/RegisterView';
 import FlagsView from './components/FlagsView';
 import MemoryView from './components/MemoryView';
 import Console from './components/Console';
-import ExperimentData from './components/ExperimentData';
 import CPU from './logic/CPU';
 import Assembler from './logic/Assembler';
 import './simulator8085.css';
-import './components/ExperimentData.css';
 
 const Simulator = () => {
     // Initialize CPU and Assembler
@@ -32,9 +30,6 @@ const Simulator = () => {
     
     // Console logs
     const [logs, setLogs] = useState([]);
-    
-    // Section visibility state
-    const [openSection, setOpenSection] = useState('');
     
     // Add a log message to the console
     const addLog = (message, type = 'info') => {
@@ -214,101 +209,6 @@ const Simulator = () => {
         return cpu.getMemory(start, length);
     };
     
-    // Add state for editor code
-    const [editorCode, setEditorCode] = useState('');
-    
-    // Handle loading a saved experiment
-    const handleLoadSavedExperiment = (experimentData) => {
-        try {
-            // Reset the CPU first
-            cpu.reset();
-            
-            // Load the program from the saved data
-            if (experimentData.input && experimentData.input.program) {
-                // Convert saved program back to code for the editor
-                const regeneratedCode = regenerateCodeFromInstructions(experimentData.input.program);
-                setEditorCode(regeneratedCode); // Set editor code state
-                
-                // Set the program in state
-                setProgram(experimentData.input.program);
-                setCurrentInstruction(experimentData.input.program.length > 0 ? 0 : null);
-                
-                addLog(`Loaded program with ${experimentData.input.program.length} instructions`, 'info');
-            }
-            
-            // Load CPU state from the saved data
-            if (experimentData.output) {
-                // Update registers if they exist in the saved data
-                if (experimentData.output.registers) {
-                    Object.keys(experimentData.output.registers).forEach(reg => {
-                        cpu.registers[reg] = experimentData.output.registers[reg];
-                    });
-                    addLog('Restored CPU registers', 'info');
-                }
-                
-                // Update flags if they exist in the saved data
-                if (experimentData.output.flags) {
-                    Object.keys(experimentData.output.flags).forEach(flag => {
-                        cpu.flags[flag] = experimentData.output.flags[flag];
-                    });
-                    addLog('Restored CPU flags', 'info');
-                }
-                
-                // Load memory if it exists in the saved data
-                if (experimentData.output.memory) {
-                    // Restore memory state
-                    for (let address in experimentData.output.memory) {
-                        const numAddress = parseInt(address, 10);
-                        cpu.memory[numAddress] = experimentData.output.memory[address];
-                    }
-                    addLog('Restored memory state', 'info');
-                }
-            }
-            
-            // Update CPU state in the UI
-            setCpuState({
-                registers: { ...cpu.registers },
-                flags: { ...cpu.flags },
-                halted: false,
-                running: false
-            });
-            
-            // Trigger memory view update to reflect the loaded memory state
-            setMemoryUpdateTrigger(prev => prev + 1);
-            
-            addLog('Successfully loaded saved experiment state', 'success');
-        } catch (error) {
-            addLog(`Error loading saved experiment: ${error.message}`, 'error');
-            console.error('Error loading saved experiment:', error);
-        }
-    };
-    
-    // Helper function to regenerate code from saved program instructions
-    const regenerateCodeFromInstructions = (instructions) => {
-        if (!instructions || !instructions.length) return '';
-        
-        // Sort instructions by address to ensure correct order
-        const sortedInstructions = [...instructions].sort((a, b) => {
-            return parseInt(a.address, 16) - parseInt(b.address, 16);
-        });
-        
-        // Convert instructions back to code
-        return sortedInstructions.map(instr => {
-            // Format might vary based on your assembler format
-            if (instr.raw) return instr.raw;
-            
-            // Fallback if raw isn't available - reconstruct from mnemonic and operands
-            if (instr.mnemonic) {
-                if (instr.operands && instr.operands.length > 0) {
-                    return `${instr.mnemonic} ${instr.operands.join(', ')}`;
-                }
-                return instr.mnemonic;
-            }
-            
-            return ''; // Empty string if we can't reconstruct
-        }).join('\n');
-    };
-    
     // Update the CPU state whenever it changes
     useEffect(() => {
         setCpuState({
@@ -328,47 +228,7 @@ const Simulator = () => {
                     <p className="simulator-subtitle">Interactive Educational Emulator</p>
                 </div>
                 <div className="simulator-container">
-                    {/* Left Panel with Collapsible Sections */}
                     <div className="simulator-left-panel">
-                        <div className={`collapsible-section ${openSection === 'registers' ? 'open' : ''}`}>
-                            <div 
-                                className="collapsible-header"
-                                onClick={() => setOpenSection(openSection === 'registers' ? '' : 'registers')}
-                            >
-                                Registers
-                            </div>
-                            <div className={`collapsible-content ${openSection === 'registers' ? 'open' : ''}`}>
-                                <RegisterView registers={cpuState.registers} />
-                            </div>
-                        </div>
-
-                        <div className="collapsible-section">
-                            <div 
-                                className="collapsible-header"
-                                onClick={() => setOpenSection(openSection === 'flags' ? '' : 'flags')}
-                            >
-                                Flags
-                            </div>
-                            <div className={`collapsible-content ${openSection === 'flags' ? 'open' : ''}`}>
-                                <FlagsView flags={cpuState.flags} />
-                            </div>
-                        </div>
-
-                        <div className="collapsible-section">
-                            <div 
-                                className="collapsible-header"
-                                onClick={() => setOpenSection(openSection === 'memory' ? '' : 'memory')}
-                            >
-                                Memory View
-                            </div>
-                            <div className={`collapsible-content ${openSection === 'memory' ? 'open' : ''}`}>
-                                <MemoryView getMemory={getMemory} memoryUpdateTrigger={memoryUpdateTrigger} />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Main Content Area */}
-                    <div className="main-content-area">
                         <Editor onLoad={handleLoadCode} />
                         <Console 
                             logs={logs}
@@ -378,14 +238,13 @@ const Simulator = () => {
                             isHalted={cpuState.halted}
                             isRunning={cpuState.running}
                         />
-                        {/* Pass the handler to the ExperimentData component */}
-                        <ExperimentData 
-                            cpu={cpu} 
-                            program={program} 
-                            logs={logs}
-                            addLog={addLog}
-                            onLoadSavedExperiment={handleLoadSavedExperiment}
-                        />
+                    </div>
+                    <div className="simulator-right-panel">
+                        <div className="simulator-control-area">
+                            <RegisterView registers={cpuState.registers} />
+                            <FlagsView flags={cpuState.flags} />
+                        </div>
+                        <MemoryView getMemory={getMemory} memoryUpdateTrigger={memoryUpdateTrigger} />
                     </div>
                 </div>
             </div>

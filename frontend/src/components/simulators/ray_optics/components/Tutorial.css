@@ -1,14 +1,17 @@
 .tutorial-container {
   padding: 1.5rem;
-  background-color: #ffffff;
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(94, 234, 212, 0.1);
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   margin-bottom: 2rem;
   transition: all 0.3s ease;
 }
 
 .tutorial-container:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border-color: rgb(94, 234, 212);
+  box-shadow: 0 8px 32px rgba(94, 234, 212, 0.15);
 }
 
 .tutorial-section h2,
@@ -17,8 +20,9 @@
   margin: 0 0 1.5rem 0;
   font-size: 1.5rem;
   font-weight: 600;
-  color: #2d3748;
+  color: rgb(94, 234, 212);
   position: relative;
+  text-shadow: 0 0 10px rgba(94, 234, 212, 0.3);
 }
 
 .tutorial-section h2::after,
@@ -28,7 +32,7 @@
   position: absolute;
   width: 40px;
   height: 3px;
-  background-color: #4299e1;
+  background: linear-gradient(90deg, rgb(94, 234, 212), transparent);
   left: 0;
   bottom: -8px;
   border-radius: 2px;
@@ -44,13 +48,24 @@
   display: flex;
   gap: 1rem;
   align-items: flex-start;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.instruction-item:hover {
+  border-color: rgb(94, 234, 212);
+  box-shadow: 0 4px 12px rgba(94, 234, 212, 0.1);
 }
 
 .instruction-icon {
   min-width: 36px;
   height: 36px;
-  background-color: #4299e1;
-  color: white;
+  background: rgba(94, 234, 212, 0.1);
+  color: rgb(94, 234, 212);
+  border: 1px solid rgba(94, 234, 212, 0.2);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -62,13 +77,13 @@
 .instruction-content h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1.1rem;
-  color: #2d3748;
+  color: rgb(94, 234, 212);
   font-weight: 600;
 }
 
 .instruction-content p {
   margin: 0;
-  color: #4a5568;
+  color: #f1f5f9;
   font-size: 0.95rem;
   line-height: 1.5;
 }
@@ -76,7 +91,7 @@
 .ray-rules-section {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid rgba(94, 234, 212, 0.1);
 }
 
 .ray-rules-list {
@@ -114,7 +129,7 @@
 .glossary-section {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid rgba(94, 234, 212, 0.1);
 }
 
 .glossary-grid {
@@ -124,28 +139,29 @@
 }
 
 .glossary-item {
-  background-color: #f8fafc;
+  background: rgba(15, 23, 42, 0.3);
   padding: 1.2rem;
   border-radius: 8px;
-  border-left: 3px solid #4299e1;
-  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 3px solid rgb(94, 234, 212);
+  transition: all 0.3s ease;
 }
 
 .glossary-item:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: rgb(94, 234, 212);
+  box-shadow: 0 4px 12px rgba(94, 234, 212, 0.15);
 }
 
 .glossary-item h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1.05rem;
   font-weight: 600;
-  color: #2d3748;
+  color: rgb(94, 234, 212);
 }
 
 .glossary-item p {
   margin: 0;
-  color: #4a5568;
+  color: #f1f5f9;
   font-size: 0.9rem;
   line-height: 1.5;
 }

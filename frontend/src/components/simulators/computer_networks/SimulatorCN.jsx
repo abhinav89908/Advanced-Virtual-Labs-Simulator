@@ -619,17 +619,26 @@ Approximate round trip times in milli-seconds:
   
   return (
     <div className="network-simulator">
+      {/* Add heading before the grid */}
+      <h1 className="text-[rgb(94,234,212)] text-4xl font-bold text-center mb-8 mt-16">
+        Network Topology and Routing
+      </h1>
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
           {/* Network Topology Canvas */}
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-800">Network Topology</h3>
+          <div className="bg-[rgba(30,41,59,0.98)] rounded-xl shadow-sm overflow-hidden mb-6 border border-[rgba(94,234,212,0.1)]">
+            <div className="p-4 border-b border-[rgba(94,234,212,0.1)] flex justify-between items-center">
+              <h3 className="text-lg font-medium text-[rgb(94,234,212)]">Network Topology</h3>
               <div className="flex space-x-2">
                 {/* Toolbar */}
                 <button
                   onClick={() => setSelectedTool('select')}
-                  className={`p-2 rounded ${selectedTool === 'select' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`p-2 rounded transition-all duration-300 ${
+                    selectedTool === 'select' 
+                      ? 'bg-[rgba(94,234,212,0.2)] text-[rgb(94,234,212)]' 
+                      : 'text-[#94a3b8] hover:bg-[rgba(94,234,212,0.1)] hover:text-[rgb(94,234,212)]'
+                  }`}
                   title="Select/Move"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -638,7 +647,11 @@ Approximate round trip times in milli-seconds:
                 </button>
                 <button
                   onClick={() => setSelectedTool('connect')}
-                  className={`p-2 rounded ${selectedTool === 'connect' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`p-2 rounded transition-all duration-300 ${
+                    selectedTool === 'connect' 
+                      ? 'bg-[rgba(94,234,212,0.2)] text-[rgb(94,234,212)]' 
+                      : 'text-[#94a3b8] hover:bg-[rgba(94,234,212,0.1)] hover:text-[rgb(94,234,212)]'
+                  }`}
                   title="Connect Devices"
                 >
                   <Cable className="h-5 w-5" />
@@ -646,7 +659,11 @@ Approximate round trip times in milli-seconds:
                 <button
                   onClick={handleDelete}
                   disabled={!selectedDevice && !selectedConnection}
-                  className={`p-2 rounded ${!selectedDevice && !selectedConnection ? 'text-gray-400 cursor-not-allowed' : 'text-red-600 hover:bg-red-50'}`}
+                  className={`p-2 rounded transition-all duration-300 ${
+                    !selectedDevice && !selectedConnection 
+                      ? 'text-[#64748b] cursor-not-allowed' 
+                      : 'text-red-400 hover:bg-red-500/10'
+                  }`}
                   title="Delete Selected"
                 >
                   <Trash2 className="h-5 w-5" />
@@ -654,29 +671,29 @@ Approximate round trip times in milli-seconds:
               </div>
             </div>
             
-            <div className="relative overflow-hidden" style={{ height: '500px' }}>
+            <div className="relative overflow-hidden bg-[rgba(15,23,42,0.95)]" style={{ height: '500px' }}>
               <canvas 
                 ref={canvasRef} 
                 width="800" 
                 height="500"
                 className="w-full h-full"
-              ></canvas>
+              />
               
-              {/* Network device palette */}
-              <div className="absolute left-4 top-4 bg-white rounded-lg shadow-lg p-2 border border-gray-200">
-                <div className="text-xs font-medium text-gray-500 mb-2 px-2">Add Devices</div>
+              {/* Device Palette */}
+              <div className="absolute left-4 top-4 bg-[rgba(30,41,59,0.98)] rounded-lg shadow-[0_0_20px_rgba(94,234,212,0.1)] p-2 border border-[rgba(94,234,212,0.1)] backdrop-blur-sm">
+                <div className="text-xs font-medium text-[rgb(94,234,212)] mb-2 px-2">Add Devices</div>
                 <div className="grid grid-cols-2 gap-1">
                   <button
                     onClick={() => addDevice('pc')}
-                    className="p-2 rounded hover:bg-gray-100 flex flex-col items-center"
+                    className="p-2 rounded hover:bg-[rgba(94,234,212,0.1)] flex flex-col items-center transition-all duration-300"
                     title="Add PC"
                   >
-                    <Monitor className="h-5 w-5 text-green-600" />
-                    <span className="text-xs mt-1">PC</span>
+                    <Monitor className="h-5 w-5 text-[rgb(94,234,212)]" />
+                    <span className="text-xs mt-1 text-[#94a3b8]">PC</span>
                   </button>
                   <button
                     onClick={() => addDevice('server')}
-                    className="p-2 rounded hover:bg-gray-100 flex flex-col items-center"
+                    className="p-2 rounded hover:bg-[rgba(94,234,212,0.1)] flex flex-col items-center transition-all duration-300"
                     title="Add Server"
                   >
                     <Server className="h-5 w-5 text-red-600" />
@@ -684,7 +701,7 @@ Approximate round trip times in milli-seconds:
                   </button>
                   <button
                     onClick={() => addDevice('router')}
-                    className="p-2 rounded hover:bg-gray-100 flex flex-col items-center"
+                    className="p-2 rounded hover:bg-[rgba(94,234,212,0.1)] flex flex-col items-center transition-all duration-300"
                     title="Add Router"
                   >
                     <Router className="h-5 w-5 text-amber-600" />
@@ -692,7 +709,7 @@ Approximate round trip times in milli-seconds:
                   </button>
                   <button
                     onClick={() => addDevice('switch')}
-                    className="p-2 rounded hover:bg-gray-100 flex flex-col items-center"
+                    className="p-2 rounded hover:bg-[rgba(94,234,212,0.1)] flex flex-col items-center transition-all duration-300"
                     title="Add Switch"
                   >
                     <Wifi className="h-5 w-5 text-indigo-600" />
@@ -700,46 +717,16 @@ Approximate round trip times in milli-seconds:
                   </button>
                 </div>
               </div>
-              
-              {/* Selected device/connection info */}
-              {(selectedDevice || selectedConnection) && (
-                <div className="absolute right-4 bottom-4 bg-white rounded-lg shadow-lg p-3 border border-gray-200 max-w-xs">
-                  {selectedDevice && (
-                    <>
-                      <h4 className="font-medium text-gray-800 mb-2">
-                        {selectedDevice.name} <span className="text-xs text-gray-500">({selectedDevice.type})</span>
-                      </h4>
-                      <div className="text-sm text-gray-600 space-y-1">
-                        <div>IP: {selectedDevice.ip}</div>
-                        <div>MAC: {selectedDevice.mac}</div>
-                        <div>ID: {selectedDevice.id}</div>
-                      </div>
-                    </>
-                  )}
-                  {selectedConnection && (
-                    <>
-                      <h4 className="font-medium text-gray-800 mb-2">Connection</h4>
-                      <div className="text-sm text-gray-600 space-y-1">
-                        <div>From: {devices.find(d => d.id === selectedConnection.from)?.name} (ID: {selectedConnection.from})</div>
-                        <div>To: {devices.find(d => d.id === selectedConnection.to)?.name} (ID: {selectedConnection.to})</div>
-                        <div>Bandwidth: {selectedConnection.bandwidth} Mbps</div>
-                        <div>Latency: {selectedConnection.latency} ms</div>
-                        <div>Packet Loss: {selectedConnection.packetLoss}%</div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
-              
-              {/* Simulation controls */}
-              <div className="absolute right-4 top-4 bg-white rounded-lg shadow-lg p-2 border border-gray-200">
+
+              {/* Simulation Control */}
+              <div className="absolute right-4 top-4 bg-[rgba(30,41,59,0.98)] rounded-lg shadow-[0_0_20px_rgba(94,234,212,0.1)] p-2 border border-[rgba(94,234,212,0.1)] backdrop-blur-sm">
                 <div className="flex items-center">
                   <button
                     onClick={() => isSimulationRunning ? stopSimulation() : startSimulation()}
-                    className={`p-2 rounded ${
+                    className={`p-2 rounded transition-all duration-300 ${
                       isSimulationRunning 
-                        ? 'bg-red-50 text-red-600 hover:bg-red-100' 
-                        : 'bg-green-50 text-green-600 hover:bg-green-100'
+                        ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' 
+                        : 'bg-[rgba(94,234,212,0.1)] text-[rgb(94,234,212)] hover:bg-[rgba(94,234,212,0.2)]'
                     }`}
                     title={isSimulationRunning ? 'Stop Simulation' : 'Start Simulation'}
                   >
@@ -748,7 +735,7 @@ Approximate round trip times in milli-seconds:
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
                   </button>
-                  <span className="text-xs font-medium ml-2">
+                  <span className="text-xs font-medium ml-2 text-[#94a3b8]">
                     {isSimulationRunning ? 'Simulation Running' : 'Simulation Stopped'}
                   </span>
                 </div>
@@ -798,13 +785,13 @@ Approximate round trip times in milli-seconds:
         
         <div>
           {/* Control Panel */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Network Settings</h3>
+          <div className="bg-[rgba(30,41,59,0.98)] rounded-xl shadow-sm p-6 border border-[rgba(94,234,212,0.1)]">
+            <h3 className="text-lg font-medium text-[rgb(94,234,212)] mb-4">Network Settings</h3>
             
             {/* Network Parameters */}
             <div className="space-y-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[rgb(94,234,212)] mb-1">
                   Packet Loss (%)
                 </label>
                 <input
@@ -816,9 +803,9 @@ Approximate round trip times in milli-seconds:
                     ...simulationSettings,
                     packetLoss: parseInt(e.target.value)
                   })}
-                  className="w-full"
+                  className="w-full accent-[rgb(94,234,212)] bg-[rgba(15,23,42,0.3)]"
                 />
-                <div className="flex justify-between text-xs text-gray-500">
+                <div className="flex justify-between text-xs text-[#94a3b8]">
                   <span>0%</span>
                   <span>{simulationSettings.packetLoss}%</span>
                   <span>100%</span>
@@ -826,7 +813,7 @@ Approximate round trip times in milli-seconds:
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[rgb(94,234,212)] mb-1">
                   Latency (ms)
                 </label>
                 <input
@@ -838,9 +825,9 @@ Approximate round trip times in milli-seconds:
                     ...simulationSettings,
                     latency: parseInt(e.target.value)
                   })}
-                  className="w-full"
+                  className="w-full accent-[rgb(94,234,212)] bg-[rgba(15,23,42,0.3)]"
                 />
-                <div className="flex justify-between text-xs text-gray-500">
+                <div className="flex justify-between text-xs text-[#94a3b8]">
                   <span>10ms</span>
                   <span>{simulationSettings.latency}ms</span>
                   <span>500ms</span>
@@ -848,7 +835,7 @@ Approximate round trip times in milli-seconds:
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[rgb(94,234,212)] mb-1">
                   Bandwidth (Mbps)
                 </label>
                 <input
@@ -860,9 +847,9 @@ Approximate round trip times in milli-seconds:
                     ...simulationSettings,
                     bandwidth: parseInt(e.target.value)
                   })}
-                  className="w-full"
+                  className="w-full accent-[rgb(94,234,212)] bg-[rgba(15,23,42,0.3)]"
                 />
-                <div className="flex justify-between text-xs text-gray-500">
+                <div className="flex justify-between text-xs text-[#94a3b8]">
                   <span>1Mbps</span>
                   <span>{simulationSettings.bandwidth}Mbps</span>
                   <span>1Gbps</span>
@@ -871,24 +858,24 @@ Approximate round trip times in milli-seconds:
             </div>
             
             {/* Network Statistics */}
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-6">
-              <h4 className="font-medium text-gray-700 mb-3">Network Statistics</h4>
+            <div className="bg-[rgba(15,23,42,0.5)] rounded-lg p-4 border border-[rgba(94,234,212,0.1)] mb-6">
+              <h4 className="font-medium text-[rgb(94,234,212)] mb-3">Network Statistics</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Devices:</span>
-                  <span className="font-medium">{devices.length}</span>
+                  <span className="text-[#94a3b8]">Devices:</span>
+                  <span className="font-medium text-[#f1f5f9]">{devices.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Connections:</span>
-                  <span className="font-medium">{connections.length}</span>
+                  <span className="text-[#94a3b8]">Connections:</span>
+                  <span className="font-medium text-[#f1f5f9]">{connections.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Packets Transmitted:</span>
-                  <span className="font-medium">{Math.floor(Math.random() * 100) + 50}</span>
+                  <span className="text-[#94a3b8]">Packets Transmitted:</span>
+                  <span className="font-medium text-[#f1f5f9]">{Math.floor(Math.random() * 100) + 50}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Network Status:</span>
-                  <span className={`font-medium ${isSimulationRunning ? 'text-green-600' : 'text-gray-600'}`}>
+                  <span className="text-[#94a3b8]">Network Status:</span>
+                  <span className={`font-medium ${isSimulationRunning ? 'text-[rgb(94,234,212)]' : 'text-[#94a3b8]'}`}>
                     {isSimulationRunning ? 'Active' : 'Inactive'}
                   </span>
                 </div>
@@ -896,12 +883,12 @@ Approximate round trip times in milli-seconds:
             </div>
             
             {/* Help Section */}
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+            <div className="bg-[rgba(15,23,42,0.5)] rounded-lg p-4 border border-[rgba(94,234,212,0.1)]">
               <div className="flex items-start">
-                <AlertCircle className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-[rgb(94,234,212)] mr-2 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-blue-700 mb-1">Quick Help</h4>
-                  <ul className="text-sm text-blue-800 space-y-1 list-disc pl-5">
+                  <h4 className="font-medium text-[rgb(94,234,212)] mb-1">Quick Help</h4>
+                  <ul className="text-sm text-[#f1f5f9] space-y-1 list-disc pl-5 marker:text-[rgb(94,234,212)]">
                     <li>Add devices from the palette</li>
                     <li>Use Connect tool to link devices</li>
                     <li>Select tool to move devices</li>

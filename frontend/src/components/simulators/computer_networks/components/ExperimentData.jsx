@@ -24,6 +24,7 @@ const ExperimentData = ({
   const [loading, setLoading] = useState(false);
   const [savedResults, setSavedResults] = useState([]);
   const [selectedResult, setSelectedResult] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   // Load notes when component mounts
   useEffect(() => {
@@ -174,105 +175,140 @@ const ExperimentData = ({
     }
   };
 
-  return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-6">
-      <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-800">Experiment Data</h3>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={saveCurrentExperiment}
-            disabled={saving || !user}
-            className={`px-3 py-1 rounded text-sm flex items-center ${
-              saving || !user
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
-            }`}
-          >
-            <Save className="h-4 w-4 mr-1" />
-            {saving ? 'Saving...' : 'Save Experiment'}
-          </button>
-        </div>
-      </div>
-      
-      <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Notes Section */}
-        <div>
-          <h4 className="font-medium text-gray-700 mb-2">Lab Notes</h4>
-          <textarea
-            className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Take notes about your experiment here..."
-            disabled={loading || !user}
-          ></textarea>
-          <div className="mt-2 flex justify-end">
-            <button
-              onClick={saveNotes}
-              disabled={saving || loading || !user}
-              className={`px-3 py-1 rounded text-sm ${
-                saving || loading || !user
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-green-50 text-green-600 hover:bg-green-100'
-              }`}
-            >
-              {saving ? 'Saving...' : 'Save Notes'}
-            </button>
-          </div>
-        </div>
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      addLog(`Selected file: ${file.name}`, 'system');
+    } else {
+      setSelectedFile(null);
+    }
+  };
+
+  const handleLoad = async () => {
+    if (!selectedFile) return;
+    
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const content = e.target.result;
+        addLog('Loaded file content', 'system');
         
-        {/* Saved Experiments Section */}
-        <div>
-          <h4 className="font-medium text-gray-700 mb-2">Saved Experiments</h4>
+        // Here you would typically parse the file content and load the experiment data
+        // For example, if the file is in JSON format:
+        try {
+          const data = JSON.parse(content);
+          addLog('Parsed JSON data from file', 'system');
+          
+          // You can now use this data to set up your experiment
+          // For example:
+          // setDevices(data.devices);
+          // setConnections(data.connections);
+          // setTerminalOutput(data.terminalOutput);
+          // setSimulationSettings(data.simulationSettings);
+          
+          addLog('Experiment data loaded from file', 'system');
+        } catch (jsonError) {
+          addLog('Failed to parse JSON data from file', 'error');
+          console.error('JSON parsing error:', jsonError);
+        }
+      };
+      
+      reader.readAsText(selectedFile);
+    } catch (error) {
+      addLog('Failed to load file', 'error');
+      console.error('Error loading file:', error);
+    }
+  };
+
+  return (
+    <div className="bg-[rgba(30,41,59,0.98)] rounded-xl shadow-sm p-6 border border-[rgba(94,234,212,0.1)]">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-lg font-medium text-[rgb(94,234,212)]">
+          Experiment Data
+        </h3>
+        <button
+          onClick={saveCurrentExperiment}
+          disabled={saving || !user}
+          className={`flex items-center space-x-2 px-4 py-2 bg-[rgba(94,234,212,0.1)] text-[rgb(94,234,212)] rounded-lg border border-[rgba(94,234,212,0.2)] hover:bg-[rgba(94,234,212,0.2)] transition-all duration-300 ${
+            saving || !user
+              ? 'cursor-not-allowed opacity-50'
+              : ''
+          }`}
+        >
+          <Save className="h-4 w-4" />
+          <span>{saving ? 'Saving...' : 'Save Experiment'}</span>
+        </button>
+      </div>
+
+      <div className="space-y-6">
+        {/* Network Configuration */}
+        <div className="bg-[rgba(15,23,42,0.5)] rounded-lg p-4 border border-[rgba(94,234,212,0.1)]">
+          <h4 className="font-medium text-[rgb(94,234,212)] mb-3">Network Configuration</h4>
+          <div className="space-y-2 text-sm text-[#f1f5f9]">
+            <pre className="bg-[rgba(15,23,42,0.3)] p-3 rounded overflow-x-auto">
+              {JSON.stringify(devices, null, 2)}
+            </pre>
+          </div>
+        </div>
+
+        {/* Connection Data */}
+        <div className="bg-[rgba(15,23,42,0.5)] rounded-lg p-4 border border-[rgba(94,234,212,0.1)]">
+          <h4 className="font-medium text-[rgb(94,234,212)] mb-3">Connection Data</h4>
+          <div className="space-y-2 text-sm text-[#f1f5f9]">
+            <pre className="bg-[rgba(15,23,42,0.3)] p-3 rounded overflow-x-auto">
+              {JSON.stringify(connections, null, 2)}
+            </pre>
+          </div>
+        </div>
+
+        {/* Terminal History */}
+        <div className="bg-[rgba(15,23,42,0.5)] rounded-lg p-4 border border-[rgba(94,234,212,0.1)]">
+          <h4 className="font-medium text-[rgb(94,234,212)] mb-3">Terminal History</h4>
+          <div className="max-h-40 overflow-y-auto">
+            {terminalOutput.map((line, i) => (
+              <div 
+                key={i}
+                className={`text-sm mb-1 ${
+                  line.type === 'command' 
+                    ? 'text-[rgb(94,234,212)]' 
+                    : line.type === 'error'
+                      ? 'text-red-400'
+                      : line.type === 'system'
+                        ? 'text-[rgb(94,234,212)]'
+                        : 'text-[#f1f5f9]'
+                }`}
+              >
+                {line.content}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Load Experiment Section */}
+        <div className="bg-[rgba(15,23,42,0.5)] rounded-lg p-4 border border-[rgba(94,234,212,0.1)]">
+          <h4 className="font-medium text-[rgb(94,234,212)] mb-3">Load Experiment</h4>
           <div className="space-y-3">
+            <input
+              type="file"
+              onChange={handleFileChange}
+              accept=".json"
+              className="block w-full text-sm text-[#f1f5f9] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[rgba(94,234,212,0.1)] file:text-[rgb(94,234,212)] hover:file:bg-[rgba(94,234,212,0.2)] file:transition-all file:duration-300"
+            />
             <button
-              onClick={loadExperimentResults}
-              disabled={loading || !user}
-              className={`w-full px-3 py-2 rounded text-sm ${
-                loading || !user
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+              onClick={handleLoad}
+              disabled={!selectedFile}
+              className={`w-full py-2 px-4 rounded-lg transition-all duration-300 ${
+                selectedFile
+                  ? 'bg-[rgba(94,234,212,0.1)] text-[rgb(94,234,212)] hover:bg-[rgba(94,234,212,0.2)]'
+                  : 'bg-[rgba(148,163,184,0.1)] text-[#94a3b8] cursor-not-allowed'
               }`}
             >
-              {loading ? 'Loading...' : 'Load Saved Experiments'}
+              Load Selected File
             </button>
-            
-            {savedResults.length > 0 && (
-              <div className="space-y-2">
-                <select
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                  value={selectedResult || ''}
-                  onChange={(e) => setSelectedResult(e.target.value)}
-                >
-                  <option value="">-- Select a saved experiment --</option>
-                  {savedResults.map(result => (
-                    <option key={result.id} value={result.id}>
-                      {new Date(result.createdAt).toLocaleString()} - {result.input.devices?.length || 0} devices
-                    </option>
-                  ))}
-                </select>
-                
-                <button
-                  onClick={loadSelectedResult}
-                  disabled={!selectedResult}
-                  className={`w-full px-3 py-2 rounded text-sm ${
-                    !selectedResult
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-green-50 text-green-600 hover:bg-green-100'
-                  }`}
-                >
-                  Load Selected Experiment
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>
-      
-      {!user && (
-        <div className="p-4 bg-red-50 border-t border-red-100 text-sm text-red-600">
-          Please login to save and load experiment data.
-        </div>
-      )}
     </div>
   );
 };

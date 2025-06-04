@@ -1,0 +1,156 @@
+.network-simulator {
+  background: rgba(15, 23, 42, 0.98);
+  min-height: 100vh;
+  padding: 6rem 2rem 2rem;  /* Increased top padding from 4rem to 6rem */
+  color: #f1f5f9;
+}
+
+/* Header - adjusted margins to match new padding */
+.network-simulator h1 {
+  color: rgb(94, 234, 212);
+  text-shadow: 0 0 10px rgba(94, 234, 212, 0.3);
+  margin-bottom: 4rem;
+  margin-top: 4rem;      /* Increased bottom margin from 3rem to 4rem */
+  font-size: 3.5rem;       /* Increased font size from 3rem to 3.5rem */
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.5px;   /* Added letter spacing for better readability */
+}
+
+/* Canvas Container */
+.topology-canvas-container {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
+/* Toolbar Buttons */
+.toolbar-button {
+  background: rgba(30, 41, 59, 0.8);
+  color: rgb(94, 234, 212);
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  border-radius: 6px;
+}
+
+.toolbar-button:hover {
+  background: rgba(94, 234, 212, 0.1);
+}
+
+.toolbar-button.active {
+  background: rgb(94, 234, 212);
+  color: rgba(15, 23, 42, 0.98);
+}
+
+/* Device Palette */
+.device-palette {
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  border-radius: 8px;
+}
+
+.device-button {
+  background: transparent;
+  color: rgb(94, 234, 212);
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  border-radius: 6px;
+}
+
+.device-button:hover {
+  background: rgba(94, 234, 212, 0.1);
+}
+
+/* Terminal */
+.network-terminal {
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  border-radius: 12px;
+}
+
+.terminal-header {
+  background: rgba(30, 41, 59, 0.9);
+  border-bottom: 1px solid rgba(94, 234, 212, 0.1);
+  color: rgb(94, 234, 212);
+}
+
+.terminal-body {
+  background: rgba(15, 23, 42, 0.95);
+  color: #f1f5f9;
+}
+
+.terminal-input {
+  background: transparent;
+  color: rgb(94, 234, 212);
+  border: 1px solid rgba(94, 234, 212, 0.2);
+}
+
+/* Control Panel */
+.control-panel {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
+/* Slider styling */
+.network-slider {
+  accent-color: rgb(94, 234, 212);
+}
+
+/* Statistics Panel */
+.stats-panel {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  border-radius: 8px;
+}
+
+/* Help Section */
+.help-section {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  border-radius: 8px;
+}
+
+/* Device Info Panel */
+.device-info {
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  border-radius: 8px;
+}
+
+/* Canvas Colors */
+.canvas-connection {
+  stroke: rgba(94, 234, 212, 0.5);
+}
+
+.canvas-connection.selected {
+  stroke: rgb(94, 234, 212);
+}
+
+/* Terminal Output Colors */
+.terminal-command {
+  color: rgb(94, 234, 212);
+}
+
+.terminal-error {
+  color: #ef4444;
+}
+
+.terminal-system {
+  color: #60a5fa;
+}
+
+.terminal-response {
+  color: #f1f5f9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .network-simulator {
+    padding: 1rem;
+  }
+  
+  .topology-canvas-container {
+    border-radius: 8px;
+  }
+}

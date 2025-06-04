@@ -135,6 +135,7 @@
 }
 
 .simulator-container {
+    background-color: #1f2937 !important;
     display: grid;
     grid-template-columns: 320px 1fr;  /* Decreased from 400px */
     gap: 20px;

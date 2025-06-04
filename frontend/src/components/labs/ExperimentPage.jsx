@@ -158,23 +158,33 @@ export default function ExperimentPage() {
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-400"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-400"></div>
           </div>
         ) : (
           <div className="px-4">
+            {/* Back and breadcrumb navigation */}
+            <div className="mb-6">
+              <button onClick={handleBackToLabs} className="flex items-center text-teal-400 hover:text-teal-300 transition-colors">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Labs
+              </button>
+              <div className="text-sm text-gray-400 mt-2">Labs / {lab?.category} / {lab?.name}</div>
+            </div>
+
             {/* Lab Header */}
             <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 p-6 mb-6">
               <h1 className="text-2xl md:text-3xl font-bold text-teal-300 mb-2">{lab?.name}</h1>
               <p className="text-gray-300 mb-4">{lab?.description}</p>
               <div className="flex flex-wrap gap-2">
                 {lab?.tags.map((tag, index) => (
-                  <span key={index} className="bg-gray-800/50 text-teal-300 px-2.5 py-1 rounded-md text-sm border border-teal-500/20">
+                  <span key={index} className="bg-gray-700/50 text-teal-300 px-2.5 py-1 rounded-md text-sm border border-teal-500/20">
                     {tag}
                   </span>
                 ))}
               </div>
             </div>
-            
-            {/* Main Content Layout */}
+
+            {/* Main Layout */}
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Sidebar */}
               <div className="lg:w-64 bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden">
@@ -210,8 +220,8 @@ export default function ExperimentPage() {
                   })}
                 </div>
               </div>
-              
-              {/* Main Area */}
+
+              {/* Main Content Area */}
               <div className="flex-1 flex flex-col">
                 {currentExperiment ? (
                   <>
@@ -235,14 +245,14 @@ export default function ExperimentPage() {
                     {/* Instructions Panel */}
                     {showInstructions && (
                       <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 p-6 mb-4">
-                        <h3 className="flex items-center text-lg font-semibold text-white mb-3">
+                        <h3 className="flex items-center text-lg font-semibold text-teal-300 mb-3">
                           <FileText className="h-5 w-5 mr-2 text-teal-400" />
                           Instructions
                         </h3>
-                        <p className="text-gray-300 mb-4">{currentExperiment.description}</p>
-                        <div className="bg-gray-700/50 p-4 rounded-md border border-teal-500/20">
+                        <p className="text-gray-200 mb-4">{currentExperiment.description}</p>
+                        <div className="bg-gray-700/50 p-4 rounded-md border border-gray-500">
                           <h4 className="font-medium text-teal-300 mb-2">Procedure</h4>
-                          <div className="text-gray-300 whitespace-pre-line">
+                          <div className="text-gray-100 whitespace-pre-line">
                             {currentExperiment.instructions}
                           </div>
                         </div>
@@ -250,10 +260,15 @@ export default function ExperimentPage() {
                     )}
                     
                     {/* Interactive Area */}
-                    <div className="bg-gray-900/50 backdrop-blur-xl rounded-xl border border-gray-800/50 overflow-hidden flex-grow">
-                      <div className="bg-gray-800/50 px-4 py-2 border-b border-gray-700/50 flex justify-between items-center">
-                        <h3 className="font-medium text-teal-300">Interactive Simulation</h3>
-                        <a href="#" className="text-teal-400 text-sm flex items-center hover:text-teal-300">
+                    <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden flex-grow">
+                      <div className="bg-gray-900 px-4 py-2 border-b border-gray-700/50 flex justify-between items-center">
+                        <h3 className="font-medium text-gray-300">Interactive Simulation</h3>
+                        <a 
+                          href={currentExperiment.module_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-teal-400 text-sm flex items-center"
+                        >
                           Open in New Tab <ExternalLink className="h-3.5 w-3.5 ml-1" />
                         </a>
                       </div>
@@ -283,16 +298,21 @@ export default function ExperimentPage() {
                       </div>
                       
                       {/* Action Bar */}
-                      <div className="bg-gray-800/50 px-6 py-4 border-t border-gray-700/50">
+                      <div className="bg-gray-900 px-6 py-4 border-t border-gray-700/50">
                         <div className="flex justify-between items-center">
                           <div className="text-sm text-gray-400">
                             Complete the steps above to finish this experiment
                           </div>
                           <div className="flex gap-3">
-                            <button className="px-4 py-2 border border-teal-500/20 rounded-md text-teal-300 hover:bg-teal-500/10">
+                            <button
+                              className="px-4 py-2 border border-gray-700 rounded-md text-gray-300 hover:bg-gray-800 transition-colors"
+                            >
                               Save Progress
                             </button>
-                            <button className="px-4 py-2 bg-teal-500/20 border border-teal-500/30 text-teal-300 rounded-md hover:bg-teal-500/30">
+                            <button
+                              onClick={handleCompleteExperiment}
+                              className="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600 transition-colors"
+                            >
                               Complete Experiment
                             </button>
                           </div>
@@ -301,14 +321,10 @@ export default function ExperimentPage() {
                     </div>
                   </>
                 ) : (
-                  <div className="bg-white rounded-xl shadow-md p-8 text-center">
-                    <div className="text-gray-500 mb-4">
-                      <Clipboard className="h-12 w-12 mx-auto" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-800 mb-2">No Experiment Selected</h3>
-                    <p className="text-gray-600">
-                      Please select an experiment from the list to begin.
-                    </p>
+                  <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 p-8 text-center">
+                    <Clipboard className="h-12 w-12 mx-auto text-teal-400 mb-4" />
+                    <h3 className="text-lg font-medium text-teal-300 mb-2">No Experiment Selected</h3>
+                    <p className="text-gray-300">Please select an experiment from the list to begin.</p>
                   </div>
                 )}
               </div>
@@ -319,8 +335,8 @@ export default function ExperimentPage() {
       
       {/* Completion Modal */}
       {showCompletionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 animate-fade-in">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800/90 rounded-xl border border-gray-700/50 max-w-md w-full p-6">
             <div className="text-center mb-6">
               <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Award className="h-8 w-8 text-green-600" />
@@ -331,15 +347,15 @@ export default function ExperimentPage() {
               </p>
             </div>
             
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <div className="bg-gray-700/50 rounded-lg p-4 mb-6">
               <div className="flex justify-between items-center mb-4">
-                <span className="font-medium text-gray-700">Your Score</span>
-                <span className="text-xl font-bold text-indigo-600">{results.score}%</span>
+                <span className="font-medium text-gray-300">Your Score</span>
+                <span className="text-xl font-bold text-teal-400">{results.score}%</span>
               </div>
               
               <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div 
-                  className="bg-indigo-600 h-2.5 rounded-full"
+                  className="bg-teal-500 h-2.5 rounded-full"
                   style={{ width: `${results.score}%` }}  
                 ></div>
               </div>
@@ -348,13 +364,13 @@ export default function ExperimentPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowCompletionModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-700 rounded-md text-gray-300 hover:bg-gray-800 transition-colors"
               >
                 Close
               </button>
               <button
                 onClick={handleBackToLabs}
-                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                className="flex-1 px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600 transition-colors"
               >
                 Back to Labs
               </button>

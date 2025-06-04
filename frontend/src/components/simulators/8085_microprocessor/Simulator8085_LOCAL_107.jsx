@@ -33,9 +33,6 @@ const Simulator = () => {
     // Console logs
     const [logs, setLogs] = useState([]);
     
-    // Section visibility state
-    const [openSection, setOpenSection] = useState('');
-    
     // Add a log message to the console
     const addLog = (message, type = 'info') => {
         setLogs(prev => [...prev, { message, type, timestamp: Date.now() }]);
@@ -328,48 +325,11 @@ const Simulator = () => {
                     <p className="simulator-subtitle">Interactive Educational Emulator</p>
                 </div>
                 <div className="simulator-container">
-                    {/* Left Panel with Collapsible Sections */}
                     <div className="simulator-left-panel">
-                        <div className={`collapsible-section ${openSection === 'registers' ? 'open' : ''}`}>
-                            <div 
-                                className="collapsible-header"
-                                onClick={() => setOpenSection(openSection === 'registers' ? '' : 'registers')}
-                            >
-                                Registers
-                            </div>
-                            <div className={`collapsible-content ${openSection === 'registers' ? 'open' : ''}`}>
-                                <RegisterView registers={cpuState.registers} />
-                            </div>
-                        </div>
-
-                        <div className="collapsible-section">
-                            <div 
-                                className="collapsible-header"
-                                onClick={() => setOpenSection(openSection === 'flags' ? '' : 'flags')}
-                            >
-                                Flags
-                            </div>
-                            <div className={`collapsible-content ${openSection === 'flags' ? 'open' : ''}`}>
-                                <FlagsView flags={cpuState.flags} />
-                            </div>
-                        </div>
-
-                        <div className="collapsible-section">
-                            <div 
-                                className="collapsible-header"
-                                onClick={() => setOpenSection(openSection === 'memory' ? '' : 'memory')}
-                            >
-                                Memory View
-                            </div>
-                            <div className={`collapsible-content ${openSection === 'memory' ? 'open' : ''}`}>
-                                <MemoryView getMemory={getMemory} memoryUpdateTrigger={memoryUpdateTrigger} />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Main Content Area */}
-                    <div className="main-content-area">
-                        <Editor onLoad={handleLoadCode} />
+                        <Editor 
+                            onLoad={handleLoadCode} 
+                            initialCode={editorCode} // Pass the code to Editor
+                        />
                         <Console 
                             logs={logs}
                             onRun={runProgram}
@@ -386,6 +346,13 @@ const Simulator = () => {
                             addLog={addLog}
                             onLoadSavedExperiment={handleLoadSavedExperiment}
                         />
+                    </div>
+                    <div className="simulator-right-panel">
+                        <div className="simulator-control-area">
+                            <RegisterView registers={cpuState.registers} />
+                            <FlagsView flags={cpuState.flags} />
+                        </div>
+                        <MemoryView getMemory={getMemory} memoryUpdateTrigger={memoryUpdateTrigger} />
                     </div>
                 </div>
             </div>

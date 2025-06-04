@@ -1,7 +1,9 @@
 .ray-canvas-container {
-  background-color: #ffffff;
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(94, 234, 212, 0.1);
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   padding: 1rem;
   transition: all 0.3s ease;
   overflow: hidden;
@@ -9,14 +11,15 @@
 }
 
 .ray-canvas-container:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border-color: rgb(94, 234, 212);
+  box-shadow: 0 8px 32px rgba(94, 234, 212, 0.15);
 }
 
 .ray-canvas {
   width: 100%;
   height: auto;
   display: block;
-  background-color: #fbfcfd;
+  background: rgba(15, 23, 42, 0.6);
   border-radius: 8px;
   cursor: pointer;
 }
@@ -32,8 +35,8 @@
 }
 
 .canvas-tool-button {
-  background-color: #fff;
-  border: none;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(94, 234, 212, 0.2);
   border-radius: 50%;
   width: 36px;
   height: 36px;
@@ -41,16 +44,15 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  color: #4a5568;
-  transition: all 0.2s ease;
+  color: rgb(94, 234, 212);
+  transition: all 0.3s ease;
 }
 
 .canvas-tool-button:hover {
-  background-color: #f7fafc;
+  background: rgba(94, 234, 212, 0.1);
+  border-color: rgb(94, 234, 212);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  color: #4299e1;
+  box-shadow: 0 0 15px rgba(94, 234, 212, 0.2);
 }
 
 /* Tooltip */
@@ -61,23 +63,23 @@
 .tooltip-icon {
   width: 36px;
   height: 36px;
-  background-color: #fff;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  color: rgb(94, 234, 212);
+  box-shadow: 0 0 15px rgba(94, 234, 212, 0.1);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  color: #4a5568;
   font-weight: bold;
   transition: all 0.2s ease;
 }
 
 .tooltip-icon:hover {
-  background-color: #f7fafc;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  color: #4299e1;
+  background: rgba(94, 234, 212, 0.1);
+  border-color: rgb(94, 234, 212);
+  box-shadow: 0 0 20px rgba(94, 234, 212, 0.2);
 }
 
 .tooltip-content {
@@ -85,8 +87,10 @@
   top: 100%;
   right: 0;
   margin-top: 8px;
-  background-color: white;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  background: rgba(30, 41, 59, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   padding: 0.8rem 1rem;
   width: 200px;
@@ -106,7 +110,7 @@
 .tooltip-content p {
   margin: 0;
   font-size: 0.85rem;
-  color: #4a5568;
+  color: #f1f5f9;
   line-height: 1.5;
 }
 
@@ -133,7 +137,7 @@
 
 .legend-text {
   font-size: 0.85rem;
-  color: #4a5568;
+  color: #f1f5f9;
 }
 
 @media (max-width: 768px) {

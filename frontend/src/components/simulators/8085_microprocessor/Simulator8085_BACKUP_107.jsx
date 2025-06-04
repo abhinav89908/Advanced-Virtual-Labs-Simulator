@@ -330,6 +330,12 @@ const Simulator = () => {
                 <div className="simulator-container">
                     {/* Left Panel with Collapsible Sections */}
                     <div className="simulator-left-panel">
+<<<<<<< HEAD
+                        <Editor 
+                            onLoad={handleLoadCode} 
+                            initialCode={editorCode} // Pass the code to Editor
+                        />
+=======
                         <div className={`collapsible-section ${openSection === 'registers' ? 'open' : ''}`}>
                             <div 
                                 className="collapsible-header"
@@ -370,6 +376,7 @@ const Simulator = () => {
                     {/* Main Content Area */}
                     <div className="main-content-area">
                         <Editor onLoad={handleLoadCode} />
+>>>>>>> 504c03c5161c506fac8f3ec47495d9403ac17b24
                         <Console 
                             logs={logs}
                             onRun={runProgram}

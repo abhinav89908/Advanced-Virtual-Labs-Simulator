@@ -125,11 +125,36 @@ export const getUserTestResults = async (userId) => {
 // Get detailed test result
 export const getTestResult = async (resultId) => {
   try {
+    console.log(`Fetching detailed result for ID: ${resultId}`);
+    
+    // Add explicit check for resultId
+    if (!resultId) {
+      console.error('No result ID provided');
+      return {
+        success: false,
+        message: 'Result ID is required'
+      };
+    }
+    
+    // Use the correct endpoint without passing userId
     const response = await axios.get(`${API_BASE_URL}/tests/result/${resultId}`);
+    console.log('Result data received:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching test result:', error);
-    throw error;
+    console.error('Error details:', {
+      message: error.message,
+      responseData: error.response?.data,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      url: error.config?.url
+    });
+    
+    // Return a structured error response instead of throwing
+    return {
+      success: false,
+      message: 'Failed to fetch test result: ' + (error.response?.data?.message || error.message)
+    };
   }
 };
 

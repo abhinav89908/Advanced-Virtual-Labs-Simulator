@@ -212,6 +212,7 @@ const TestList = () => {
                           <Link
                             to={`/tests/result/${result.id}`}
                             className="flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white py-3 font-medium transition-colors"
+                            aria-label={`View results for ${result.test?.title || 'test'}`}
                           >
                             View Results
                             <ChevronRight className="h-4 w-4 ml-1" />

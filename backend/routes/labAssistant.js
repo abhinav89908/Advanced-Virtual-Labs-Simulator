@@ -198,7 +198,7 @@ router.post('/ai-chat', async (req, res) => {
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'meta-llama/llama-3.3-8b-instruct:free', // You can change this to any model available on OpenRouter
+        model: 'meta-llama/llama-3.3-8b-instruct:free',
         messages: [
           {
             role: 'user',
@@ -215,7 +215,6 @@ router.post('/ai-chat', async (req, res) => {
         headers: {
           'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': process.env.SITE_URL || 'http://localhost:3000',
           'X-Title': 'Virtual Lab Assistant'
         }
       }
@@ -223,7 +222,7 @@ router.post('/ai-chat', async (req, res) => {
 
     // Extract the response content
     const aiResponse = response.data.choices[0].message.content;
-    
+    console.log('AI response:', aiResponse.slice(0, 50)); 
     return res.json({ 
       success: true, 
       message: aiResponse

@@ -29,7 +29,7 @@ const StudentsManagement = () => {
     const fetchStudents = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3000/api/users/getUsers');
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users/getUsers`);
         // filter out admin accounts 
 
         response.data = response.data.filter(user => user.role != 'admin');
@@ -120,7 +120,7 @@ const StudentsManagement = () => {
     if (!selectedGroup || selectedStudents.length === 0) return;
     
     try {
-      await axios.post(`http://localhost:3000/api/groups/${selectedGroup}/members`, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/groups/${selectedGroup}/members`, {
         studentIds: selectedStudents
       });
       
@@ -146,10 +146,10 @@ const StudentsManagement = () => {
     e.preventDefault();
     
     try {
-      await axios.post('http://localhost:3000/api/users/register', newStudent);
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/users/register`, newStudent);
       
       // Refresh student list
-      const response = await axios.get('http://localhost:3000/api/users?role=user');
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users?role=user`);
       setStudents(response.data);
       
       // Reset form and close modal
@@ -179,12 +179,12 @@ const StudentsManagement = () => {
     try {
       await Promise.all(
         selectedStudents.map(id => 
-          axios.delete(`http://localhost:3000/api/users/${id}`)
+          axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/users/${id}`)
         )
       );
       
       // Refresh student list
-      const response = await axios.get('http://localhost:3000/api/users?role=user');
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users?role=user`);
       setStudents(response.data);
       setSelectedStudents([]);
     } catch (error) {

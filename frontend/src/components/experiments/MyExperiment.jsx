@@ -6,7 +6,7 @@ import axios from 'axios';
 import experimentsData from '../../virtual_db/experiements.json';
 import labsData from '../../virtual_db/labs.json';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const UserExperimentsDashboard = () => {
   const { user } = useContext(UserContext);

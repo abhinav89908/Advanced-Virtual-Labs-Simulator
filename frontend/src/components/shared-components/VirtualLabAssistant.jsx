@@ -77,8 +77,8 @@ export default function VirtualLabAssistant() {
     // .then(response => {.....
     //   // ..yet to implement
 
-    
-    axios.post('http://localhost:3000/api/assistant/chat', { message: text })
+
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/assistant/chat`, { message: text })
     // axios.post('/api/assistant/chat', { message: text })
       .then(response => {
         const { type, experiment, data, message } = response.data;
@@ -216,7 +216,7 @@ export default function VirtualLabAssistant() {
       
       // For each experiment, get the first procedure step
       for (const experiment of experiments) {
-        const response = await axios.post('http://localhost:3000/api/assistant/chat', { 
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/assistant/chat`, { 
           message: `procedure ${experiment}` 
         });
         
@@ -239,7 +239,7 @@ export default function VirtualLabAssistant() {
     setIsThinking(true);
     
     try {
-      const response = await axios.post('http://localhost:3000/api/assistant/chat', { 
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/assistant/chat`, { 
         message: `procedure ${experiment}` 
       });
       
@@ -285,7 +285,7 @@ export default function VirtualLabAssistant() {
   const processAiChat = (text) => {
     setIsAiThinking(true);
     
-    axios.post('http://localhost:3000/api/assistant/ai-chat', { message: text })
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/assistant/ai-chat`, { message: text })
       .then(response => {
         setAiMessages(prev => [...prev, { 
           type: 'bot', 

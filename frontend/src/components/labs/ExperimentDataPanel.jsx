@@ -11,9 +11,9 @@ const ExperimentDataPanel = ({ experimentId }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
-  
+
+  const API_URL = process.env.REACT_APP_API_URL || `${import.meta.env.VITE_BACKEND_URL}/api`;
+
   useEffect(() => {
     if (user && experimentId) {
       fetchExperimentData();

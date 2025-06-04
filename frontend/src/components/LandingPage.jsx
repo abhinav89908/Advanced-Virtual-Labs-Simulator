@@ -47,6 +47,9 @@ export default function LandingPage() {
   // Force component re-render when login state changes
   const [rerender, setRerender] = useState(0);
 
+  console.log('LandingPage rendered', { user, isLoggedIn });
+  console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
+
   useEffect(() => {
     const style = document.createElement('style');
     style.textContent = floatAnimation;

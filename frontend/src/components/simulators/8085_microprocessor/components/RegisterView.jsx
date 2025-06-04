@@ -1,4 +1,5 @@
 import React from 'react';
+import './RegisterView.css';
 
 /**
  * RegisterView component to display the current state of CPU registers

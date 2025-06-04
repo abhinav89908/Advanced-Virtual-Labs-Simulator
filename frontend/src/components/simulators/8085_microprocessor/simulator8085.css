@@ -49,34 +49,13 @@
 }
 
 /* General Simulator Styles */
-@keyframes gradientBG {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-.simulator-page {
-    background: linear-gradient(
-        -45deg,
-        rgba(17, 24, 39, 1),
-        rgba(30, 41, 59, 1),
-        rgba(15, 23, 42, 1),
-        rgba(30, 41, 59, 1)
-    );
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
+.simulator-page{
+    background: var(--background-dark);
     color: var(--text-primary);
     font-family: 'Roboto', 'Segoe UI', sans-serif;
     min-height: 100vh;
     padding: 20px;
 }
-
 .simulator {
     background: var(--background-gradient);
     color: var(--text-primary);

@@ -228,18 +228,23 @@ const ProcessSchedulerSimulator = () => {
   };
   
   return (
-    <div className="process-scheduler p-4">
+    <div className="process-scheduler p-4 bg-[#1e293b]">
+      {/* Add main heading */}
+      <h1 className="text-3xl font-bold text-center mb-8 text-[#5EEAD4] drop-shadow-glow">
+        CPU Scheduling Algorithms
+      </h1>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           {/* Gantt Chart */}
-          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">CPU Scheduling Timeline</h3>
+          <div className="bg-[#1e293b] rounded-xl shadow-sm p-6 mb-6 border border-[rgba(94,234,212,0.1)]">  
+            <h3 className="text-[#5EEAD4] text-lg font-semibold mb-4">CPU Scheduling Timeline</h3>
             <div className="flex items-center mb-2">
-              <Clock className="h-4 w-4 text-gray-500 mr-2" />
-              <span className="text-gray-700">Current Time: <span className="font-medium">{currentTime}</span></span>
+              <Clock className="h-4 w-4 text-[#94a3b8] mr-2" />
+              <span className="text-[#f1f5f9]">Current Time: <span className="font-medium text-[#5EEAD4]">{currentTime}</span></span>
             </div>
             
-            <div className="gantt-chart mt-4 overflow-x-auto">
+            <div className="gantt-chart mt-4 overflow-x-auto bg-[rgba(15,23,42,0.3)] p-4 rounded-lg border border-[rgba(94,234,212,0.1)]">
               <div className="flex min-w-full">
                 {executionHistory.map((event, index) => (
                   <div 
@@ -247,23 +252,24 @@ const ProcessSchedulerSimulator = () => {
                     className="gantt-block text-xs flex-shrink-0 h-10 flex items-center justify-center text-white font-medium"
                     style={{
                       width: '50px',
-                      backgroundColor: event.color
+                      backgroundColor: event.color,
+                      boxShadow: '0 0 10px rgba(0,0,0,0.1)'
                     }}
                   >
                     {event.name}
                   </div>
                 ))}
               </div>
-              <div className="flex min-w-full border-t border-gray-200">
+              <div className="flex min-w-full border-t border-[rgba(94,234,212,0.1)] mt-2 pt-2">
                 {executionHistory.map((event, index) => (
                   <div 
                     key={index}
-                    className="flex-shrink-0 w-[50px] text-center text-xs text-gray-600 pt-1"
+                    className="flex-shrink-0 w-[50px] text-center text-xs text-[#94a3b8] pt-1"
                   >
                     {event.time}
                   </div>
                 ))}
-                <div className="flex-shrink-0 w-[50px] text-center text-xs text-gray-600 pt-1">
+                <div className="flex-shrink-0 w-[50px] text-center text-xs text-[#5EEAD4] pt-1 font-medium">
                   {currentTime}
                 </div>
               </div>
@@ -271,20 +277,20 @@ const ProcessSchedulerSimulator = () => {
             
             {/* Process Queue */}
             <div className="mt-8">
-              <h4 className="font-medium text-gray-700 mb-2">Process Queue</h4>
+              <h4 className="text-[#5EEAD4] font-medium mb-2">Process Queue</h4>
               <div className="overflow-x-auto">
-                <table className="min-w-full border border-gray-200 rounded-md">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full border border-[rgba(94,234,212,0.1)] rounded-md">
+                  <thead className="bg-[rgba(15,23,42,0.3)]">
                     <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Process</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrival Time</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Burst Time</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remaining</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-[#94a3b8] uppercase tracking-wider">Process</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-[#94a3b8] uppercase tracking-wider">Arrival Time</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-[#94a3b8] uppercase tracking-wider">Burst Time</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-[#94a3b8] uppercase tracking-wider">Priority</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-[#94a3b8] uppercase tracking-wider">Remaining</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-[#94a3b8] uppercase tracking-wider">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white">
+                  <tbody className="divide-y divide-[rgba(94,234,212,0.1)] bg-[rgba(15,23,42,0.2)]">
                     {processes.map(process => (
                       <tr key={process.id}>
                         <td className="px-4 py-2 whitespace-nowrap">
@@ -343,12 +349,12 @@ const ProcessSchedulerSimulator = () => {
         
         <div>
           {/* Control Panel */}
-          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Simulation Controls</h3>
+          <div className="bg-[#1e293b] rounded-xl shadow-sm p-6 mb-6 border border-[rgba(94,234,212,0.1)]">
+            <h3 className="text-[#5EEAD4] text-lg font-semibold mb-4">Simulation Controls</h3>
             
             {/* Algorithm Selection */}
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[#f1f5f9] mb-1">
                 Scheduling Algorithm
               </label>
               <select
@@ -357,7 +363,7 @@ const ProcessSchedulerSimulator = () => {
                   setAlgorithm(e.target.value);
                   resetSimulation();
                 }}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                className="block w-full px-3 py-2 bg-[rgba(15,23,42,0.3)] border border-[rgba(94,234,212,0.2)] rounded-md text-[#f1f5f9] focus:border-[#5EEAD4] focus:ring-[rgba(94,234,212,0.2)]"
               >
                 <option value="fcfs">First-Come-First-Served (FCFS)</option>
                 <option value="sjf">Shortest Job First (SJF)</option>
@@ -365,11 +371,11 @@ const ProcessSchedulerSimulator = () => {
                 <option value="rr">Round Robin (RR)</option>
               </select>
             </div>
-            
+
             {/* Time Quantum (for Round Robin) */}
             {algorithm === 'rr' && (
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[#f1f5f9] mb-1">
                   Time Quantum
                 </label>
                 <input
@@ -377,7 +383,7 @@ const ProcessSchedulerSimulator = () => {
                   min="1"
                   value={timeQuantum}
                   onChange={(e) => setTimeQuantum(parseInt(e.target.value))}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className="block w-full px-3 py-2 bg-[rgba(15,23,42,0.3)] border border-[rgba(94,234,212,0.2)] rounded-md text-[#f1f5f9] focus:border-[#5EEAD4] focus:ring-[rgba(94,234,212,0.2)]"
                 />
               </div>
             )}
@@ -386,8 +392,10 @@ const ProcessSchedulerSimulator = () => {
             <div className="flex flex-wrap gap-2 mb-6">
               <button
                 onClick={toggleSimulation}
-                className={`px-4 py-2 rounded-md text-white ${
-                  isRunning ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
+                className={`px-4 py-2 rounded-md text-[#f1f5f9] border border-[rgba(94,234,212,0.2)] ${
+                  isRunning 
+                    ? 'bg-[rgba(239,68,68,0.1)] hover:bg-[rgba(239,68,68,0.2)] hover:border-[#ef4444]' 
+                    : 'bg-[rgba(94,234,212,0.1)] hover:bg-[rgba(94,234,212,0.2)] hover:border-[#5EEAD4]'
                 }`}
               >
                 {isRunning ? (
@@ -399,13 +407,13 @@ const ProcessSchedulerSimulator = () => {
               <button
                 onClick={runStep}
                 disabled={isRunning}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-[rgba(94,234,212,0.1)] text-[#f1f5f9] rounded-md hover:bg-[rgba(94,234,212,0.2)] border border-[rgba(94,234,212,0.2)] hover:border-[#5EEAD4] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <SkipForward className="h-4 w-4 inline mr-1" /> Step
               </button>
               <button
                 onClick={resetSimulation}
-                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+                className="px-4 py-2 bg-[rgba(94,234,212,0.1)] text-[#f1f5f9] rounded-md hover:bg-[rgba(94,234,212,0.2)] border border-[rgba(94,234,212,0.2)] hover:border-[#5EEAD4]"
               >
                 <RefreshCw className="h-4 w-4 inline mr-1" /> Reset
               </button>
@@ -474,7 +482,7 @@ const ProcessSchedulerSimulator = () => {
                 </div>
                 <button
                   onClick={addProcess}
-                  className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                  className="w-full px-4 py-2 bg-[rgba(94,234,212,0.1)] text-[#5EEAD4] rounded-md hover:bg-[rgba(94,234,212,0.2)] border border-[rgba(94,234,212,0.2)] hover:border-[#5EEAD4] transition-all duration-300 flex items-center justify-center"
                 >
                   <Plus className="h-4 w-4 inline mr-1" /> Add Process
                 </button>

@@ -176,18 +176,18 @@ const ExperimentData = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">Experiment Data & Notes</h3>
+    <div className="bg-[#1e293b] rounded-xl shadow-sm p-6 mb-6 border border-[rgba(94,234,212,0.1)]">
+      <h3 className="text-[#5EEAD4] text-lg font-semibold mb-4">Experiment Data & Notes</h3>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Notes Section */}
         <div>
-          <div className="flex items-center mb-2">
-            <FileText className="h-4 w-4 text-gray-500 mr-2" />
-            <h4 className="font-medium text-gray-700">Lab Notes</h4>
+          <div className="flex items-center mb-2"> 
+            <FileText className="h-4 w-4 text-[#94a3b8] mr-2" />
+            <h4 className="text-[#f1f5f9] font-medium">Lab Notes</h4>
           </div>
           <textarea
-            className="w-full h-40 p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+            className="w-full h-40 p-3 bg-[rgba(15,23,42,0.3)] border border-[rgba(94,234,212,0.2)] rounded-md text-[#f1f5f9] focus:border-[#5EEAD4] focus:ring-[rgba(94,234,212,0.2)] placeholder-[#94a3b8]"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Take notes about the scheduling algorithms, their performance, and your observations..."
@@ -197,56 +197,43 @@ const ExperimentData = ({
             <button
               onClick={saveNotes}
               disabled={saving || loading || !user}
-              className={`px-3 py-1 rounded-md text-sm flex items-center ${
-                saving || loading || !user
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-indigo-600 text-white hover:bg-indigo-700'
-              }`}
+              className="px-4 py-2 bg-[rgba(94,234,212,0.1)] text-[#5EEAD4] rounded-md hover:bg-[rgba(94,234,212,0.2)] border border-[rgba(94,234,212,0.2)] hover:border-[#5EEAD4] disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
-              <Save className="h-4 w-4 mr-1" />
+              <Save className="h-4 w-4 mr-2" />
               {saving ? 'Saving...' : 'Save Notes'}
             </button>
           </div>
         </div>
-        
-        {/* Saved Experiments Section */}
+
+        {/* Saved Results Section */}
         <div>
           <div className="flex items-center mb-2">
-            <Download className="h-4 w-4 text-gray-500 mr-2" />
-            <h4 className="font-medium text-gray-700">Experiment Data</h4>
+            <Download className="h-4 w-4 text-[#94a3b8] mr-2" />
+            <h4 className="text-[#f1f5f9] font-medium">Saved Experiments</h4>
           </div>
-          
           <div className="space-y-3">
             <button
               onClick={saveCurrentExperiment}
               disabled={saving || !user || processes.length === 0}
-              className={`w-full px-3 py-2 rounded-md text-sm flex items-center justify-center ${
-                saving || !user || processes.length === 0
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-green-600 text-white hover:bg-green-700'
-              }`}
+              className="w-full px-4 py-2 bg-[rgba(94,234,212,0.1)] text-[#5EEAD4] rounded-md hover:bg-[rgba(94,234,212,0.2)] border border-[rgba(94,234,212,0.2)] hover:border-[#5EEAD4] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              <Save className="h-4 w-4 mr-1" />
+              <Save className="h-4 w-4 mr-2" />
               {saving ? 'Saving...' : 'Save Current Experiment'}
             </button>
-            
+
             <button
               onClick={loadExperimentResults}
               disabled={loading || !user}
-              className={`w-full px-3 py-2 rounded-md text-sm flex items-center justify-center ${
-                loading || !user
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
+              className="w-full px-4 py-2 bg-[rgba(94,234,212,0.1)] text-[#5EEAD4] rounded-md hover:bg-[rgba(94,234,212,0.2)] border border-[rgba(94,234,212,0.2)] hover:border-[#5EEAD4] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              <Upload className="h-4 w-4 mr-1" />
+              <Upload className="h-4 w-4 mr-2" />
               {loading ? 'Loading...' : 'Load Saved Experiments'}
             </button>
-            
+
             {savedResults.length > 0 && (
-              <div className="mt-3 space-y-2">
+              <div className="space-y-2">
                 <select
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="block w-full px-3 py-2 bg-[rgba(15,23,42,0.3)] border border-[rgba(94,234,212,0.2)] rounded-md text-[#f1f5f9] focus:border-[#5EEAD4] focus:ring-[rgba(94,234,212,0.2)]"
                   value={selectedResult || ''}
                   onChange={(e) => setSelectedResult(e.target.value)}
                 >
@@ -257,17 +244,13 @@ const ExperimentData = ({
                     </option>
                   ))}
                 </select>
-                
+
                 <button
                   onClick={loadSelectedResult}
                   disabled={!selectedResult}
-                  className={`w-full px-3 py-2 rounded-md text-sm flex items-center justify-center ${
-                    !selectedResult
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  }`}
+                  className="w-full px-4 py-2 bg-[rgba(94,234,212,0.1)] text-[#5EEAD4] rounded-md hover:bg-[rgba(94,234,212,0.2)] border border-[rgba(94,234,212,0.2)] hover:border-[#5EEAD4] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                 >
-                  <Download className="h-4 w-4 mr-1" />
+                  <Download className="h-4 w-4 mr-2" />
                   Load Selected Experiment
                 </button>
               </div>
@@ -275,9 +258,9 @@ const ExperimentData = ({
           </div>
         </div>
       </div>
-      
+
       {!user && (
-        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-100 rounded-md text-sm text-yellow-800">
+        <div className="mt-4 p-3 bg-[rgba(94,234,212,0.1)] border border-[rgba(94,234,212,0.2)] rounded-md text-sm text-[#5EEAD4]">
           Please login to save and load experiment data.
         </div>
       )}

@@ -190,10 +190,6 @@ export default function ExperimentPage() {
               <div className="lg:w-64 bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden">
                 <div className="bg-teal-500/10 border-b border-teal-500/20 px-4 py-3">
                   <h3 className="text-teal-300 font-medium">Available Experiments</h3>
-              {/* Sidebar */}
-              <div className="lg:w-64 bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden">
-                <div className="bg-teal-500/10 border-b border-teal-500/20 px-4 py-3">
-                  <h3 className="text-teal-300 font-medium">Available Experiments</h3>
                 </div>
                 <div className="divide-y divide-gray-800/50">
                   {experiments.map((experiment) => {
@@ -304,7 +300,6 @@ export default function ExperimentPage() {
                       {/* Action Bar */}
                       <div className="bg-gray-900 px-6 py-4 border-t border-gray-700/50">
                         <div className="flex justify-between items-center">
-                          <div className="text-sm text-gray-400">
                           <div className="text-sm text-gray-400">
                             Complete the steps above to finish this experiment
                           </div>

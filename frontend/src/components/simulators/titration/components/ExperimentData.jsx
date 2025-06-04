@@ -153,82 +153,96 @@ const ExperimentData = ({
   };
 
   return (
-    <div className="experiment-data-section">
-      <h2>Experiment Data & Notes</h2>
+    <div className="bg-gradient-to-br from-[#1e293b] to-[#0f172a] rounded-xl p-6 border border-[rgba(94,234,212,0.1)]">
+      <h2 className="text-[#5EEAD4] text-xl font-semibold mb-6">Experiment Data & Notes</h2>
       
       {statusMessage && (
-        <div className="status-message">
+        <div className="mb-4 p-3 bg-[rgba(94,234,212,0.1)] text-[#5EEAD4] rounded-md border border-[rgba(94,234,212,0.2)]">
           {statusMessage}
         </div>
-      )}
+      )}  
       
-      <div className="experiment-data-layout">
-        <div className="notes-section">
-          <h3>Lab Notes</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-gradient-to-br from-[rgba(15,23,42,0.4)] to-[rgba(15,23,42,0.2)] p-4 rounded-lg border border-[rgba(94,234,212,0.1)]">
+          <h3 className="text-[#5EEAD4] font-medium mb-3">Lab Notes</h3>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Take notes about your titration experiment, observations, and conclusions..."
             disabled={loading || !user}
+            className="w-full h-40 p-3 bg-[rgba(15,23,42,0.3)] border border-[rgba(94,234,212,0.2)] rounded-md 
+            text-[#f1f5f9] placeholder-[#94a3b8] focus:border-[#5EEAD4] focus:ring-[rgba(94,234,212,0.2)]"
           ></textarea>
           <button 
             onClick={saveNotes}
             disabled={saving || loading || !user}
-            className="save-button"
+            className="mt-3 px-4 py-2 bg-[rgba(94,234,212,0.1)] text-[#5EEAD4] rounded-md
+            hover:bg-[rgba(94,234,212,0.2)] border border-[rgba(94,234,212,0.2)] hover:border-[#5EEAD4]
+            disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
           >
             {saving ? 'Saving...' : 'Save Notes'}
           </button>
         </div>
         
-        <div className="saved-experiments-section">
-          <h3>Experiment Data</h3>
+        <div className="bg-gradient-to-br from-[rgba(15,23,42,0.4)] to-[rgba(15,23,42,0.2)] p-4 rounded-lg border border-[rgba(94,234,212,0.1)]">
+          <h3 className="text-[#5EEAD4] font-medium mb-3">Experiment Data</h3>
           
-          <div className="experiment-buttons">
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="bg-[rgba(15,23,42,0.3)] p-3 rounded-lg border border-[rgba(94,234,212,0.1)]">
+              <span className="text-[#94a3b8] text-sm">Acid</span>
+              <span className="text-[#5EEAD4] text-lg font-medium block">{selectedAcid}</span>
+            </div>
+            <div className="bg-[rgba(15,23,42,0.3)] p-3 rounded-lg border border-[rgba(94,234,212,0.1)]">
+              <span className="text-[#94a3b8] text-sm">Base</span>
+              <span className="text-[#5EEAD4] text-lg font-medium block">{selectedBase}</span>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
             <button
               onClick={saveCurrentExperiment}
               disabled={saving || !user}
-              className="save-button"
+              className="w-full px-4 py-2 bg-[rgba(94,234,212,0.1)] text-[#5EEAD4] rounded-md
+              hover:bg-[rgba(94,234,212,0.2)] border border-[rgba(94,234,212,0.2)] hover:border-[#5EEAD4]
+              disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
             >
               {saving ? 'Saving...' : 'Save Current Experiment'}
             </button>
             
-            <button
-              onClick={loadExperimentResults}
-              disabled={loading || !user}
-              className="load-button"
-            >
-              {loading ? 'Loading...' : 'Load Saved Experiments'}
-            </button>
+            {savedResults.length > 0 && (
+              <div className="space-y-3">
+                <select
+                  value={selectedResult || ''}
+                  onChange={(e) => setSelectedResult(e.target.value)}
+                  className="w-full px-3 py-2 bg-[rgba(15,23,42,0.3)] border border-[rgba(94,234,212,0.2)] 
+                  rounded-md text-[#f1f5f9] focus:border-[#5EEAD4] focus:ring-[rgba(94,234,212,0.2)]"
+                >
+                  <option value="">-- Select a saved experiment --</option>
+                  {savedResults.map(result => (
+                    <option key={result.id} value={result.id}>
+                      {new Date(result.createdAt).toLocaleString()} - {result.input.selectedAcid} & {result.input.selectedBase}
+                    </option>
+                  ))}
+                </select>
+                
+                <button
+                  onClick={loadSelectedResult}
+                  disabled={!selectedResult}
+                  className="w-full px-4 py-2 bg-[rgba(94,234,212,0.1)] text-[#5EEAD4] rounded-md
+                  hover:bg-[rgba(94,234,212,0.2)] border border-[rgba(94,234,212,0.2)] hover:border-[#5EEAD4]
+                  disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                >
+                  Load Selected Experiment
+                </button>
+              </div>
+            )}
           </div>
-          
-          {savedResults.length > 0 && (
-            <div className="saved-results">
-              <select
-                value={selectedResult || ''}
-                onChange={(e) => setSelectedResult(e.target.value)}
-              >
-                <option value="">-- Select a saved experiment --</option>
-                {savedResults.map(result => (
-                  <option key={result.id} value={result.id}>
-                    {new Date(result.createdAt).toLocaleString()} - {result.input.selectedAcid} & {result.input.selectedBase}
-                  </option>
-                ))}
-              </select>
-              
-              <button
-                onClick={loadSelectedResult}
-                disabled={!selectedResult}
-                className="load-button"
-              >
-                Load Selected Experiment
-              </button>
-            </div>
-          )}
         </div>
       </div>
-      
+
       {!user && (
-        <div className="login-prompt">
+        <div className="mt-4 p-3 bg-[rgba(94,234,212,0.1)] border border-[rgba(94,234,212,0.2)] 
+        rounded-md text-sm text-[#5EEAD4]">
           Please login to save and load experiment data.
         </div>
       )}

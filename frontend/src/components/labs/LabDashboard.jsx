@@ -13,7 +13,7 @@ import {
 import labsData from "../../virtual_db/labs.json";
 import ResponsiveHeader from "../shared-components/Header";
 import Footer from "../shared-components/Footer";
-import handleAssistantToggle from "../shared-components/labAssistant";
+import { useLabAssistant } from "../shared-components/labAssistant";
 
 export default function LabDashboard() {
   const [labs, setLabs] = useState([]);
@@ -94,7 +94,6 @@ export default function LabDashboard() {
       <ResponsiveHeader
         isConnected={isConnected}
         isConnecting={false}
-        onAssistantToggle={handleAssistantToggle}
       />
 
       <main className="flex-grow container mx-auto px-4 pt-24 pb-12">

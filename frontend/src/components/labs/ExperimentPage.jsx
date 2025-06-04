@@ -6,7 +6,7 @@ import experimentsData from '../../virtual_db/experiements.json';
 import usersData from '../../virtual_db/users.json';
 import ResponsiveHeader from '../shared-components/Header';
 import Footer from '../shared-components/Footer';
-import handleAssistantToggle from '../shared-components/labAssistant';
+import { useLabAssistant } from '../shared-components/labAssistant';
 
 export default function ExperimentPage() {
   const [searchParams] = useSearchParams();
@@ -146,11 +146,9 @@ export default function ExperimentPage() {
   const experimentProgress = getExperimentProgress();
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
-      <ResponsiveHeader 
+    <div className="min-h-screen bg-gray-900 flex flex-col">      <ResponsiveHeader 
         isConnected={isConnected} 
         isConnecting={false}
-        onAssistantToggle={handleAssistantToggle}
       />
       
       <main className="flex-grow container mx-auto pt-20 pb-12">

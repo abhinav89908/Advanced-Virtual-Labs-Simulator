@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/authRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
 import experimentRoutes from './routes/experimentRoutes.js';
+import labAssistantRoutes from './routes/labAssistant.js';
 
 // Load environment variables
 dotenv.config();
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/users', userRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/experiments', experimentRoutes);
+app.use('/api/assistant', labAssistantRoutes);
 
 // Default route
 app.get('/', (req, res) => {

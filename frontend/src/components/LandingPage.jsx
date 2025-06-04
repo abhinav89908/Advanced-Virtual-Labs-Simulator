@@ -15,7 +15,8 @@ import Footer from './shared-components/Footer';
 import StudentLogin from './LoginPage';
 import StudentRegistration from './RegistrationPage';
 import { UserContext } from './hooks/userContext';
-import handleAssistantToggle from './shared-components/labAssistant';
+// Import the useLabAssistant hook instead of handleAssistantToggle
+import { useLabAssistant } from './shared-components/labAssistant';
 
 
 const floatAnimation = `
@@ -128,12 +129,9 @@ export default function LandingPage() {
       gradient: "from-teal-500/20 to-gray-800/20"
     }
   ];
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-800 to-gray-900">
-      <ResponsiveHeader
-        onAssistantToggle={handleAssistantToggle}
-      />
+      <ResponsiveHeader />
 
       {/* Hero Section */}
       <section className="pt-24 pb-16 md:pt-32 md:pb-24 relative overflow-hidden">

@@ -2,12 +2,13 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Settings, User, LogOut, ChevronDown, Bell, BookOpen, Users, Beaker, Layers, Home, Bot, MessageCircle, Shield } from 'lucide-react';
 import { UserContext } from '../hooks/userContext';
+import { useLabAssistant } from './labAssistant';
 
-const Header = ({ isConnecting, isConnected, onAssistantToggle }) => {
+const Header = ({ isConnecting, isConnected }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const { user, logout, isAdmin } = useContext(UserContext);
+  const { isVisible: isAssistantOpen, toggle } = useLabAssistant();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -22,20 +23,8 @@ const Header = ({ isConnecting, isConnected, onAssistantToggle }) => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  // Updated toggleAssistant to ensure the callback is called
-  const toggleAssistant = () => {
-    const newState = !isAssistantOpen;
-    setIsAssistantOpen(newState);
-    
-    // Call the onAssistantToggle callback with the new state
-    if (onAssistantToggle) {
-      onAssistantToggle(newState);
-    }
   };
 
   const handleProfileClick = () => {
@@ -105,10 +94,9 @@ const Header = ({ isConnecting, isConnected, onAssistantToggle }) => {
                     </span>
                   )}
                 </div>
-                
-                {/* Virtual Lab Assistant Button - Updated with proper aria labels */}
+                  {/* Virtual Lab Assistant Button - Updated with proper aria labels */}
                 <button 
-                  onClick={toggleAssistant}
+                  onClick={() => toggle()}
                   aria-pressed={isAssistantOpen}
                   aria-label="Toggle Virtual Lab Assistant"
                   className={`p-2 rounded-full transition-all duration-300 ${
@@ -122,10 +110,9 @@ const Header = ({ isConnecting, isConnected, onAssistantToggle }) => {
               </div>
               
               {/* Mobile Connection Status */}
-              <div className="md:hidden flex items-center space-x-3">
-                {/* Virtual Lab Assistant Button - Mobile */}
+              <div className="md:hidden flex items-center space-x-3">                {/* Virtual Lab Assistant Button - Mobile */}
                 <button 
-                  onClick={toggleAssistant}
+                  onClick={() => toggle()}
                   aria-pressed={isAssistantOpen}
                   aria-label="Toggle Virtual Lab Assistant"
                   className={`p-2 rounded-full transition-all duration-300 ${
@@ -253,9 +240,8 @@ const Header = ({ isConnecting, isConnected, onAssistantToggle }) => {
                   >
                     <Shield className="h-5 w-5 mr-2" /> Admin Dashboard
                   </Link>
-                )}
-                <button
-                  onClick={toggleAssistant}
+                )}                <button
+                  onClick={() => toggle()}
                   className={`py-2 flex items-center transition-colors duration-300 ${
                     isAssistantOpen ? 'text-teal-400' : 'text-gray-400 hover:text-teal-400'
                   }`}

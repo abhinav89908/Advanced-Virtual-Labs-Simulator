@@ -28,7 +28,6 @@ import AdminPortal from './components/admin/AdminPortal';
 import AdminDashboard from './components/admin/AdminDashboard';
 import StudentManagement from './components/admin/StudentManagement';
 import GroupManagementAdmin from './components/admin/GroupManagement';
-import ResultsManagement from './components/admin/ResultsManagement';
 import TestManagement from './components/admin/TestManagement';
 
 // Test Components
@@ -64,7 +63,6 @@ function App() {
             <Route path="students" element={<StudentManagement />} />
             <Route path="groups" element={<GroupManagementAdmin />} />
             <Route path="tests" element={<TestManagement />} />
-            <Route path="results" element={<ResultsManagement />} />
           </Route>
           
           <Route path="/admin/groups/create" element={<GroupForm />} />

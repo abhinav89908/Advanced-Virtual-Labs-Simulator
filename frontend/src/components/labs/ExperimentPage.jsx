@@ -6,6 +6,7 @@ import experimentsData from '../../virtual_db/experiements.json';
 import usersData from '../../virtual_db/users.json';
 import ResponsiveHeader from '../shared-components/Header';
 import Footer from '../shared-components/Footer';
+import { useLabAssistant } from '../shared-components/labAssistant';
 
 export default function ExperimentPage() {
   const [searchParams] = useSearchParams();
@@ -134,9 +135,7 @@ export default function ExperimentPage() {
     navigate('/labs');
   };
 
-  const handleAssistantToggle = (isOpen) => {
-    console.log("Assistant is now:", isOpen ? "open" : "closed");
-  };
+  
 
   // Check if user has completed this experiment before
   const getExperimentProgress = () => {
@@ -147,11 +146,9 @@ export default function ExperimentPage() {
   const experimentProgress = getExperimentProgress();
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
-      <ResponsiveHeader 
+    <div className="min-h-screen bg-gray-900 flex flex-col">      <ResponsiveHeader 
         isConnected={isConnected} 
         isConnecting={false}
-        onAssistantToggle={handleAssistantToggle}
       />
       
       <main className="flex-grow container mx-auto pt-20 pb-12">
@@ -260,15 +257,10 @@ export default function ExperimentPage() {
                     )}
                     
                     {/* Interactive Area */}
-                    <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden flex-grow">
-                      <div className="bg-gray-900 px-4 py-2 border-b border-gray-700/50 flex justify-between items-center">
-                        <h3 className="font-medium text-gray-300">Interactive Simulation</h3>
-                        <a 
-                          href={currentExperiment.module_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-teal-400 text-sm flex items-center"
-                        >
+                    <div className="bg-gray-900/50 backdrop-blur-xl rounded-xl border border-gray-800/50 overflow-hidden flex-grow">
+                      <div className="bg-gray-800/50 px-4 py-2 border-b border-gray-700/50 flex justify-between items-center">
+                        <h3 className="font-medium text-teal-300">Interactive Simulation</h3>
+                        <a href={currentExperiment.module_url} className="text-teal-400 text-sm flex items-center hover:text-teal-300">
                           Open in New Tab <ExternalLink className="h-3.5 w-3.5 ml-1" />
                         </a>
                       </div>

@@ -4,6 +4,8 @@ import axios from 'axios';
 import { Link} from 'react-router-dom';
 import { useContext } from 'react';
 import { UserContext } from '../hooks/userContext'; 
+import { createGroup, deleteGroup, getAllGroups, updateGroup } from '../../services/groupService';
+import { getAllUsers } from '../../services/userService';
 
 const GroupManagement = () => {
   const [groups, setGroups] = useState([]);
@@ -32,20 +34,70 @@ const GroupManagement = () => {
     fetchData();
   }, []);
   
+  // Submit the form (add or edit)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      if (selectedGroup) {
+        // Update existing group
+        await updateGroup(selectedGroup.id, formData);
+      } else {
+        // Create new group
+        await createGroup(formData);
+      }
+      
+      // Refresh groups list
+      fetchData(); // Use the fetchData function instead of direct API call
+      
+      // Close modal
+      setShowAddModal(false);
+    } catch (error) {
+      console.error('Error saving group:', error);
+      alert('Failed to save group: ' + (error.message || 'Unknown error'));
+    }
+  };
+  
+  // Fetch groups and students data
   const fetchData = async () => {
     try {
       setLoading(true);
       
-      // Fetch groups
-      const groupsResponse = await axios.get('http://localhost:3000/api/groups');
-      setGroups(groupsResponse.data);
-      setFilteredGroups(groupsResponse.data);
+      if (!user || !user.id) {
+        console.error('User ID is undefined, cannot fetch data');
+        setGroups([]);
+        setFilteredGroups([]);
+        setLoading(false);
+        return;
+      }
       
-      // Fetch students for member selection
-      const studentsResponse = await axios.get('http://localhost:3000/api/users?role=user');
-      setStudents(studentsResponse.data);
+      // Fetch groups
+      console.log('Fetching groups for user ID:', user.id);
+      const groupsResponse = await getAllGroups(user.id);
+      console.log('Groups response:', groupsResponse);
+      
+      // Ensure we have a valid groups array
+      const groupsData = groupsResponse?.groups || [];
+      console.log('Groups data to use:', groupsData);
+      
+      setGroups(groupsData);
+      setFilteredGroups(groupsData);
+      
+      // Fetch students
+      const studentsResponse = await getAllUsers();
+      console.log('Students response:', studentsResponse);
+      
+      // Ensure we have a valid students array
+      const studentsData = Array.isArray(studentsResponse) ? studentsResponse : [];
+      const filteredStudents = studentsData.filter(user => user.role !== 'admin');
+      
+      setStudents(filteredStudents);
     } catch (error) {
       console.error('Error fetching data:', error);
+      // Set empty arrays to prevent filter errors
+      setGroups([]);
+      setFilteredGroups([]);
+      setStudents([]);
     } finally {
       setLoading(false);
     }
@@ -53,12 +105,28 @@ const GroupManagement = () => {
   
   // Filter groups based on search term
   useEffect(() => {
-    const results = groups.filter(group => 
-      group.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      group.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      group.department?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredGroups(results);
+    if (!Array.isArray(groups)) {
+      console.warn('Groups is not an array:', groups);
+      setFilteredGroups([]);
+      return;
+    }
+    
+    try {
+      const results = groups.filter(group => {
+        if (!group) return false;
+        
+        return (
+          (group.name && group.name.toLowerCase().includes((searchTerm || '').toLowerCase())) ||
+          (group.code && group.code.toLowerCase().includes((searchTerm || '').toLowerCase())) ||
+          (group.department && group.department.toLowerCase().includes((searchTerm || '').toLowerCase()))
+        );
+      });
+      
+      setFilteredGroups(results);
+    } catch (error) {
+      console.error('Error filtering groups:', error);
+      setFilteredGroups([]);
+    }
   }, [searchTerm, groups]);
   
   // Handle search change
@@ -99,7 +167,7 @@ const GroupManagement = () => {
       course: group.course || '',
       department: group.department || '',
       members: group.members || [],
-      creatorId: user.id // Assuming userId is stored in localStorage
+      creatorId: user.id 
     });
     setShowAddModal(true);
   };
@@ -120,31 +188,6 @@ const GroupManagement = () => {
     setShowAddModal(true);
   };
   
-  // Submit the form (add or edit)
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      if (selectedGroup) {
-        // Update existing group
-        await axios.put(`http://localhost:3000/api/groups/update/${selectedGroup.id}`, formData);
-      } else {
-        // Create new group
-        await axios.post('http://localhost:3000/api/groups/create', formData);
-      }
-      
-      // Refresh groups list
-      const response = await axios.get('http://localhost:3000/api/groups');
-      setGroups(response.data);
-      
-      // Close modal
-      setShowAddModal(false);
-    } catch (error) {
-      console.error('Error saving group:', error);
-      alert('Failed to save group');
-    }
-  };
-  
   // Delete group
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this group?')) {
@@ -152,8 +195,7 @@ const GroupManagement = () => {
     }
     
     try {
-      await axios.delete(`http://localhost:3000/api/groups/${id}`);
-      
+      await deleteGroup(id, user.id);
       // Refresh groups list
       setGroups(groups.filter(group => group.id !== id));
     } catch (error) {
@@ -267,11 +309,11 @@ const GroupManagement = () => {
                     </div>
                     <div className="flex items-center text-sm">
                       <School className="h-4 w-4 text-gray-400 mr-2" />
-                      <span className="text-gray-700">{group.department || 'No Department'}</span>
+                      <span className="text-gray-700">{group.course || 'No Course'}</span>
                     </div>
                     <div className="flex items-center text-sm">
                       <Calendar className="h-4 w-4 text-gray-400 mr-2" />
-                      <span className="text-gray-700">{group.year || 'N/A'}</span>
+                      <span className="text-gray-700">{group.batchYear || 'N/A'}</span>
                     </div>
                   </div>
                   

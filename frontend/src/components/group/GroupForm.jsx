@@ -37,8 +37,12 @@ const GroupForm = () => {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const usersResponse = await getAllUsers();
-      setAvailableUsers(usersResponse.users || []);
+      // Get all users from the system
+      const usersData = await getAllUsers();
+      console.log("Available users data:", usersData);
+      
+      // Make sure we're storing full user objects
+      setAvailableUsers(usersData || []);
       
       if (isEditMode) {
         const groupResponse = await getGroupDetails(groupId);
@@ -47,10 +51,22 @@ const GroupForm = () => {
         setFormData({
           name: group.name,
           description: group.description || '',
-          isPrivate: group.isPrivate,
+          isPrivate: group.isPrivate || false,
         });
         
-        setSelectedUsers(group.members || []);
+        // For editing mode, we need to get the full user objects for selected members
+        if (group.members && group.members.length > 0) {
+          // Convert member IDs to full user objects
+          const memberUsers = [];
+          for (const memberId of group.members) {
+            const matchingUser = usersData.find(user => user.id === memberId);
+            if (matchingUser) {
+              memberUsers.push(matchingUser);
+            }
+          }
+          console.log("Selected member users:", memberUsers);
+          setSelectedUsers(memberUsers);
+        }
       }
       
       setIsLoading(false);
@@ -70,15 +86,19 @@ const GroupForm = () => {
   };
   
   const handleUserSelect = (userId) => {
-    const user = availableUsers.find(user => user.id === userId);
-    if (user && !selectedUsers.some(u => u.id === userId)) {
-      setSelectedUsers([...selectedUsers, user]);
+    // Find the full user object from available users
+    const userToAdd = availableUsers.find(user => user.id === userId);
+    console.log("Adding user:", userToAdd);
+    
+    if (userToAdd && !selectedUsers.some(u => u.id === userId)) {
+      setSelectedUsers(prevUsers => [...prevUsers, userToAdd]);
     }
     setSearchQuery('');
   };
   
   const handleRemoveUser = (userId) => {
     setSelectedUsers(selectedUsers.filter(user => user.id !== userId));
+    console.log("Removed user with ID:", userId, "Remaining users:", selectedUsers.length - 1);
   };
   
   const handleSubmit = async (e) => {
@@ -88,31 +108,52 @@ const GroupForm = () => {
       setIsSaving(true);
       setError(null);
       
+      // Extract just the IDs from the selected users
+      const memberIds = selectedUsers.map(user => user.id);
+      console.log("Submitting with member IDs:", memberIds);
+      
       const payload = {
         ...formData,
-        memberIds: selectedUsers.map(user => user.id),
-        creatorId: user.id
+        members: memberIds,
+        creatorId: user.id,
+        userId: user.id // Include userId for permissions check on update
       };
       
+      console.log('Submitting form with payload:', payload);
+      
       if (isEditMode) {
-        await updateGroup(groupId, { ...payload, userId: user.id });
+        const response = await updateGroup(groupId, payload);
+        console.log('Update response:', response);
       } else {
-        await createGroup(payload);
+        const response = await createGroup(payload);
+        console.log('Create response:', response);
       }
       
       navigate('/admin/groups');
     } catch (error) {
       console.error('Failed to save group:', error);
-      setError('Failed to save group. Please try again later.');
+      setError('Failed to save group: ' + (error.response?.data?.message || error.message || 'Unknown error'));
       setIsSaving(false);
     }
   };
   
+  // Update the filtering logic to handle different user object structures
   const filteredUsers = searchQuery
-    ? availableUsers.filter(user => 
-        !selectedUsers.some(u => u.id === user.id) && 
-        user.username.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+    ? availableUsers.filter(user => {
+        // Skip users that are already selected
+        if (selectedUsers.some(u => u.id === user.id)) {
+          return false;
+        }
+        
+        // Check various user properties for matches
+        const searchLower = searchQuery.toLowerCase();
+        return (
+          (user.firstName && user.firstName.toLowerCase().includes(searchLower)) ||
+          (user.lastName && user.lastName.toLowerCase().includes(searchLower)) ||
+          (user.email && user.email.toLowerCase().includes(searchLower)) ||
+          (user.username && user.username.toLowerCase().includes(searchLower))
+        );
+      })
     : [];
 
   if (!isLoggedIn || !isAdmin) {
@@ -237,9 +278,13 @@ const GroupForm = () => {
                               className="flex items-center px-4 py-2 hover:bg-gray-800 cursor-pointer"
                             >
                               <div className="h-8 w-8 rounded-full bg-teal-500/20 text-teal-300 flex items-center justify-center mr-2">
-                                {user.firstName.charAt(0).toUpperCase()}
+                                {(user.firstName?.charAt(0) || user.email?.charAt(0) || 'U').toUpperCase()}
                               </div>
-                              <span className="text-gray-300">{user.firstName + user.lastName}</span>
+                              <span className="text-gray-300">
+                                {user.firstName && user.lastName 
+                                  ? `${user.firstName} ${user.lastName}`
+                                  : user.email || user.username || 'Unknown User'}
+                              </span>
                             </div>
                           ))}
                         </div>
@@ -265,9 +310,13 @@ const GroupForm = () => {
                             <div key={user.id} className="flex justify-between items-center bg-gray-800/50 rounded-lg px-3 py-2">
                               <div className="flex items-center">
                                 <div className="h-7 w-7 rounded-full bg-teal-500/20 text-teal-300 flex items-center justify-center mr-2">
-                                  {user.username.charAt(0).toUpperCase()}
+                                  {(user.firstName?.charAt(0) || user.email?.charAt(0) || 'U').toUpperCase()}
                                 </div>
-                                <span className="text-gray-300 text-sm">{user.firstName + user.lastName}</span>
+                                <span className="text-gray-300 text-sm">
+                                  {user.firstName && user.lastName 
+                                    ? `${user.firstName} ${user.lastName}`
+                                    : user.email || user.username || 'Unknown User'}
+                                </span>
                               </div>
                               <button
                                 type="button"

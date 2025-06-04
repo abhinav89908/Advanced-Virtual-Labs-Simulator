@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, UserPlus, Edit, Trash2, UserCheck, Mail, Download } from 'lucide-react';
 import axios from 'axios';
+import { getAllGroups } from '../../services/groupService';
 
 const StudentsManagement = () => {
   const [students, setStudents] = useState([]);
@@ -28,9 +29,38 @@ const StudentsManagement = () => {
     const fetchStudents = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3000/api/users/getUsers');
-        setStudents(response.data);
-        setFilteredStudents(response.data);
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users/getUsers`);
+        // filter out admin accounts 
+
+        response.data = response.data.filter(user => user.role != 'admin');
+        
+        // Process students data to handle Firestore timestamps
+        const studentsWithDates = response.data.map(student => {
+          // Check if createdAt is a Firestore timestamp object (with seconds and nanoseconds)
+          let formattedDate;
+          if (student.createdAt) {
+            if (typeof student.createdAt === 'object' && 'seconds' in student.createdAt) {
+              // Convert Firestore timestamp to Date and then to ISO string
+              formattedDate = new Date(student.createdAt.seconds * 1000).toISOString();
+            } else if (typeof student.createdAt === 'string') {
+              // Already a string, use as is
+              formattedDate = student.createdAt;
+            } else {
+              // Use current date as fallback
+              formattedDate = new Date().toISOString();
+            }
+          } else {
+            formattedDate = new Date().toISOString();
+          }
+          
+          return {
+            ...student,
+            createdAt: formattedDate
+          };
+        });
+        
+        setStudents(studentsWithDates);
+        setFilteredStudents(studentsWithDates);
       } catch (error) {
         console.error('Error fetching students:', error);
       } finally {
@@ -40,8 +70,8 @@ const StudentsManagement = () => {
     
     const fetchGroups = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/users/getUsers');
-        setGroups(response.data);
+        const response = await getAllGroups();
+        setGroups(response.groups || []);  // Changed from response.data to response.groups
       } catch (error) {
         console.error('Error fetching groups:', error);
       }
@@ -90,7 +120,7 @@ const StudentsManagement = () => {
     if (!selectedGroup || selectedStudents.length === 0) return;
     
     try {
-      await axios.post(`http://localhost:3000/api/groups/${selectedGroup}/members`, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/groups/${selectedGroup}/members`, {
         studentIds: selectedStudents
       });
       
@@ -116,10 +146,10 @@ const StudentsManagement = () => {
     e.preventDefault();
     
     try {
-      await axios.post('http://localhost:3000/api/users/register', newStudent);
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/users/register`, newStudent);
       
       // Refresh student list
-      const response = await axios.get('http://localhost:3000/api/users?role=user');
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users?role=user`);
       setStudents(response.data);
       
       // Reset form and close modal
@@ -149,12 +179,12 @@ const StudentsManagement = () => {
     try {
       await Promise.all(
         selectedStudents.map(id => 
-          axios.delete(`http://localhost:3000/api/users/${id}`)
+          axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/users/${id}`)
         )
       );
       
       // Refresh student list
-      const response = await axios.get('http://localhost:3000/api/users?role=user');
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users?role=user`);
       setStudents(response.data);
       setSelectedStudents([]);
     } catch (error) {
@@ -168,13 +198,20 @@ const StudentsManagement = () => {
     const headers = ['Student ID', 'First Name', 'Last Name', 'Email', 'Created At'];
     const csvRows = [
       headers.join(','),
-      ...filteredStudents.map(student => [
-        student.studentId,
-        student.firstName,
-        student.lastName,
-        student.email,
-        new Date(student.createdAt).toLocaleDateString()
-      ].join(','))
+      ...filteredStudents.map(student => {
+        // Format date for CSV
+        const formattedDate = typeof student.createdAt === 'string'
+          ? new Date(student.createdAt).toLocaleDateString()
+          : new Date().toLocaleDateString();
+          
+        return [
+          student.studentId || 'N/A',
+          student.firstName || 'N/A',
+          student.lastName || 'N/A',
+          student.email || 'N/A',
+          formattedDate
+        ].join(',');
+      })
     ];
     
     const csvContent = 'data:text/csv;charset=utf-8,' + csvRows.join('\n');
@@ -335,7 +372,9 @@ const StudentsManagement = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
-                        {new Date(student.createdAt).toLocaleDateString()}
+                        {typeof student.createdAt === 'string' 
+                          ? new Date(student.createdAt).toLocaleDateString()
+                          : 'Invalid Date'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

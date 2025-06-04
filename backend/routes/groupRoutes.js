@@ -300,14 +300,14 @@ router.get('/user/:userId', async (req, res) => {
 router.post('/update/:groupId', async (req, res) => {
     try {
         const { groupId } = req.params;
-        const { name, description, course, batchYear, userId } = req.body;
+        const { name, code, description, course, batchYear, creatorId, members } = req.body;
         
         console.log('Updating group details:', { groupId, ...req.body });
 
-        if (!groupId || !userId) {
+        if (!groupId) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Group ID and User ID are required' 
+                message: 'Group ID is required' 
             });
         }
 
@@ -322,36 +322,50 @@ router.post('/update/:groupId', async (req, res) => {
             });
         }
 
-        // Check if user is an admin
+        // Get current group data
         const groupData = groupDoc.data();
-        if (!groupData.admins.includes(userId)) {
-            return res.status(403).json({ 
-                success: false, 
-                message: 'Only group admins can update group details' 
-            });
-        }
+        console.log('Current group data:', groupData);
 
-        // Update group details
+        // Prepare update data
         const updateData = {
             updatedAt: serverTimestamp()
         };
 
+        // Only update fields that are provided
         if (name) updateData.name = name;
+        if (code) updateData.code = code;
         if (description !== undefined) updateData.description = description;
         if (course) updateData.course = course;
         if (batchYear) updateData.batchYear = batchYear;
+        if (creatorId) updateData.creatorId = creatorId;
+        
+        // If members array is provided, update it
+        if (members && Array.isArray(members)) {
+            updateData.members = members;
+        }
 
+        console.log('Updating group with data:', updateData);
+
+        // Update the group document
         await updateDoc(groupRef, updateData);
 
+        console.log('Group updated successfully');
         res.status(200).json({ 
             success: true, 
             message: 'Group details updated successfully' 
         });
     } catch (error) {
         console.error('Error updating group:', error);
+        console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            code: error.code
+        });
+        
         res.status(500).json({ 
             success: false, 
-            message: 'Failed to update group',
+            message: 'Failed to update group: ' + (error.message || 'Unknown error'),
             error: error.message 
         });
     }
@@ -929,6 +943,70 @@ router.post('/:groupId/documents', async (req, res) => {
             error: error.toString()
         });
     }
+});
+
+/**
+ * @route   POST /api/groups/:groupId/members
+ * @desc    Add a member to the group
+ * @access  Public
+ */
+router.post('/:groupId/members', async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const { userId } = req.body;
+    
+    console.log("Add member request:", { groupId, userId, body: req.body });
+    
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required'
+      });
+    }
+    
+    // Get the group
+    const groupRef = doc(db, 'groups', groupId);
+    const groupDoc = await getDoc(groupRef);
+    
+    if (!groupDoc.exists()) {
+      return res.status(404).json({
+        success: false,
+        message: 'Group not found'
+      });
+    }
+    
+    const groupData = groupDoc.data();
+    console.log("Group data:", groupData);
+    
+    // Check if user is already a member
+    if (groupData.members && groupData.members.includes(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'User is already a member of this group'
+      });
+    }
+    
+    // Add the user to the group's members array
+    const updatedMembers = [...(groupData.members || []), userId];
+    console.log("Updated members list:", updatedMembers);
+    
+    await updateDoc(groupRef, {
+      members: updatedMembers,
+      updatedAt: serverTimestamp()
+    });
+    
+    return res.status(200).json({
+      success: true,
+      message: 'User added to group successfully'
+    });
+  } catch (error) {
+    console.error('Error adding member to group:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to add member to group',
+      error: error.message
+    });
+  }
 });
 
 // Export the router as a named export for better compatibility

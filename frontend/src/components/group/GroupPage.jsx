@@ -42,7 +42,7 @@ const GroupsPage = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-800 to-gray-900 pb-12">
       <ResponsiveHeader isConnected={isConnected} />
       
-      <main className="pt-24 container mx-auto px-4">
+      <main className="pt-24 container mx-auto px-4 mb-12">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">Groups</h1>

@@ -35,10 +35,20 @@ export const createGroup = async (groupData) => {
   }
 };
 
-// Update group
-export const updateGroup = async (groupId, updateData) => {
+/**
+ * Update a group
+ * @param {string} groupId - ID of the group to update
+ * @param {Object} groupData - New group data
+ * @returns {Promise<Object>} Response object
+ */
+export const updateGroup = async (groupId, groupData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/groups/update/${groupId}`, updateData);
+    console.log('Updating group:', groupId, 'with data:', groupData);
+    const response = await axios.post(`${API_BASE_URL}/groups/update/${groupId}`, groupData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error updating group:', error);
@@ -130,12 +140,56 @@ export const deleteGroup = async (groupId, userId) => {
 };
 
 // Admin functions
-export const getAllGroups = async () => {
+export const getAllGroups = async (userId) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/admin/groups`);
+    const response = await axios.get(`${API_BASE_URL}/groups/user/${userId}`);
+    
+    // Ensure we always return an object with a groups property (even if empty)
+    if (!response.data || !response.data.groups) {
+      console.warn('getAllGroups response missing groups array:', response.data);
+      return { 
+        success: true, 
+        groups: [] 
+      };
+    }
+    
     return response.data;
   } catch (error) {
     console.error('Error fetching all groups:', error);
-    throw error;
+    // Return a default structure instead of throwing to prevent UI crashes
+    return { 
+      success: false, 
+      groups: [],
+      message: error.response?.data?.message || 'Failed to fetch groups'
+    };
+  }
+};
+
+/**
+ * Add a member to a group
+ * @param {string} groupId - ID of the group
+ * @param {string} userId - ID of the user to add
+ * @returns {Promise<Object>} Response object
+ */
+export const addMemberToGroup = async (groupId, userId) => {
+  try {
+    console.log("Adding member to group", { groupId, userId });
+    // Explicitly set content type to ensure proper request formatting
+    const response = await axios.post(
+      `${API_BASE_URL}/groups/${groupId}/members`, 
+      { userId },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error adding member to group:', error);
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to add member to group'
+    };
   }
 };

@@ -11,7 +11,9 @@ import {
     updateDoc, 
     deleteDoc,
     serverTimestamp,
-    Timestamp 
+    Timestamp,
+    orderBy,
+    limit
 } from 'firebase/firestore';
 
 const router = express.Router();
@@ -428,6 +430,81 @@ router.get('/notes/student/:studentId', async (req, res) => {
             success: false, 
             message: 'Failed to fetch student notes',
             error: error.message 
+        });
+    }
+});
+
+/**
+ * @route   GET /api/experiments/results/recent
+ * @desc    Get recent experiment results (for admin dashboard)
+ * @access  Public
+ */
+router.get('/results/recent', async (req, res) => {
+    try {
+        console.log('Fetching recent experiment results');
+        
+        // Query for the most recent experiment results, limited to 10
+        const experimentResultsRef = collection(db, 'experimentResults');
+        const querySnapshot = await getDocs(
+            query(experimentResultsRef, orderBy('createdAt', 'desc'), limit(10))
+        );
+        
+        if (querySnapshot.empty) {
+            return res.status(200).json({ 
+                success: true, 
+                results: [],
+                message: 'No experiment results found' 
+            });
+        }
+        
+        const results = [];
+        
+        // Process each document
+        for (const docSnapshot of querySnapshot.docs) {
+            const resultData = docSnapshot.data();
+            
+            // Get experiment name if available
+            let experimentName = 'Unknown Experiment';
+            if (resultData.experimentId) {
+                try {
+                    const experimentRef = doc(db, 'experiments', resultData.experimentId);
+                    const experimentDoc = await getDoc(experimentRef);
+                    if (experimentDoc.exists()) {
+                        experimentName = experimentDoc.data().name || 'Unnamed Experiment';
+                    }
+                } catch (err) {
+                    console.error('Error fetching experiment details:', err);
+                }
+            }
+            
+            results.push({
+                id: docSnapshot.id,
+                ...resultData,
+                experimentName,
+                createdAt: resultData.createdAt?.toDate().toISOString() || null,
+                updatedAt: resultData.updatedAt?.toDate().toISOString() || null
+            });
+        }
+        
+        console.log(`Found ${results.length} recent experiment results`);
+        return res.status(200).json({ 
+            success: true, 
+            results 
+        });
+    } catch (error) {
+        console.error('Error fetching recent experiment results:', error);
+        console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            code: error.code
+        });
+        
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Failed to fetch recent experiment results: ' + (error.message || 'Unknown error'),
+            errorCode: error.code || 'UNKNOWN_ERROR',
+            error: error.toString()
         });
     }
 });

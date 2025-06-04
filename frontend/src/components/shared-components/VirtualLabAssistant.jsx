@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Send, BookOpen, HelpCircle, ClipboardCheck, Bot } from 'lucide-react';
+import { MessageCircle, Send, BookOpen, HelpCircle, ClipboardCheck, Bot, BotMessageSquare } from 'lucide-react';
 import './scrollbar.css'; // Import the custom scrollbar styles
 import axios from 'axios';
 
@@ -15,6 +15,18 @@ export default function VirtualLabAssistant() {
   const [isThinking, setIsThinking] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  
+  // Add new state for AI chat
+  const [aiMessages, setAiMessages] = useState([
+    { 
+      type: 'bot', 
+      content: 'Hello! I\'m an advanced AI assistant powered by OpenRouter. I can help you with detailed information about any topic. What would you like to know?' 
+    }
+  ]);
+  const [aiInput, setAiInput] = useState('');
+  const [isAiThinking, setIsAiThinking] = useState(false);
+  const aiMessagesEndRef = useRef(null);
+  
   // Auto focus input when opened
   useEffect(() => {
     if (inputRef.current) {
@@ -60,10 +72,12 @@ export default function VirtualLabAssistant() {
   };
   const processUserInput = (text) => {
     setIsThinking(true);
+
+    // axios.post('/api/assistant/ai-chat', { message: text })
+    // .then(response => {.....
+    //   // ..yet to implement
+
     
-    // Make API call to backend
-    // If your frontend and backend are on the same host (with a proxy or same origin), you don't need to specify the host.
-    // If your backend is on a different host/port, use the full URL, e.g.:
     axios.post('http://localhost:3000/api/assistant/chat', { message: text })
     // axios.post('/api/assistant/chat', { message: text })
       .then(response => {
@@ -202,7 +216,7 @@ export default function VirtualLabAssistant() {
       
       // For each experiment, get the first procedure step
       for (const experiment of experiments) {
-        const response = await axios.post('/api/assistant/chat', { 
+        const response = await axios.post('http://localhost:3000/api/assistant/chat', { 
           message: `procedure ${experiment}` 
         });
         
@@ -225,7 +239,7 @@ export default function VirtualLabAssistant() {
     setIsThinking(true);
     
     try {
-      const response = await axios.post('/api/assistant/chat', { 
+      const response = await axios.post('http://localhost:3000/api/assistant/chat', { 
         message: `procedure ${experiment}` 
       });
       
@@ -257,7 +271,54 @@ export default function VirtualLabAssistant() {
       handleSend();
     }
   };
-
+  
+  // Add function to handle AI chat
+  const handleAiSend = () => {
+    if (aiInput.trim() === '') return;
+    
+    // Add user message to AI chat
+    setAiMessages(prev => [...prev, { type: 'user', content: aiInput }]);
+    processAiChat(aiInput);
+    setAiInput('');
+  };
+  
+  const processAiChat = (text) => {
+    setIsAiThinking(true);
+    
+    axios.post('http://localhost:3000/api/assistant/ai-chat', { message: text })
+      .then(response => {
+        setAiMessages(prev => [...prev, { 
+          type: 'bot', 
+          content: response.data.message
+        }]);
+        setIsAiThinking(false);
+      })
+      .catch(error => {
+        console.error('Error communicating with AI:', error);
+        setAiMessages(prev => [...prev, { 
+          type: 'bot', 
+          content: 'Sorry, I encountered an error processing your request. Please try again.'
+        }]);
+        setIsAiThinking(false);
+      });
+  };
+  
+  const handleAiKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleAiSend();
+    }
+  };
+  
+  // Update useEffect to scroll to bottom for both chat tabs
+  useEffect(() => {
+    if (activeTab === 'chat') {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    } else if (activeTab === 'ai-chat') {
+      aiMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, aiMessages, activeTab]);
+  
   return (
     <div className="flex flex-col h-full w-full bg-gray-900 rounded-lg shadow-xl overflow-hidden border border-gray-700">
       {/* Header */}
@@ -285,6 +346,12 @@ export default function VirtualLabAssistant() {
           onClick={() => switchTab('help')}
         >
           <HelpCircle size={18} className="mr-2 text-teal-400" /> Help
+        </button>
+        <button 
+          className={`flex-1 py-3 px-4 flex items-center justify-center transition-colors ${activeTab === 'ai-chat' ? 'bg-gray-700 border-b-2 border-teal-400' : 'hover:bg-gray-700'}`} 
+          onClick={() => switchTab('ai-chat')}
+        >
+          <BotMessageSquare size={18} className="mr-2 text-teal-400" /> Ai-Chat
         </button>
       </div>
       
@@ -451,24 +518,70 @@ export default function VirtualLabAssistant() {
             </div>
           </div>
         )}
+        {activeTab === 'ai-chat' && (
+          <>
+            {aiMessages.map((message, index) => (
+              <div key={index}>
+                {message.type === 'user' && (
+                  <div className="flex justify-end mb-4">
+                    <div className="bg-purple-600 text-white rounded-2xl py-3 px-4 max-w-xs shadow-sm">
+                      {message.content}
+                    </div>
+                  </div>
+                )}
+                {message.type === 'bot' && (
+                  <div className="flex mb-4">
+                    <div className="relative">
+                      <div className="absolute -left-2 -top-2 w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center shadow">
+                        <BotMessageSquare size={16} className="text-purple-400" />
+                      </div>
+                      <div className="bg-gray-700 border border-gray-600 rounded-2xl py-3 px-5 pl-8 max-w-xs shadow-sm ml-4">
+                        <div className="whitespace-pre-line text-gray-200">
+                          {message.content}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+            {isAiThinking && (
+              <div className="flex mb-4">
+                <div className="relative">
+                  <div className="absolute -left-2 -top-2 w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center shadow">
+                    <BotMessageSquare size={16} className="text-purple-400" />
+                  </div>
+                  <div className="bg-gray-700 border border-gray-600 rounded-2xl py-3 px-4 pl-8 shadow-sm ml-4">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-purple-300 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={aiMessagesEndRef} />
+          </>
+        )}
       </div>
       
-      {/* Input area */}
-      {activeTab === 'chat' && (
+      {/* Input area - update to handle both chat tabs */}
+      {(activeTab === 'chat' || activeTab === 'ai-chat') && (
         <div className="p-4 bg-gray-800 border-t border-gray-700">
           <div className="flex relative">
             <input
-              className="flex-1 border border-gray-600 bg-gray-700 text-white rounded-full py-3 px-5 pr-12 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all placeholder-gray-400"
-              placeholder="Ask about an experiment..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
+              className={`flex-1 border border-gray-600 bg-gray-700 text-white rounded-full py-3 px-5 pr-12 focus:outline-none focus:ring-2 ${activeTab === 'chat' ? 'focus:ring-teal-500 focus:border-teal-500' : 'focus:ring-purple-500 focus:border-purple-500'} transition-all placeholder-gray-400`}
+              placeholder={activeTab === 'chat' ? "Ask about an experiment..." : "Ask me anything..."}
+              value={activeTab === 'chat' ? input : aiInput}
+              onChange={(e) => activeTab === 'chat' ? setInput(e.target.value) : setAiInput(e.target.value)}
+              onKeyDown={activeTab === 'chat' ? handleKeyDown : handleAiKeyDown}
               ref={inputRef}
             />
             <button
-              className="absolute right-1 top-1 bottom-1 bg-teal-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-teal-500 transition-colors"
-              onClick={handleSend}
-              disabled={!input.trim()}
+              className={`absolute right-1 top-1 bottom-1 ${activeTab === 'chat' ? 'bg-teal-600 hover:bg-teal-500' : 'bg-purple-600 hover:bg-purple-500'} text-white rounded-full w-10 h-10 flex items-center justify-center transition-colors`}
+              onClick={activeTab === 'chat' ? handleSend : handleAiSend}
+              disabled={(activeTab === 'chat' ? !input.trim() : !aiInput.trim())}
             >
               <Send size={18} />
             </button>

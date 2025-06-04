@@ -5,6 +5,7 @@ import authRoutes from './routes/authRoutes.js';
 import experimentRoutes from './routes/experimentRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
 import testRoutes from './routes/testRoutes.js';
+import labAssistant from './routes/labAssistant.js';
 
 // Load environment variables
 dotenv.config();
@@ -44,6 +45,8 @@ app.use('/api/users', authRoutes);
 app.use('/api/experiments', experimentRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/tests', testRoutes);
+app.use('/api/assistant', labAssistant);
+
 
 // Default route
 app.get('/', (req, res) => {

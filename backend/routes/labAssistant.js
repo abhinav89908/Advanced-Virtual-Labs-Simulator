@@ -1,4 +1,9 @@
 import express from 'express';
+import axios from 'axios';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 const router = express.Router();
 
 // Knowledge base for lab assistant
@@ -176,6 +181,60 @@ router.get('/experiments', (req, res) => {
   } catch (error) {
     console.error('Error fetching experiments:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add the AI chat endpoint
+router.post('/ai-chat', async (req, res) => {
+  try {
+    const { message } = req.body;
+
+    console.log('AI chat request received:', message);
+    
+    if (!message) {
+      return res.status(400).json({ success: false, message: 'No message provided' });
+    }
+
+    const response = await axios.post(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        model: 'meta-llama/llama-3.3-8b-instruct:free', // You can change this to any model available on OpenRouter
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: message
+              }
+            ]
+          }
+        ]
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': process.env.SITE_URL || 'http://localhost:3000',
+          'X-Title': 'Virtual Lab Assistant'
+        }
+      }
+    );
+
+    // Extract the response content
+    const aiResponse = response.data.choices[0].message.content;
+    
+    return res.json({ 
+      success: true, 
+      message: aiResponse
+    });
+    
+  } catch (error) {
+    console.error('Error in AI chat:', error.response?.data || error.message);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Failed to get AI response'
+    });
   }
 });
 

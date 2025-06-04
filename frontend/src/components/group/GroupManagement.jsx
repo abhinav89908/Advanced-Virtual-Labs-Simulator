@@ -55,7 +55,7 @@ const GroupManagement = () => {
   );
 
   if (!isLoggedIn || !isAdmin) {
-    return null; // Return null while redirecting
+    return null;
   }
 
   return (

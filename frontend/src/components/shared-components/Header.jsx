@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Settings, User, LogOut, ChevronDown, Bell, BookOpen, Users, Beaker, Layers, Home, Bot, MessageCircle, Shield } from 'lucide-react';
+import { Menu, X, Settings, User, LogOut, ChevronDown, Bell, BookOpen, Users, Beaker, Layers, Home, Bot, MessageCircle, Shield, ClipboardList } from 'lucide-react';
 import { UserContext } from '../hooks/userContext';
 
 const Header = ({ isConnecting, isConnected, onAssistantToggle }) => {
@@ -170,6 +170,12 @@ const Header = ({ isConnecting, isConnected, onAssistantToggle }) => {
                 >
                   <User className="h-4 w-4 mr-1" /> Profile
                 </Link>
+                <Link 
+                  to="/tests" 
+                  className={`${isActive('/tests') ? 'text-teal-400' : 'text-gray-400 hover:text-teal-400'} flex items-center transition-colors duration-300`}
+                >
+                  <ClipboardList className="h-4 w-4 mr-1" /> Tests
+                </Link>
                 {isAdmin && (
                   <Link 
                     to="/admin" 
@@ -245,6 +251,12 @@ const Header = ({ isConnecting, isConnected, onAssistantToggle }) => {
                   className={`${isActive('/profile') ? 'text-teal-400' : 'text-gray-400'} py-2 flex items-center transition-colors duration-300`}
                 >
                   <User className="h-5 w-5 mr-2" /> Profile
+                </Link>
+                <Link 
+                  to="/tests" 
+                  className={`${isActive('/tests') ? 'text-teal-400' : 'text-gray-400'} py-2 flex items-center transition-colors duration-300`}
+                >
+                  <ClipboardList className="h-5 w-5 mr-2" /> Tests
                 </Link>
                 {isAdmin && (
                   <Link 

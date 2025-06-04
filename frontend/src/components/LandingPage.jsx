@@ -15,6 +15,7 @@ import Footer from './shared-components/Footer';
 import StudentLogin from './LoginPage';
 import StudentRegistration from './RegistrationPage';
 import { UserContext } from './hooks/userContext';
+import handleAssistantToggle from './shared-components/labAssistant';
 
 
 const floatAnimation = `
@@ -88,9 +89,6 @@ export default function LandingPage() {
     setShowRegistration(false);
   };
 
-  const handleAssistantToggle = (isOpen) => {
-    console.log("Assistant is now:", isOpen ? "open" : "closed");
-  };
 
   const features = [
     {

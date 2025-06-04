@@ -158,6 +158,7 @@ export default function ExperimentPage() {
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-400"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-400"></div>
           </div>
         ) : (
           <div className="px-4">
@@ -189,29 +190,38 @@ export default function ExperimentPage() {
               <div className="lg:w-64 bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden">
                 <div className="bg-teal-500/10 border-b border-teal-500/20 px-4 py-3">
                   <h3 className="text-teal-300 font-medium">Available Experiments</h3>
+              {/* Sidebar */}
+              <div className="lg:w-64 bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden">
+                <div className="bg-teal-500/10 border-b border-teal-500/20 px-4 py-3">
+                  <h3 className="text-teal-300 font-medium">Available Experiments</h3>
                 </div>
-                <div className="divide-y divide-gray-700/50">
-                  {experiments.map((experiment) => (
-                    <button
-                      key={experiment._id}
-                      className={`block w-full px-4 py-3 text-left transition-colors ${
-                        currentExperiment?._id === experiment._id 
-                          ? 'bg-teal-500/10 text-teal-300' 
-                          : 'text-gray-300 hover:bg-teal-500/5 hover:text-teal-300'
-                      }`}
-                      onClick={() => selectExperiment(experiment)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{experiment.name}</span>
-                        {experiment.completed && <Award className="h-4 w-4 text-teal-400" />}
-                      </div>
-                      <span className="text-xs text-gray-400 flex items-center gap-2 mt-1">
-                        <span>{experiment.difficulty}</span>
-                        <span>•</span>
-                        <span>{experiment.estimated_time}</span>
-                      </span>
-                    </button>
-                  ))}
+                <div className="divide-y divide-gray-800/50">
+                  {experiments.map((experiment) => {
+                    const isCompleted = currentUser?.progress?.[experiment._id]?.completed;
+                    return (
+                      <button
+                        key={experiment._id}
+                        className={`block w-full px-4 py-3 text-left transition-colors ${
+                          currentExperiment?._id === experiment._id 
+                            ? 'bg-teal-500/10 text-teal-300' 
+                            : 'text-gray-300 hover:bg-teal-500/5 hover:text-teal-300'
+                        }`}
+                        onClick={() => selectExperiment(experiment)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">{experiment.name}</span>
+                          {isCompleted && (
+                            <Award className="h-4 w-4 text-teal-400" />
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-400 flex items-center gap-2 mt-1">
+                          <span>{experiment.difficulty}</span>
+                          <span>•</span>
+                          <span>{experiment.estimated_time}</span>
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -222,56 +232,34 @@ export default function ExperimentPage() {
                     {/* Experiment Header */}
                     <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 p-6 mb-4">
                       <div className="flex justify-between items-center">
-                        <h2 className="text-xl font-bold text-teal-300">{currentExperiment.name}</h2>
+                        <h2 className="text-xl font-bold text-white">
+                          {currentExperiment.name}
+                        </h2>
                         <div className="flex gap-2">
-                          <button className="px-3 py-1.5 rounded-md border border-teal-500/20 text-teal-300 hover:bg-teal-500/10">
+                          <button className="px-3 py-1.5 rounded-md border border-teal-500/20 text-teal-300 hover:bg-teal-500/10 text-sm">
                             {showInstructions ? 'Hide' : 'Show'} Instructions
                           </button>
-                          <button className="px-3 py-1.5 rounded-md border border-teal-500/20 text-teal-300 hover:bg-teal-500/10 flex items-center">
+                          <button className="px-3 py-1.5 rounded-md border border-teal-500/20 text-teal-300 hover:bg-teal-500/10 text-sm flex items-center">
                             <Play className="h-3.5 w-3.5 mr-1" /> Reset
                           </button>
                         </div>
                       </div>
                     </div>
 
-                    {/* Instructions */}
+                    {/* Instructions Panel */}
                     {showInstructions && (
                       <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl border border-gray-700/50 p-6 mb-4">
-                        <h3 className="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                          <FileText className="h-5 w-5 mr-2 text-indigo-500" />
+                        <h3 className="flex items-center text-lg font-semibold text-white mb-3">
+                          <FileText className="h-5 w-5 mr-2 text-teal-400" />
                           Instructions
                         </h3>
                         <p className="text-gray-300 mb-4">{currentExperiment.description}</p>
-                        <div className="bg-gray-700/50 p-4 rounded-md border border-gray-500">
-                          <h4 className="font-medium text-gray-300 mb-2">Procedure</h4>
-                          <div className="text-gray-200 whitespace-pre-line">
+                        <div className="bg-gray-700/50 p-4 rounded-md border border-teal-500/20">
+                          <h4 className="font-medium text-teal-300 mb-2">Procedure</h4>
+                          <div className="text-gray-300 whitespace-pre-line">
                             {currentExperiment.instructions}
                           </div>
                         </div>
-                        
-                        {/* Previous Results (if any) */}
-                        {experimentProgress && (
-                          <div className="mt-4 bg-blue-50 p-4 rounded-md border border-blue-200">
-                            <h4 className="flex items-center font-medium text-blue-700 mb-2">
-                              <Info className="h-4 w-4 mr-2" />
-                              Previous Attempt
-                            </h4>
-                            <div className="grid grid-cols-3 gap-4 text-sm">
-                              <div>
-                                <div className="text-blue-600 font-medium">Score</div>
-                                <div>{experimentProgress.score}%</div>
-                              </div>
-                              <div>
-                                <div className="text-blue-600 font-medium">Attempts</div>
-                                <div>{experimentProgress.attempts}</div>
-                              </div>
-                              <div>
-                                <div className="text-blue-600 font-medium">Last Attempt</div>
-                                <div>{new Date(experimentProgress.last_attempt).toLocaleDateString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     )}
                     
@@ -316,6 +304,7 @@ export default function ExperimentPage() {
                       {/* Action Bar */}
                       <div className="bg-gray-900 px-6 py-4 border-t border-gray-700/50">
                         <div className="flex justify-between items-center">
+                          <div className="text-sm text-gray-400">
                           <div className="text-sm text-gray-400">
                             Complete the steps above to finish this experiment
                           </div>

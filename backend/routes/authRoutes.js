@@ -33,6 +33,7 @@ router.post('/register', async (req, res, next) => {
       email,
       studentId,
       password,
+      role: 'user', // Set default role as user
       createdAt: Timestamp.now(),
     };
     const existingUserQuery = query(
@@ -77,11 +78,14 @@ router.post('/login', async (req, res, next) => {
     const userDoc = querySnapshot.docs[0];
     const userData = userDoc.data();
 
+    // Remove sensitive data before sending to client
+    const { password: userPassword, ...safeUserData } = userData;
+
     res.status(200).json({
       message: 'Login successful',
       user: {
         id: userDoc.id,
-        ...userData
+        ...safeUserData
       }
     });
   } catch (error) {
@@ -107,27 +111,85 @@ router.post('/auth/google', async (req, res) => {
     const userRef = doc(db, 'users', uid);
     const userSnap = await getDoc(userRef);
 
-
+    let userData;
+    
     if (!userSnap.exists()) {
+      // New user, create with default role
       const [firstName, lastName] = name.split(' ');
-      await setDoc(userRef, {
+      userData = {
         email,
         firstName,
         lastName,
         profileImage: picture,
+        role: 'user', // Default role for new Google users
         createdAt: Timestamp.now()
-      });
+      };
+      
+      await setDoc(userRef, userData);
+    } else {
+      userData = userSnap.data();
     }
-    console.log('User data:', userSnap.data());
-    // Return user info
+    
+    console.log('User data:', userData);
+    
+    // Return user info including role
     res.status(200).json({
       message: 'Google login successful',
-      user: { uid, email, name, picture }
+      user: { 
+        id: uid,
+        email, 
+        name, 
+        picture,
+        role: userData.role || 'user'
+      }
     });
 
   } catch (error) {
     console.error('Google login error:', error);
     res.status(500).json({ error: 'Invalid token or server error' });
+  }
+});
+
+// code to get all the users
+
+router.get('/getUsers', async (req, res) => {
+  try {
+    const usersRef = collection(db, 'users');
+    const usersSnapshot = await getDocs(usersRef);
+    const usersList = usersSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    res.status(200).json(usersList);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+}
+);
+
+router.get('/:userId/details', async (req, res) => {
+  try {
+    // get user details
+    const { userId } = req.params;
+    const userRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const userData = userSnap.data();
+    // Remove sensitive data before sending to client
+    const { password, ...safeUserData } = userData;
+    res.status(200).json({
+      user: {
+        id: userSnap.id,
+        ...safeUserData
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    res.status(500).json({ error: 'Failed to fetch user details' });
   }
 });
 

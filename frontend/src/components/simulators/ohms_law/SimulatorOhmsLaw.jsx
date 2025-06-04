@@ -346,94 +346,123 @@ const SimulatorOhmsLaw = () => {
   };
 
   return (
-    <div className="simulator-container">
-      <h1>Ohm's Law Circuit Simulator</h1>
-      
-      <div className="simulator-description">
-        <p>
-          This simulator demonstrates Ohm's Law: V = I × R, where V is voltage (in volts), 
-          I is current (in amperes), and R is resistance (in ohms).
-        </p>
-        <p><strong>Instructions:</strong> Drag components to position them. Click on terminals to create wire connections.</p>
-      </div>
-      
-      <div className="simulator-layout">
-        <div className="simulator-main">
-          <div 
-            ref={circuitBoardRef}
-            className="circuit-board"
-            onMouseMove={updateActiveConnection}
-            onClick={() => activeConnection && cancelConnection()}
-          >
-            <CircuitBoard 
-              components={components}
-              connections={connections}
-              activeConnection={activeConnection}
-              startConnection={startConnection}
-              completeConnection={completeConnection}
-              cancelConnection={cancelConnection}
-              startDragging={startDragging}
-              activeTerminals={activeTerminals}
-              circuitComplete={circuitComplete}
-              current={current}
+    <div className="bg-[#1e293b] min-h-screen p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <header className="text-center space-y-4">
+          <h1 className="text-3xl font-bold text-[#5EEAD4] drop-shadow-glow">
+            Ohm's Law Circuit Simulator
+          </h1>
+          <div className="bg-gradient-to-br from-[rgba(15,23,42,0.4)] to-[rgba(15,23,42,0.2)] p-4 rounded-lg border border-[rgba(94,234,212,0.1)]">
+            <p className="text-[#f1f5f9] mb-2">
+              This simulator demonstrates Ohm's Law: V = I × R, where V is voltage (in volts), 
+              I is current (in amperes), and R is resistance (in ohms).
+            </p>
+            <p className="text-[#94a3b8]">
+              <strong className="text-[#5EEAD4]">Instructions:</strong> Drag components to position them. Click on terminals to create wire connections.
+            </p>
+          </div>
+        </header>
+
+        {/* Main Simulator Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Circuit Board and Readings */}
+          <div className="lg:col-span-2 space-y-6">
+            <div 
+              ref={circuitBoardRef}
+              className="bg-gradient-to-br from-[rgba(15,23,42,0.6)] to-[rgba(15,23,42,0.4)] 
+              rounded-xl border border-[rgba(94,234,212,0.1)] p-6 aspect-[4/3] relative
+              hover:shadow-lg hover:shadow-[rgba(94,234,212,0.1)] transition-all duration-300"
+              onMouseMove={updateActiveConnection}
+              onClick={() => activeConnection && cancelConnection()}
+            >
+              <CircuitBoard 
+                components={components}
+                connections={connections}
+                activeConnection={activeConnection}
+                startConnection={startConnection}
+                completeConnection={completeConnection}
+                cancelConnection={cancelConnection}
+                startDragging={startDragging}
+                activeTerminals={activeTerminals}
+                circuitComplete={circuitComplete}
+                current={current}
+                voltage={voltage}
+              />
+            </div>
+
+            {/* Readings Panel */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-gradient-to-br from-[rgba(15,23,42,0.4)] to-[rgba(15,23,42,0.2)] 
+                p-4 rounded-lg border border-[rgba(94,234,212,0.1)]">
+                <h3 className="text-[#94a3b8] text-sm font-medium mb-2">Ammeter</h3>
+                <div className="text-2xl font-bold text-[#5EEAD4]">
+                  {circuitComplete ? current.toFixed(3) : "0.000"} A
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-[rgba(15,23,42,0.4)] to-[rgba(15,23,42,0.2)]
+                p-4 rounded-lg border border-[rgba(94,234,212,0.1)]">
+                <h3 className="text-[#94a3b8] text-sm font-medium mb-2">Voltmeter</h3>
+                <div className="text-2xl font-bold text-[#5EEAD4]">
+                  {circuitComplete ? voltage.toFixed(2) : "0.00"} V
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-[rgba(15,23,42,0.4)] to-[rgba(15,23,42,0.2)]
+                p-4 rounded-lg border border-[rgba(94,234,212,0.1)]">
+                <h3 className="text-[#94a3b8] text-sm font-medium mb-2">Power</h3>
+                <div className="text-2xl font-bold text-[#5EEAD4]">
+                  {circuitComplete ? power.toFixed(2) : "0.00"} W
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Controls and Data */}
+          <div className="space-y-6">
+            <ControlPanel 
               voltage={voltage}
+              resistance={resistance}
+              onVoltageChange={handleVoltageChange}
+              onResistanceChange={handleResistanceChange}
+              onRecordMeasurement={recordMeasurement}
+              onReset={resetCircuit}
+              circuitComplete={circuitComplete}
             />
-          </div>
-          
-          <div className="readings-panel">
-            <div className="meter-reading ammeter">
-              <h3>Ammeter</h3>
-              <div className="meter-value">{circuitComplete ? current.toFixed(3) : "0.000"} A</div>
-            </div>
-            <div className="meter-reading voltmeter">
-              <h3>Voltmeter</h3>
-              <div className="meter-value">{circuitComplete ? voltage.toFixed(2) : "0.00"} V</div>
-            </div>
-            <div className="meter-reading power-meter">
-              <h3>Power</h3>
-              <div className="meter-value">{circuitComplete ? power.toFixed(2) : "0.00"} W</div>
-            </div>
+            <DataTable measurements={measurements} />
           </div>
         </div>
-        
-        <div className="simulator-controls">
-          <ControlPanel 
-            voltage={voltage}
-            resistance={resistance}
-            onVoltageChange={handleVoltageChange}
-            onResistanceChange={handleResistanceChange}
-            onRecordMeasurement={recordMeasurement}
-            onReset={resetCircuit}
-            circuitComplete={circuitComplete}
-          />
-          
-          <DataTable measurements={measurements} />
+
+        {/* Circuit Status */}
+        <div className="bg-gradient-to-br from-[rgba(15,23,42,0.4)] to-[rgba(15,23,42,0.2)] 
+          p-4 rounded-lg border border-[rgba(94,234,212,0.1)]">
+          <div className={`flex items-center space-x-2 ${
+            circuitComplete ? 'text-green-400' : 'text-[#94a3b8]'
+          }`}>
+            <div className={`w-3 h-3 rounded-full ${
+              circuitComplete ? 'bg-green-400' : 'bg-[#94a3b8]'
+            }`}></div>
+            <span>Circuit Status: {circuitComplete ? 'Complete' : 'Incomplete'}</span>
+          </div>
+          {!circuitComplete && (
+            <p className="mt-2 text-sm text-[#94a3b8]">
+              Connect all components to complete the circuit. Click on terminals (circles) to create wire connections.
+            </p>
+          )}
         </div>
+
+        {/* Experiment Data */}
+        <ExperimentData
+          voltage={voltage}
+          resistance={resistance}
+          current={current}
+          power={power}
+          components={components}
+          connections={connections}
+          circuitComplete={circuitComplete}
+          measurements={measurements}
+          onLoadSavedExperiment={handleLoadSavedExperiment}
+        />
       </div>
-      
-      <div className="circuit-status">
-        <div className={`status-indicator ${circuitComplete ? 'complete' : 'incomplete'}`}>
-          Circuit Status: {circuitComplete ? 'Complete' : 'Incomplete'}
-        </div>
-        {!circuitComplete && (
-          <div className="help-text">
-            Connect all components to complete the circuit. Click on terminals (circles) to create wire connections.
-          </div>
-        )}
-      </div>
-      
-      {/* Add ExperimentData component */}
-      <ExperimentData
-        voltage={voltage}
-        resistance={resistance}
-        current={current}
-        power={power}
-        components={components}
-        connections={connections}
-        circuitComplete={circuitComplete}
-        measurements={measurements}
-        onLoadSavedExperiment={handleLoadSavedExperiment}
-      />
     </div>
   );
 };

@@ -13,6 +13,7 @@ import {
 import labsData from "../../virtual_db/labs.json";
 import ResponsiveHeader from "../shared-components/Header";
 import Footer from "../shared-components/Footer";
+import { useLabAssistant } from "../shared-components/labAssistant";
 
 export default function LabDashboard() {
   const [labs, setLabs] = useState([]);
@@ -84,16 +85,15 @@ export default function LabDashboard() {
     navigate("/simulator/8085");
   };
 
-  const handleAssistantToggle = (isOpen) => {
-    console.log("Assistant is now:", isOpen ? "open" : "closed");
-  };
+  // const handleAssistantToggle = (isOpen) => {
+  //   console.log("Assistant is now:", isOpen ? "open" : "closed");
+  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       <ResponsiveHeader
         isConnected={isConnected}
         isConnecting={false}
-        onAssistantToggle={handleAssistantToggle}
       />
 
       <main className="flex-grow container mx-auto px-4 pt-24 pb-12">

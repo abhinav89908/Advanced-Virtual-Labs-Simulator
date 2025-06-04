@@ -1,5 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { UserProvider } from './components/hooks/userContext';
+import { useState, useEffect } from 'react';
+import { Bot } from 'lucide-react';
+import './components/shared-components/animations.css';
 
 // Pages
 import LandingPage from './components/LandingPage';
@@ -34,6 +37,56 @@ import TestManagement from './components/admin/TestManagement';
 import TestList from './components/tests/TestList';
 import TakeTest from './components/tests/TakeTest';
 import TestResult from './components/tests/TestResult';
+
+// Lab Assistant
+import ChatBotPopup from './components/shared-components/ChatBotPopup';
+import { useLabAssistant } from './components/shared-components/labAssistant';
+
+// Chat bot toggle button component
+function ChatBotButton() {
+  const { toggle, isVisible } = useLabAssistant();
+  const [hasNewMessage, setHasNewMessage] = useState(true);
+
+  // Simulate new message notification on first load
+  useEffect(() => {
+    // Clear the notification when the assistant is opened
+    if (isVisible) {
+      setHasNewMessage(false);
+    }
+    
+    // Show a notification after 10 seconds if the assistant is closed
+    const timer = setTimeout(() => {
+      if (!isVisible) {
+        setHasNewMessage(true);
+      }
+    }, 10000);
+    
+    return () => clearTimeout(timer);
+  }, [isVisible]);
+  
+  return (
+    <button
+      onClick={() => {
+        toggle();
+        setHasNewMessage(false);
+      }}
+      className={`fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-full ${
+        isVisible ? 'bg-gray-700 hover:bg-gray-600' : 'bg-teal-500 hover:bg-teal-600'
+      } shadow-lg shadow-teal-500/20 text-white transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2 focus:ring-offset-gray-900 ${
+        hasNewMessage && !isVisible ? 'animate-pulse-custom' : ''
+      }`}
+      aria-label="Toggle Lab Assistant"
+    >
+      <Bot size={24} />
+      {hasNewMessage && !isVisible && (
+        <span className="absolute -top-1 -right-1 flex h-4 w-4">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-300 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-4 w-4 bg-teal-400"></span>
+        </span>
+      )}
+    </button>
+  );
+}
 
 function App() {
   return (
@@ -76,6 +129,10 @@ function App() {
           <Route path="/simulator/process-scheduler" element={<SimulatorOS />} />
           <Route path='/simulator/network-sim' element={<SimulatorCN />} />
         </Routes>
+        
+        {/* Chat Bot Button and Popup - Available globally */}
+        <ChatBotButton />
+        <ChatBotPopup />
       </Router>
     </UserProvider>
   );
